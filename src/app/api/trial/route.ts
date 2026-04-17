@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { trialFormSchema } from "@/lib/schemas";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 import { checkRateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
@@ -25,6 +25,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Validation failed", details: parsed.error.flatten() },
         { status: 400 },
+      );
+    }
+
+    const supabase = getSupabase();
+    if (!supabase) {
+      return NextResponse.json(
+        { error: "Database is not configured" },
+        { status: 503 },
       );
     }
 
