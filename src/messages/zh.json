@@ -443,6 +443,10 @@
     "guides": {
       "title": "路径判断与问题解答 | GEO",
       "description": "帮助在日本发展的人整理方向、判断路径、理解边界。"
+    },
+    "breadcrumbs": {
+      "trialSuccess": "提交成功",
+      "partnerSuccess": "申请已提交"
     }
   }
 }

@@ -181,6 +181,44 @@ export function getArticlesByCluster(
   return getAllArticles(locale).filter((article) => article.cluster === cluster);
 }
 
+/**
+ * 返回一篇文章的 "LLM-friendly" Markdown：
+ *  - `Article.content` 经 gray-matter 已无 frontmatter，无需再剥离
+ *  - 顶部追加最小元信息头（title / description / url / locale / published / [updated] / [type] / [cluster]）
+ *  - 正文 .trim() + 末尾换行归一化
+ *  - 不读 env，siteUrl 由调用方注入
+ */
+export function getArticleMarkdown(
+  locale: string,
+  category: string,
+  slug: string,
+  siteUrl: string,
+): string | null {
+  const article = getArticleBySlug(locale, category, slug);
+  if (!article) return null;
+
+  const url = `${siteUrl}/${locale}${article.href}`;
+  const header = [
+    `# ${article.title}`,
+    "",
+    `> ${article.description}`,
+    "",
+    `- URL: ${url}`,
+    `- Locale: ${locale}`,
+    `- Published: ${article.publishedAt}`,
+    article.updatedAt ? `- Updated: ${article.updatedAt}` : null,
+    article.contentType ? `- Type: ${article.contentType}` : null,
+    article.cluster ? `- Cluster: ${article.cluster}` : null,
+    "",
+    "---",
+    "",
+  ]
+    .filter((line): line is string => line !== null)
+    .join("\n");
+
+  return header + article.content.trim() + "\n";
+}
+
 export function getAllArticleSlugs(): {
   locale: string;
   category: string;

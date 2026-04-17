@@ -1,4 +1,44 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+async function collectSchemaTypes(page: Page): Promise<string[]> {
+  const scripts = page.locator('script[type="application/ld+json"]');
+  const count = await scripts.count();
+  const types: string[] = [];
+  for (let i = 0; i < count; i++) {
+    const raw = await scripts.nth(i).textContent();
+    if (!raw?.trim()) continue;
+    let data: unknown;
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      continue;
+    }
+    const pushType = (node: Record<string, unknown>) => {
+      const t = node["@type"];
+      if (typeof t === "string") types.push(t);
+      else if (Array.isArray(t)) {
+        for (const x of t) {
+          if (typeof x === "string") types.push(x);
+        }
+      }
+    };
+    if (Array.isArray(data)) {
+      for (const node of data) {
+        if (node && typeof node === "object") pushType(node as Record<string, unknown>);
+      }
+    } else if (data && typeof data === "object") {
+      const d = data as Record<string, unknown>;
+      if (Array.isArray(d["@graph"])) {
+        for (const node of d["@graph"]) {
+          if (node && typeof node === "object") pushType(node as Record<string, unknown>);
+        }
+      } else {
+        pushType(d);
+      }
+    }
+  }
+  return types;
+}
 
 test.describe("Core locale and conversion flows", () => {
   test("zh and ja home pages are reachable", async ({ page }) => {
@@ -35,6 +75,39 @@ test.describe("Core locale and conversion flows", () => {
     const success = await page.goto("/zh/trial/success");
     expect(success?.ok()).toBeTruthy();
     await expect(page.locator("h1")).toBeVisible();
+  });
+
+  test("guides index exposes BreadcrumbList and WebSite JSON-LD", async ({ page }) => {
+    const res = await page.goto("/zh/guides");
+    expect(res?.ok()).toBeTruthy();
+    const types = await collectSchemaTypes(page);
+    expect(types).toContain("BreadcrumbList");
+    expect(types).toContain("WebSite");
+  });
+
+  test("FAQ MDX article exposes FAQPage and Article JSON-LD", async ({ page }) => {
+    const res = await page.goto("/zh/guides/boundaries/faq-japanese-path");
+    expect(res?.ok()).toBeTruthy();
+    const types = await collectSchemaTypes(page);
+    expect(types).toContain("FAQPage");
+    expect(types).toContain("Article");
+    expect(types).toContain("BreadcrumbList");
+  });
+
+  test("cluster entry exposes HowTo and Article JSON-LD", async ({ page }) => {
+    const res = await page.goto("/zh/guides/paths/japanese-learning-path-cluster-entry");
+    expect(res?.ok()).toBeTruthy();
+    const types = await collectSchemaTypes(page);
+    expect(types).toContain("HowTo");
+    expect(types).toContain("Article");
+  });
+
+  test("framework article exposes HowTo JSON-LD", async ({ page }) => {
+    const res = await page.goto("/zh/guides/paths/framework-japanese-or-job-first");
+    expect(res?.ok()).toBeTruthy();
+    const types = await collectSchemaTypes(page);
+    expect(types).toContain("HowTo");
+    expect(types).toContain("Article");
   });
 
   test("partner page form fields and success page are reachable", async ({ page }) => {

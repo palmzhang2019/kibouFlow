@@ -1,6 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import { Section } from "@/components/shared/Section";
 import { ArticleCard } from "@/components/article/ArticleCard";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
+import { buildBreadcrumbItems } from "@/lib/seo/breadcrumbs";
 import {
   getAllArticles,
   CATEGORIES,
@@ -39,7 +41,12 @@ export default async function GuidesIndexPage({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "guides" });
+  const tNav = await getTranslations({ locale, namespace: "common.nav" });
   const allArticles = getAllArticles(locale);
+  const crumbs = buildBreadcrumbItems([
+    { path: `/${locale}`, name: tNav("home") },
+    { path: `/${locale}/guides`, name: tNav("guides") },
+  ]);
   const clusterEntries = getArticlesByContentType(locale, "cluster");
   const faqEntries = getArticlesByContentType(locale, "faq");
   const frameworkEntries = getArticlesByContentType(locale, "framework");
@@ -56,7 +63,9 @@ export default async function GuidesIndexPage({
   })).filter((g) => g.articles.length > 0);
 
   return (
-    <Section>
+    <>
+      <BreadcrumbJsonLd items={crumbs} id="jsonld-breadcrumb-guides" />
+      <Section>
       <div className="max-w-3xl mx-auto text-center">
         <h1 className="text-3xl sm:text-4xl font-bold">{t("title")}</h1>
         <p className="mt-3 text-muted">{t("subtitle")}</p>
@@ -138,5 +147,6 @@ export default async function GuidesIndexPage({
         ))}
       </div>
     </Section>
+    </>
   );
 }

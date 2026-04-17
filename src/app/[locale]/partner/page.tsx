@@ -2,6 +2,8 @@ import { getTranslations } from "next-intl/server";
 import { Section } from "@/components/shared/Section";
 import { Card } from "@/components/shared/Card";
 import { PartnerForm } from "@/components/forms/PartnerForm";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
+import { buildBreadcrumbItems } from "@/lib/seo/breadcrumbs";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -24,6 +26,11 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function PartnerPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "partner" });
+  const tNav = await getTranslations({ locale, namespace: "common.nav" });
+  const crumbs = buildBreadcrumbItems([
+    { path: `/${locale}`, name: tNav("home") },
+    { path: `/${locale}/partner`, name: tNav("partner") },
+  ]);
 
   const typeItems = [0, 1, 2, 3].map((i) => ({
     title: t(`types.items.${i}.title`),
@@ -44,6 +51,7 @@ export default async function PartnerPage({ params }: { params: Promise<{ locale
 
   return (
     <>
+      <BreadcrumbJsonLd items={crumbs} id="jsonld-breadcrumb-partner" />
       {/* Header */}
       <Section>
         <div className="max-w-2xl mx-auto text-center">

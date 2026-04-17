@@ -1,6 +1,9 @@
 import { getTranslations } from "next-intl/server";
 import { Section } from "@/components/shared/Section";
 import { FAQAccordion } from "@/components/faq/FAQAccordion";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildBreadcrumbItems } from "@/lib/seo/breadcrumbs";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -23,6 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function FAQPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "faq" });
+  const tNav = await getTranslations({ locale, namespace: "common.nav" });
 
   const items = Array.from({ length: 10 }, (_, i) => ({
     q: t(`items.${i}.q`),
@@ -42,12 +46,15 @@ export default async function FAQPage({ params }: { params: Promise<{ locale: st
     })),
   };
 
+  const crumbs = buildBreadcrumbItems([
+    { path: `/${locale}`, name: tNav("home") },
+    { path: `/${locale}/faq`, name: tNav("faq") },
+  ]);
+
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <BreadcrumbJsonLd items={crumbs} id="jsonld-breadcrumb-faq" />
+      <JsonLd data={jsonLd} id="jsonld-faqpage-index" />
       <Section>
         <div className="max-w-2xl mx-auto">
           <h1 className="text-3xl sm:text-4xl font-bold text-center">{t("title")}</h1>

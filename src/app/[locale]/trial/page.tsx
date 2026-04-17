@@ -2,6 +2,8 @@ import { getTranslations } from "next-intl/server";
 import { Section } from "@/components/shared/Section";
 import { Card } from "@/components/shared/Card";
 import { TrialForm } from "@/components/forms/TrialForm";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
+import { buildBreadcrumbItems } from "@/lib/seo/breadcrumbs";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -24,6 +26,11 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function TrialPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "trial" });
+  const tNav = await getTranslations({ locale, namespace: "common.nav" });
+  const crumbs = buildBreadcrumbItems([
+    { path: `/${locale}`, name: tNav("home") },
+    { path: `/${locale}/trial`, name: tNav("trial") },
+  ]);
 
   const forWhomItems = [0, 1, 2, 3].map((i) => t(`forWhom.items.${i}`));
   const notForItems = [0, 1, 2].map((i) => t(`notFor.items.${i}`));
@@ -35,6 +42,7 @@ export default async function TrialPage({ params }: { params: Promise<{ locale: 
 
   return (
     <>
+      <BreadcrumbJsonLd items={crumbs} id="jsonld-breadcrumb-trial" />
       <Section>
         <div className="max-w-2xl mx-auto text-center">
           <h1 className="text-3xl sm:text-4xl font-bold">{t("title")}</h1>

@@ -1,23 +1,53 @@
 import type { MetadataRoute } from "next";
-import { getAllArticleSlugs } from "@/lib/content";
+import { getAllArticles } from "@/lib/content";
+import type { ContentType } from "@/lib/content";
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://your-domain.com";
+const BASE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://kibouflow.com";
+
+const LOCALES = ["zh", "ja"] as const;
+const STATIC_PAGES = ["", "/trial", "/partner", "/faq", "/guides"] as const;
+
+function priorityOf(contentType?: ContentType): number {
+  switch (contentType) {
+    case "cluster":
+      return 0.9;
+    case "framework":
+      return 0.85;
+    case "faq":
+      return 0.8;
+    case "case":
+      return 0.75;
+    default:
+      return 0.7;
+  }
+}
+
+function staticChangeFrequency(
+  page: (typeof STATIC_PAGES)[number],
+): "weekly" | "monthly" {
+  return page === "" ? "weekly" : "monthly";
+}
+
+function staticPriority(page: (typeof STATIC_PAGES)[number]): number {
+  if (page === "") return 1.0;
+  if (page === "/guides") return 0.9;
+  return 0.8;
+}
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const locales = ["zh", "ja"];
-  const staticPages = ["", "/trial", "/partner", "/faq", "/guides"];
-
   const entries: MetadataRoute.Sitemap = [];
 
-  for (const locale of locales) {
-    for (const page of staticPages) {
+  for (const locale of LOCALES) {
+    for (const page of STATIC_PAGES) {
       entries.push({
         url: `${BASE_URL}/${locale}${page}`,
         lastModified: new Date(),
-        changeFrequency: page === "" ? "weekly" : "monthly",
-        priority: page === "" ? 1.0 : page === "/guides" ? 0.9 : 0.8,
+        changeFrequency: staticChangeFrequency(page),
+        priority: staticPriority(page),
         alternates: {
           languages: {
+            "x-default": `${BASE_URL}/zh${page}`,
             zh: `${BASE_URL}/zh${page}`,
             ja: `${BASE_URL}/ja${page}`,
           },
@@ -26,21 +56,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }
   }
 
-  const articleSlugs = getAllArticleSlugs();
-  for (const { locale, category, slug } of articleSlugs) {
-    const path = `/guides/${category}/${slug}`;
-    entries.push({
-      url: `${BASE_URL}/${locale}${path}`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.7,
-      alternates: {
-        languages: {
-          zh: `${BASE_URL}/zh${path}`,
-          ja: `${BASE_URL}/ja${path}`,
+  for (const locale of LOCALES) {
+    const articles = getAllArticles(locale);
+    for (const article of articles) {
+      const lastMod = article.updatedAt ?? article.publishedAt;
+      entries.push({
+        url: `${BASE_URL}/${locale}${article.href}`,
+        lastModified: new Date(lastMod),
+        changeFrequency: "monthly",
+        priority: priorityOf(article.contentType),
+        alternates: {
+          languages: {
+            "x-default": `${BASE_URL}/zh${article.href}`,
+            zh: `${BASE_URL}/zh${article.href}`,
+            ja: `${BASE_URL}/ja${article.href}`,
+          },
         },
-      },
-    });
+      });
+    }
   }
 
   return entries;

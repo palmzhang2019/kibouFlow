@@ -1,14 +1,23 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import {
   getArticleBySlug,
   getRelatedArticles,
   getAllArticleSlugs,
   CATEGORIES,
+  type Category,
 } from "@/lib/content";
 import { ArticleLayout } from "@/components/article/ArticleLayout";
 import { ArticleTracking } from "@/components/article/ArticleTracking";
 import { getMDXComponents } from "@/components/article/mdx-components";
+import { ArticleJsonLd } from "@/components/seo/ArticleJsonLd";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
+import { FAQPageJsonLd } from "@/components/seo/FAQPageJsonLd";
+import { HowToJsonLd } from "@/components/seo/HowToJsonLd";
+import { buildBreadcrumbItems } from "@/lib/seo/breadcrumbs";
+import { extractFaqPairsFromMarkdown } from "@/lib/faq-extractor";
+import { extractHowToFromMarkdown } from "@/lib/howto-extractor";
 
 interface PageParams {
   locale: string;
@@ -74,23 +83,32 @@ export default async function ArticlePage({
     ? getRelatedArticles(locale, article.relatedSlugs)
     : [];
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: article.title,
-    description: article.description,
-    datePublished: article.publishedAt,
-    dateModified: article.updatedAt || article.publishedAt,
-    author: { "@type": "Organization", name: "GEO" },
-    publisher: { "@type": "Organization", name: "GEO" },
-  };
+  const tNav = await getTranslations({ locale, namespace: "common.nav" });
+  const tGuides = await getTranslations({ locale, namespace: "guides" });
+  const categoryLabel = tGuides(`categories.${category as Category}`);
+
+  const crumbs = buildBreadcrumbItems([
+    { path: `/${locale}`, name: tNav("home") },
+    { path: `/${locale}/guides`, name: tNav("guides") },
+    { path: `/${locale}/guides#${category}`, name: categoryLabel },
+    { path: `/${locale}/guides/${category}/${slug}`, name: article.title },
+  ]);
+
+  const faqPairs =
+    article.contentType === "faq" ? extractFaqPairsFromMarkdown(article.content) : [];
+  const howTo =
+    article.contentType === "framework" || article.contentType === "cluster"
+      ? extractHowToFromMarkdown(article.content)
+      : null;
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <BreadcrumbJsonLd items={crumbs} id="jsonld-breadcrumb-article" />
+      <ArticleJsonLd article={article} locale={locale} />
+      {faqPairs.length >= 2 ? <FAQPageJsonLd pairs={faqPairs} locale={locale} /> : null}
+      {howTo && howTo.steps.length >= 2 ? (
+        <HowToJsonLd howTo={howTo} locale={locale} />
+      ) : null}
       <ArticleTracking category={category} slug={slug} />
       <ArticleLayout article={article} relatedArticles={relatedArticles}>
         <MDXRemote

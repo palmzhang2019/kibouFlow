@@ -1,6 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import { Section } from "@/components/shared/Section";
 import { Link } from "@/i18n/navigation";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
+import { buildBreadcrumbItems } from "@/lib/seo/breadcrumbs";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -14,11 +16,20 @@ export default async function TrialSuccessPage({ params }: { params: Promise<{ l
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "trial.success" });
   const ct = await getTranslations({ locale, namespace: "common.cta" });
+  const tNav = await getTranslations({ locale, namespace: "common.nav" });
+  const tMeta = await getTranslations({ locale, namespace: "metadata.breadcrumbs" });
+  const crumbs = buildBreadcrumbItems([
+    { path: `/${locale}`, name: tNav("home") },
+    { path: `/${locale}/trial`, name: tNav("trial") },
+    { path: `/${locale}/trial/success`, name: tMeta("trialSuccess") },
+  ]);
 
   const steps = [0, 1, 2].map((i) => t(`steps.${i}`));
 
   return (
-    <Section className="text-center">
+    <>
+      <BreadcrumbJsonLd items={crumbs} id="jsonld-breadcrumb-trial-success" />
+      <Section className="text-center">
       <div className="max-w-md mx-auto">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
           <svg className="h-8 w-8 text-success" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -50,5 +61,6 @@ export default async function TrialSuccessPage({ params }: { params: Promise<{ l
         </div>
       </div>
     </Section>
+    </>
   );
 }

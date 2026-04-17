@@ -1,10 +1,13 @@
 import {
   getAllArticleSlugs,
   getArticleBySlug,
+  getArticleMarkdown,
   getArticlesByCategory,
   getArticlesByContentType,
   getArticlesByCluster,
 } from "@/lib/content";
+import { extractFaqPairsFromMarkdown } from "@/lib/faq-extractor";
+import { extractHowToFromMarkdown } from "@/lib/howto-extractor";
 
 describe("content utilities", () => {
   it("loads known article by slug", () => {
@@ -62,5 +65,62 @@ describe("content utilities", () => {
     const clusterArticles = getArticlesByCluster("zh", "direction-sorting");
     expect(clusterArticles.length).toBeGreaterThan(0);
     expect(clusterArticles.some((item) => item.slug === "direction-sorting-cluster-entry")).toBe(true);
+  });
+
+  it("renders LLM-friendly markdown with header and no frontmatter residue", () => {
+    const md = getArticleMarkdown(
+      "zh",
+      "boundaries",
+      "faq-japanese-path",
+      "https://kibouflow.com",
+    );
+    expect(md).not.toBeNull();
+    expect(md!).toContain(
+      "- URL: https://kibouflow.com/zh/guides/boundaries/faq-japanese-path",
+    );
+    expect(md!.startsWith("---\ntitle:")).toBe(false);
+    expect(md!.endsWith("\n")).toBe(true);
+  });
+
+  it("returns null for missing article in getArticleMarkdown", () => {
+    const md = getArticleMarkdown(
+      "zh",
+      "problems",
+      "missing-slug",
+      "https://kibouflow.com",
+    );
+    expect(md).toBeNull();
+  });
+
+  it("real faq MDX yields enough FAQ pairs for FAQPage JSON-LD", () => {
+    const article = getArticleBySlug("zh", "boundaries", "faq-japanese-path");
+    expect(article?.contentType).toBe("faq");
+    const pairs = extractFaqPairsFromMarkdown(article!.content);
+    expect(pairs.length).toBeGreaterThanOrEqual(2);
+    expect(pairs.every((p) => p.name && p.text)).toBe(true);
+  });
+
+  it("real cluster entry MDX yields HowTo steps", () => {
+    const article = getArticleBySlug(
+      "zh",
+      "paths",
+      "japanese-learning-path-cluster-entry",
+    );
+    expect(article?.contentType).toBe("cluster");
+    const how = extractHowToFromMarkdown(article!.content);
+    expect(how).not.toBeNull();
+    expect(how!.steps.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("real framework MDX yields HowTo under 判断维度", () => {
+    const article = getArticleBySlug(
+      "zh",
+      "paths",
+      "framework-japanese-or-job-first",
+    );
+    expect(article?.contentType).toBe("framework");
+    const how = extractHowToFromMarkdown(article!.content);
+    expect(how).not.toBeNull();
+    expect(how!.steps.length).toBeGreaterThanOrEqual(2);
   });
 });

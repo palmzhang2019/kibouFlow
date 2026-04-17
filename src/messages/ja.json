@@ -443,6 +443,10 @@
     "guides": {
       "title": "進め方ガイド | GEO",
       "description": "日本で発展したい方の方向整理、道筋判断、対応範囲の説明。"
+    },
+    "breadcrumbs": {
+      "trialSuccess": "送信完了",
+      "partnerSuccess": "申し込み完了"
     }
   }
 }
