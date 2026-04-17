@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useCallback } from "react";
 import { useLocale } from "next-intl";
 import { usePathname } from "@/i18n/navigation";
 import { sendTrackingEvent } from "@/lib/tracking";
+import { resolveFormEventName } from "@/lib/tracking-events";
 import { captureUTMParams, getStoredUTMParams, getOrCreateSessionId } from "@/lib/utm";
 
 interface TrackingContextType {
@@ -35,13 +36,6 @@ function buildEvent(eventName: string, locale: string, extra?: Record<string, st
     ...utm,
     ...extra,
   };
-}
-
-function resolveFormEventName(formType: string, phase: "started" | "submitted") {
-  if (formType === "trial" || formType === "partner") {
-    return `${formType}_form_${phase}`;
-  }
-  return phase === "started" ? "form_start" : "form_submit";
 }
 
 export function TrackingProvider({ children }: { children: React.ReactNode }) {

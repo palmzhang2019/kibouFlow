@@ -14,6 +14,8 @@ test.describe("Core locale and conversion flows", () => {
   test("guides list and one detail article are reachable", async ({ page }) => {
     const guides = await page.goto("/zh/guides");
     expect(guides?.ok()).toBeTruthy();
+    await expect(page.locator("body")).toContainText("主题簇入口");
+    await expect(page.locator("body")).toContainText("案例库");
 
     const firstGuide = page.locator('a[href^="/zh/guides/"]').first();
     await expect(firstGuide).toBeVisible();
@@ -21,6 +23,7 @@ test.describe("Core locale and conversion flows", () => {
     await firstGuide.click();
     await expect(page).toHaveURL(/\/zh\/guides\/.+\/.+/);
     await expect(page.locator("h1")).toBeVisible();
+    await expect(page.locator("body")).toContainText("下一步建议");
   });
 
   test("trial page form fields and success page are reachable", async ({ page }) => {
