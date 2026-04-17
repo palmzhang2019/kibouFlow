@@ -26,6 +26,24 @@ export function ArticleLayout({
   children,
 }: ArticleLayoutProps) {
   const t = useTranslations("guides");
+  const contentTypeLabel = article.contentType
+    ? t(`contentTypes.${article.contentType}`)
+    : null;
+  const nextStepLinks = [
+    {
+      href: "/guides/cases/case-library",
+      label: t("nextSteps.caseLibrary"),
+    },
+    {
+      href:
+        article.cluster === "japanese-path"
+          ? "/guides/boundaries/faq-japanese-path"
+          : article.cluster === "partner-needs"
+            ? "/guides/boundaries/faq-partner-collaboration"
+            : "/guides/boundaries/faq-job-prep",
+      label: t("nextSteps.clusterFaq"),
+    },
+  ];
 
   return (
     <article className="py-10 sm:py-14">
@@ -36,7 +54,7 @@ export function ArticleLayout({
           <span
             className={`inline-block text-xs font-medium px-2.5 py-1 rounded-full ${categoryColors[article.category]}`}
           >
-            {t(`categories.${article.category}`)}
+            {contentTypeLabel || t(`categories.${article.category}`)}
           </span>
         </div>
 
@@ -72,6 +90,22 @@ export function ArticleLayout({
             />
 
             <RelatedArticles articles={relatedArticles} />
+
+            <section className="mt-10 rounded-lg border border-gray-200 bg-gray-50 p-5">
+              <h2 className="text-sm font-semibold">{t("nextSteps.title")}</h2>
+              <p className="mt-2 text-sm text-muted">{t("nextSteps.subtitle")}</p>
+              <div className="mt-3 flex flex-col gap-2">
+                {nextStepLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="text-sm text-primary hover:underline"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            </section>
 
             <div className="mt-8">
               <Link

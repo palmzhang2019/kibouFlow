@@ -1,5 +1,8 @@
+"use client";
+
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
+import { useTracking } from "@/components/tracking/TrackingProvider";
 import type { ArticleMeta, Category } from "@/lib/content";
 
 interface ArticleCardProps {
@@ -15,16 +18,26 @@ const categoryColors: Record<Category, string> = {
 
 export function ArticleCard({ article }: ArticleCardProps) {
   const t = useTranslations("guides");
+  const { trackCTAClick } = useTracking();
+  const contentTypeLabel = article.contentType
+    ? t(`contentTypes.${article.contentType}`)
+    : null;
 
   return (
     <Link
       href={article.href}
+      onClick={() =>
+        trackCTAClick(
+          `guides-card-${article.contentType || article.category}-${article.slug}`,
+          "guides_index",
+        )
+      }
       className="group block rounded-xl border border-gray-100 bg-white p-6 shadow-sm hover:border-primary/30 hover:shadow-md transition-all"
     >
       <span
         className={`inline-block text-xs font-medium px-2.5 py-1 rounded-full ${categoryColors[article.category]}`}
       >
-        {t(`categories.${article.category}`)}
+        {contentTypeLabel || t(`categories.${article.category}`)}
       </span>
       <h3 className="mt-3 text-lg font-semibold group-hover:text-primary transition-colors line-clamp-2">
         {article.title}

@@ -1,24 +1,28 @@
+"use client";
+
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { useTracking } from "@/components/tracking/TrackingProvider";
 
 const previewItems = [
   {
     titleKey: "item1",
-    href: "/guides/problems/resume-vs-japanese",
+    href: "/guides/paths/job-prep-cluster-entry",
   },
   {
     titleKey: "item2",
-    href: "/guides/paths/four-preparation-paths",
+    href: "/guides/paths/japanese-learning-path-cluster-entry",
   },
   {
     titleKey: "item3",
-    href: "/guides/boundaries/when-to-use-hope-sorting",
+    href: "/guides/paths/direction-sorting-cluster-entry",
   },
 ] as const;
 
 export function GuidesPreview() {
   const t = useTranslations("home.guidesPreview");
   const guides = useTranslations("guides");
+  const { trackCTAClick } = useTracking();
 
   return (
     <div className="mt-12">
@@ -31,6 +35,7 @@ export function GuidesPreview() {
           <Link
             key={item.titleKey}
             href={item.href}
+            onClick={() => trackCTAClick(`home-cluster-preview-${item.titleKey}`, "home")}
             className="group block rounded-xl border border-gray-100 bg-white p-5 shadow-sm hover:border-primary/30 hover:shadow-md transition-all"
           >
             <h3 className="text-sm font-semibold group-hover:text-primary transition-colors">

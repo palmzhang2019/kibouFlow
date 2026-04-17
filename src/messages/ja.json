@@ -118,10 +118,10 @@
     },
     "guidesPreview": {
       "title": "どこから始めればいいか分からない？",
-      "subtitle": "よくある悩みの判断の考え方を見てみましょう",
-      "item1": "日本で就職するなら、まず履歴書？それとも日本語？",
-      "item2": "日本で発展するための4つの準備パス",
-      "item3": "どんな問題が希望整理に向いている？"
+      "subtitle": "まずは3つのテーマ入口から",
+      "item1": "就職準備をどう整理するか（入口）",
+      "item2": "日本語学習パスをどう判断するか（入口）",
+      "item3": "方向が不明なときの希望整理（入口）"
     },
     "bottomCta": {
       "title": "準備はできましたか？",
@@ -385,6 +385,23 @@
   "guides": {
     "title": "進め方ガイド",
     "subtitle": "方向を整理し、判断ロジックを理解し、合理的な次のステップを見つける",
+    "sections": {
+      "clusters": "テーマクラスター入口",
+      "caseLibrary": "ケースライブラリ",
+      "faqs": "FAQ特集",
+      "frameworks": "判断フレーム",
+      "concepts": "概念・用語"
+    },
+    "contentTypes": {
+      "problem": "よくある悩み",
+      "path": "進め方の判断",
+      "boundary": "対応範囲の説明",
+      "case": "実例",
+      "faq": "FAQ",
+      "framework": "判断フレーム",
+      "concept": "概念ページ",
+      "cluster": "テーマ入口"
+    },
     "categories": {
       "problems": "よくある悩み",
       "paths": "進め方の判断",
@@ -395,6 +412,12 @@
     "relatedArticles": "関連記事",
     "publishedAt": "公開日",
     "backToGuides": "ガイドに戻る",
+    "nextSteps": {
+      "title": "次のステップ",
+      "subtitle": "まだ迷う場合は、次のページから進めてください。",
+      "caseLibrary": "ケースライブラリで近いサンプルを確認する",
+      "clusterFaq": "このテーマのFAQで誤判定を先に減らす"
+    },
     "articleCta": {
       "title": "あなたの状況を整理してみませんか？",
       "subtitle": "一度に全部考える必要はありません。まず現状を教えてください"

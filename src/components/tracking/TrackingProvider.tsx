@@ -37,6 +37,13 @@ function buildEvent(eventName: string, locale: string, extra?: Record<string, st
   };
 }
 
+function resolveFormEventName(formType: string, phase: "started" | "submitted") {
+  if (formType === "trial" || formType === "partner") {
+    return `${formType}_form_${phase}`;
+  }
+  return phase === "started" ? "form_start" : "form_submit";
+}
+
 export function TrackingProvider({ children }: { children: React.ReactNode }) {
   const locale = useLocale();
   const pathname = usePathname();
@@ -62,14 +69,22 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
 
   const trackFormStart = useCallback(
     (formType: string) => {
-      sendTrackingEvent(buildEvent("form_start", locale, { element_id: formType }));
+      sendTrackingEvent(
+        buildEvent(resolveFormEventName(formType, "started"), locale, {
+          element_id: formType,
+        }),
+      );
     },
     [locale],
   );
 
   const trackFormSubmit = useCallback(
     (formType: string) => {
-      sendTrackingEvent(buildEvent("form_submit", locale, { element_id: formType }));
+      sendTrackingEvent(
+        buildEvent(resolveFormEventName(formType, "submitted"), locale, {
+          element_id: formType,
+        }),
+      );
     },
     [locale],
   );

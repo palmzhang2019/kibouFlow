@@ -118,10 +118,10 @@
     },
     "guidesPreview": {
       "title": "不知道从哪里开始？",
-      "subtitle": "先看看这些常见问题的判断思路",
-      "item1": "在日本找工作，应该先改简历还是先补日语？",
-      "item2": "在日本发展的 4 条常见准备路径",
-      "item3": "什么问题适合先做希望整理？"
+      "subtitle": "先从这三个主题入口开始",
+      "item1": "求职准备怎么整理（主题入口）",
+      "item2": "日语学习路径怎么判断（主题入口）",
+      "item3": "方向不清时，怎么先做希望整理（主题入口）"
     },
     "bottomCta": {
       "title": "准备好了吗？",
@@ -385,6 +385,23 @@
   "guides": {
     "title": "路径判断与问题解答",
     "subtitle": "帮你整理方向、理解判断逻辑、找到合理的下一步",
+    "sections": {
+      "clusters": "主题簇入口",
+      "caseLibrary": "案例库",
+      "faqs": "专题 FAQ",
+      "frameworks": "判断框架",
+      "concepts": "概念与术语"
+    },
+    "contentTypes": {
+      "problem": "问题解答",
+      "path": "路径判断",
+      "boundary": "边界说明",
+      "case": "案例",
+      "faq": "FAQ",
+      "framework": "判断框架",
+      "concept": "概念页",
+      "cluster": "主题簇入口"
+    },
     "categories": {
       "problems": "问题解答",
       "paths": "路径判断",
@@ -395,6 +412,12 @@
     "relatedArticles": "相关文章",
     "publishedAt": "发布于",
     "backToGuides": "返回路径判断",
+    "nextSteps": {
+      "title": "下一步建议",
+      "subtitle": "如果你还不确定下一步，请先看这些页面。",
+      "caseLibrary": "查看案例库，找到与你最接近的样本",
+      "clusterFaq": "查看本主题 FAQ，快速排除常见误判"
+    },
     "articleCta": {
       "title": "想整理一下你的情况？",
       "subtitle": "不需要一次想清楚，先把现状说出来就好"

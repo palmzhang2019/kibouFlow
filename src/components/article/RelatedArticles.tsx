@@ -31,7 +31,9 @@ export function RelatedArticles({ articles }: RelatedArticlesProps) {
             <span
               className={`inline-block text-xs font-medium px-2 py-0.5 rounded ${categoryColors[article.category]}`}
             >
-              {t(`categories.${article.category}`)}
+              {article.contentType
+                ? t(`contentTypes.${article.contentType}`)
+                : t(`categories.${article.category}`)}
             </span>
             <h3 className="mt-2 text-sm font-semibold group-hover:text-primary transition-colors line-clamp-2">
               {article.title}

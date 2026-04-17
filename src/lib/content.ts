@@ -4,6 +4,24 @@ import matter from "gray-matter";
 
 export const CATEGORIES = ["problems", "paths", "boundaries", "cases"] as const;
 export type Category = (typeof CATEGORIES)[number];
+export const CONTENT_TYPES = [
+  "problem",
+  "path",
+  "boundary",
+  "case",
+  "faq",
+  "framework",
+  "concept",
+  "cluster",
+] as const;
+export type ContentType = (typeof CONTENT_TYPES)[number];
+export const CLUSTERS = [
+  "job-prep",
+  "japanese-path",
+  "direction-sorting",
+  "partner-needs",
+] as const;
+export type ClusterType = (typeof CLUSTERS)[number];
 
 export interface ArticleFrontmatter {
   title: string;
@@ -12,6 +30,9 @@ export interface ArticleFrontmatter {
   slug: string;
   publishedAt: string;
   updatedAt?: string;
+  contentType?: ContentType;
+  cluster?: ClusterType;
+  audience?: ("individual" | "partner" | "both")[];
   suitableFor?: string[];
   notSuitableFor?: string[];
   relatedSlugs?: string[]; // e.g. "paths/four-preparation-paths"
@@ -33,6 +54,56 @@ function buildHref(category: string, slug: string): string {
   return `/guides/${category}/${slug}`;
 }
 
+function inferContentType(category: Category): ContentType {
+  switch (category) {
+    case "problems":
+      return "problem";
+    case "paths":
+      return "path";
+    case "boundaries":
+      return "boundary";
+    case "cases":
+      return "case";
+    default:
+      return "problem";
+  }
+}
+
+function inferCluster(category: Category, slug: string): ClusterType {
+  if (
+    slug.includes("hope-sorting") ||
+    slug.includes("goal-unclear") ||
+    slug.includes("push-forward-or-sort-first")
+  ) {
+    return "direction-sorting";
+  }
+  if (slug.includes("japanese") || slug.includes("language")) {
+    return "japanese-path";
+  }
+  if (slug.includes("partner")) {
+    return "partner-needs";
+  }
+  if (category === "paths" || category === "problems") {
+    return "job-prep";
+  }
+  return "direction-sorting";
+}
+
+function normalizeFrontmatter(
+  frontmatter: ArticleFrontmatter,
+  category: string,
+): ArticleFrontmatter {
+  const normalizedCategory = category as Category;
+  return {
+    ...frontmatter,
+    category: normalizedCategory,
+    contentType: frontmatter.contentType || inferContentType(normalizedCategory),
+    cluster: frontmatter.cluster || inferCluster(normalizedCategory, frontmatter.slug),
+    ctaType: frontmatter.ctaType || "trial",
+    audience: frontmatter.audience || ["individual"],
+  };
+}
+
 export function getArticleBySlug(
   locale: string,
   category: string,
@@ -43,7 +114,7 @@ export function getArticleBySlug(
 
   const raw = fs.readFileSync(filePath, "utf-8");
   const { data, content } = matter(raw);
-  const fm = data as ArticleFrontmatter;
+  const fm = normalizeFrontmatter(data as ArticleFrontmatter, category);
 
   return {
     ...fm,
@@ -67,7 +138,7 @@ export function getArticlesByCategory(
       const slug = filename.replace(/\.mdx$/, "");
       const raw = fs.readFileSync(path.join(dirPath, filename), "utf-8");
       const { data } = matter(raw);
-      const fm = data as ArticleFrontmatter;
+      const fm = normalizeFrontmatter(data as ArticleFrontmatter, category);
       return { ...fm, locale, href: buildHref(category, slug) };
     })
     .sort(
@@ -89,10 +160,25 @@ export function getRelatedArticles(
       const [category, slug] = ref.split("/");
       const article = getArticleBySlug(locale, category, slug);
       if (!article) return null;
-      const { content: _, ...meta } = article;
+      const { content, ...meta } = article;
+      void content;
       return meta;
     })
     .filter((a): a is ArticleMeta => a !== null);
+}
+
+export function getArticlesByContentType(
+  locale: string,
+  contentType: ContentType,
+): ArticleMeta[] {
+  return getAllArticles(locale).filter((article) => article.contentType === contentType);
+}
+
+export function getArticlesByCluster(
+  locale: string,
+  cluster: ClusterType,
+): ArticleMeta[] {
+  return getAllArticles(locale).filter((article) => article.cluster === cluster);
 }
 
 export function getAllArticleSlugs(): {
