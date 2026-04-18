@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { getServiceSupabase } from "@/lib/supabase";
+import { getPg } from "@/lib/db";
 
 export interface GeoSiteSettingsRow {
   site_name: string;
@@ -95,47 +94,46 @@ export function mergeJsonLd(
   return out;
 }
 
-async function readSiteSettings(
-  supabase: SupabaseClient,
-): Promise<GeoSiteSettingsRow | null> {
-  const { data, error } = await supabase
-    .from("geo_site_settings")
-    .select("*")
-    .order("updated_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  if (error) return null;
-  return (data as GeoSiteSettingsRow | null) ?? null;
+async function readSiteSettings(): Promise<GeoSiteSettingsRow | null> {
+  const sql = getPg();
+  if (!sql) return null;
+  const rows = await sql<GeoSiteSettingsRow[]>`
+    select site_name, default_title_template, default_description, default_locale,
+           site_url, robots_policy, updated_by, updated_at::text as updated_at
+    from geo_site_settings
+    order by updated_at desc
+    limit 1
+  `;
+  return rows[0] ?? null;
 }
 
-async function readPageSettings(
-  supabase: SupabaseClient,
-  locale: string,
-  path: string,
-): Promise<GeoPageSettingsRow | null> {
-  const { data, error } = await supabase
-    .from("geo_page_settings")
-    .select("*")
-    .eq("locale", locale)
-    .eq("path", path)
-    .maybeSingle();
-  if (error) return null;
-  return (data as GeoPageSettingsRow | null) ?? null;
+async function readPageSettings(locale: string, path: string): Promise<GeoPageSettingsRow | null> {
+  const sql = getPg();
+  if (!sql) return null;
+  const rows = await sql<GeoPageSettingsRow[]>`
+    select locale, path, meta_title, meta_description, canonical_url,
+           og_title, og_description, og_image, noindex, jsonld_overrides,
+           updated_by, updated_at::text as updated_at
+    from geo_page_settings
+    where locale = ${locale} and path = ${path}
+    limit 1
+  `;
+  return rows[0] ?? null;
 }
 
 export async function getGeoConfigBundle(
   locale: "zh" | "ja",
   path: string,
 ): Promise<GeoConfigBundle> {
-  const supabase = getServiceSupabase();
   const normalizedPath = normalizeGeoPath(path);
-  if (!supabase) {
+  const sql = getPg();
+  if (!sql) {
     return { site: null, page: null, source: "none" };
   }
 
   const [site, page] = await Promise.all([
-    readSiteSettings(supabase),
-    readPageSettings(supabase, locale, normalizedPath),
+    readSiteSettings(),
+    readPageSettings(locale, normalizedPath),
   ]);
   return { site, page, source: site || page ? "db" : "none" };
 }

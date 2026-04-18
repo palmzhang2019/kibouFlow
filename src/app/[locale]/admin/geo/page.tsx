@@ -1,7 +1,10 @@
-import { GeoSettingsMvp } from "@/components/admin/GeoSettingsMvp";
+import { redirect } from "next/navigation";
 
-export const dynamic = "force-dynamic";
-
-export default function GeoAdminPage() {
-  return <GeoSettingsMvp />;
+export default async function LegacyGeoAdminRedirect({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  redirect(`/${locale}/admin/geo-audit`);
 }

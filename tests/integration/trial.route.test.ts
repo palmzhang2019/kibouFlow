@@ -1,16 +1,16 @@
 import { POST } from "@/app/api/trial/route";
 
-const { checkRateLimitMock, getSupabaseMock } = vi.hoisted(() => ({
+const { checkRateLimitMock, insertTrialSubmissionMock } = vi.hoisted(() => ({
   checkRateLimitMock: vi.fn(),
-  getSupabaseMock: vi.fn(),
+  insertTrialSubmissionMock: vi.fn(),
 }));
 
 vi.mock("@/lib/rate-limit", () => ({
   checkRateLimit: checkRateLimitMock,
 }));
 
-vi.mock("@/lib/supabase", () => ({
-  getSupabase: getSupabaseMock,
+vi.mock("@/lib/pg-data", () => ({
+  insertTrialSubmission: insertTrialSubmissionMock,
 }));
 
 describe("POST /api/trial", () => {
@@ -40,7 +40,7 @@ describe("POST /api/trial", () => {
   });
 
   it("returns 503 when database is not configured", async () => {
-    getSupabaseMock.mockReturnValue(null);
+    insertTrialSubmissionMock.mockResolvedValue({ ok: false, reason: "not_configured" });
 
     const req = new Request("http://localhost/api/trial", {
       method: "POST",
@@ -56,9 +56,7 @@ describe("POST /api/trial", () => {
   });
 
   it("returns success for valid payload", async () => {
-    const insertMock = vi.fn().mockResolvedValue({ error: null });
-    const fromMock = vi.fn().mockReturnValue({ insert: insertMock });
-    getSupabaseMock.mockReturnValue({ from: fromMock });
+    insertTrialSubmissionMock.mockResolvedValue({ ok: true });
 
     const req = new Request("http://localhost/api/trial", {
       method: "POST",
@@ -72,6 +70,12 @@ describe("POST /api/trial", () => {
     const res = await POST(req as never);
     expect(res.status).toBe(200);
     await expect(res.json()).resolves.toEqual({ success: true });
-    expect(fromMock).toHaveBeenCalledWith("trial_submissions");
+    expect(insertTrialSubmissionMock).toHaveBeenCalledWith(
+      "2.2.2.2",
+      expect.objectContaining({
+        name: "Alice",
+        contact: "alice@example.com",
+      }),
+    );
   });
 });

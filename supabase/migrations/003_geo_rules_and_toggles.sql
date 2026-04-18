@@ -37,28 +37,3 @@ create table if not exists geo_rule_change_logs (
 
 create index if not exists idx_geo_rule_change_logs_locale on geo_rule_change_logs(locale);
 create index if not exists idx_geo_rule_change_logs_created_at on geo_rule_change_logs(created_at desc);
-
-alter table geo_rules enable row level security;
-alter table geo_page_schema_toggles enable row level security;
-alter table geo_rule_change_logs enable row level security;
-
-create policy "Service role can manage geo_rules"
-  on geo_rules
-  for all
-  to service_role
-  using (true)
-  with check (true);
-
-create policy "Service role can manage geo_page_schema_toggles"
-  on geo_page_schema_toggles
-  for all
-  to service_role
-  using (true)
-  with check (true);
-
-create policy "Service role can manage geo_rule_change_logs"
-  on geo_rule_change_logs
-  for all
-  to service_role
-  using (true)
-  with check (true);

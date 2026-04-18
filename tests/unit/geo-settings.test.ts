@@ -4,12 +4,12 @@ import {
   resolveGeoMetadata,
 } from "@/lib/geo-settings";
 
-const { getServiceSupabaseMock } = vi.hoisted(() => ({
-  getServiceSupabaseMock: vi.fn(),
+const { getPgMock } = vi.hoisted(() => ({
+  getPgMock: vi.fn(),
 }));
 
-vi.mock("@/lib/supabase", () => ({
-  getServiceSupabase: getServiceSupabaseMock,
+vi.mock("@/lib/db", () => ({
+  getPg: getPgMock,
 }));
 
 describe("geo settings utils", () => {
@@ -39,7 +39,7 @@ describe("geo settings utils", () => {
   });
 
   it("falls back to existing metadata when db is unavailable", async () => {
-    getServiceSupabaseMock.mockReturnValue(null);
+    getPgMock.mockReturnValue(null);
     const resolved = await resolveGeoMetadata({
       locale: "zh",
       path: "/zh",

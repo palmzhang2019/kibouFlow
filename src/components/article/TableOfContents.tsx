@@ -34,7 +34,10 @@ export function TableOfContents() {
       });
     });
 
-    setItems(tocItems);
+    const id = requestAnimationFrame(() => {
+      setItems(tocItems);
+    });
+    return () => cancelAnimationFrame(id);
   }, []);
 
   useEffect(() => {

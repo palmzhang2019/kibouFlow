@@ -1,13 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSupabase } from "@/lib/supabase";
+import { insertTrackingEvent } from "@/lib/pg-data";
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = getSupabase();
-    if (!supabase) {
-      return NextResponse.json({ ok: true });
-    }
-
     const body = await request.json();
 
     const event = {
@@ -23,7 +18,7 @@ export async function POST(request: NextRequest) {
       user_agent: body.user_agent ? String(body.user_agent).slice(0, 500) : null,
     };
 
-    await supabase.from("tracking_events").insert(event);
+    await insertTrackingEvent(event);
 
     return NextResponse.json({ ok: true });
   } catch {

@@ -1,11 +1,11 @@
 import { POST } from "@/app/api/track/route";
 
-const { getSupabaseMock } = vi.hoisted(() => ({
-  getSupabaseMock: vi.fn(),
+const { insertTrackingEventMock } = vi.hoisted(() => ({
+  insertTrackingEventMock: vi.fn().mockResolvedValue(undefined),
 }));
 
-vi.mock("@/lib/supabase", () => ({
-  getSupabase: getSupabaseMock,
+vi.mock("@/lib/pg-data", () => ({
+  insertTrackingEvent: insertTrackingEventMock,
 }));
 
 describe("POST /api/track", () => {
@@ -13,9 +13,7 @@ describe("POST /api/track", () => {
     vi.clearAllMocks();
   });
 
-  it("returns ok when supabase is not configured", async () => {
-    getSupabaseMock.mockReturnValue(null);
-
+  it("returns ok when database is not configured", async () => {
     const req = new Request("http://localhost/api/track", {
       method: "POST",
       body: JSON.stringify({ event_name: "view", page_path: "/zh" }),
@@ -28,10 +26,6 @@ describe("POST /api/track", () => {
   });
 
   it("inserts tracking event and truncates long user_agent", async () => {
-    const insertMock = vi.fn().mockResolvedValue({ error: null });
-    const fromMock = vi.fn().mockReturnValue({ insert: insertMock });
-    getSupabaseMock.mockReturnValue({ from: fromMock });
-
     const req = new Request("http://localhost/api/track", {
       method: "POST",
       body: JSON.stringify({
@@ -44,8 +38,7 @@ describe("POST /api/track", () => {
 
     const res = await POST(req as never);
     expect(res.status).toBe(200);
-    expect(fromMock).toHaveBeenCalledWith("tracking_events");
-    expect(insertMock).toHaveBeenCalledWith(
+    expect(insertTrackingEventMock).toHaveBeenCalledWith(
       expect.objectContaining({
         event_name: "click",
         page_path: "/ja",

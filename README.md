@@ -86,7 +86,7 @@ docs/
 - 单元测试：`tests/unit`
   - 已覆盖内容工具、埋点工具、阶段3新增字段筛选与事件命名规则
 - 集成测试：`tests/integration`
-  - 已覆盖 `/api/trial`、`/api/partner`、`/api/track` 核心路径
+  - 已覆盖 `/api/trial`、`/api/partner`、`/api/track` 核心路径，以及 `/api/admin/geo-audit/*` 与登录会话
 - E2E：`tests/e2e/core-flows.spec.ts`
   - 覆盖 `/zh`、`/ja`、`/guides`、文章详情、trial/partner 成功页可达
   - 包含阶段3结构可见性（主题簇入口、案例库、下一步建议）检查
@@ -115,6 +115,12 @@ docs/
 - `partner_form_started`
 - `partner_form_submitted`
 - 其他非 trial/partner 表单回退：`form_start` / `form_submit`
+
+## GEO 体检后台（极简）
+
+- 路径：`/{locale}/admin/login` → `/{locale}/admin/geo-audit`；旧地址 `/admin/geo` 会重定向到新路径。
+- 环境变量说明见根目录 `.env.example` 与 `docs/geo-backend-operation-guide.md`。
+- 依赖：`ADMIN_GEO_PASSWORD`、`ADMIN_SESSION_SECRET`；数据层使用 **`DATABASE_URL`**（PostgreSQL）读写表单、GEO 配置、体检历史等。
 
 ## 注意事项
 

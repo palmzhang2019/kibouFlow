@@ -1,16 +1,16 @@
 import { POST } from "@/app/api/partner/route";
 
-const { checkRateLimitMock, getSupabaseMock } = vi.hoisted(() => ({
+const { checkRateLimitMock, insertPartnerSubmissionMock } = vi.hoisted(() => ({
   checkRateLimitMock: vi.fn(),
-  getSupabaseMock: vi.fn(),
+  insertPartnerSubmissionMock: vi.fn(),
 }));
 
 vi.mock("@/lib/rate-limit", () => ({
   checkRateLimit: checkRateLimitMock,
 }));
 
-vi.mock("@/lib/supabase", () => ({
-  getSupabase: getSupabaseMock,
+vi.mock("@/lib/pg-data", () => ({
+  insertPartnerSubmission: insertPartnerSubmissionMock,
 }));
 
 describe("POST /api/partner", () => {
@@ -40,7 +40,7 @@ describe("POST /api/partner", () => {
   });
 
   it("returns 503 when database is not configured", async () => {
-    getSupabaseMock.mockReturnValue(null);
+    insertPartnerSubmissionMock.mockResolvedValue({ ok: false, reason: "not_configured" });
 
     const req = new Request("http://localhost/api/partner", {
       method: "POST",
@@ -57,9 +57,7 @@ describe("POST /api/partner", () => {
   });
 
   it("returns success for valid payload", async () => {
-    const insertMock = vi.fn().mockResolvedValue({ error: null });
-    const fromMock = vi.fn().mockReturnValue({ insert: insertMock });
-    getSupabaseMock.mockReturnValue({ from: fromMock });
+    insertPartnerSubmissionMock.mockResolvedValue({ ok: true });
 
     const req = new Request("http://localhost/api/partner", {
       method: "POST",
@@ -74,6 +72,13 @@ describe("POST /api/partner", () => {
     const res = await POST(req as never);
     expect(res.status).toBe(200);
     await expect(res.json()).resolves.toEqual({ success: true });
-    expect(fromMock).toHaveBeenCalledWith("partner_submissions");
+    expect(insertPartnerSubmissionMock).toHaveBeenCalledWith(
+      "4.4.4.4",
+      expect.objectContaining({
+        org_name: "Kibou",
+        contact_person: "Bob",
+        contact_method: "bob@example.com",
+      }),
+    );
   });
 });

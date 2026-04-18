@@ -1,220 +1,61 @@
-# GEO 后台操作指南（Phase 1-3）
+# GEO 体检后台操作指南
 
-> 适用对象：运营、编辑、审核人、管理员  
-> 目标：用统一流程完成配置编辑、规则调整、审核发布、导出交接
-
----
-
-## 1. 后台入口
-
-- 访问路径：`/{locale}/admin/geo`（示例：`/zh/admin/geo`）
-- 建议每次进入先执行：
-  - 先点击“加载/查询”按钮，获取当前线上配置
-  - 再修改并保存，避免覆盖他人变更
+本仓库后台已收敛为 **仅用于 GEO 仓库自动化体检**：登录后运行 Python 脚本、查看 Markdown 报告、浏览历史记录。
 
 ---
 
-## 2. 角色与权限（Phase 3）
+## 1. 入口与环境变量
 
-系统固定 3 种角色：
+- **登录页**：`/{locale}/admin/login`（示例：`/zh/admin/login`）
+- **体检主页**：`/{locale}/admin/geo-audit`
+- **历史列表**：`/{locale}/admin/geo-audit/history`
+- **历史详情**：`/{locale}/admin/geo-audit/history/{id}`
 
-- `admin`
-  - 可配置角色绑定
-  - 可审核、可发布、可紧急发布
-  - 可导出与查看审计
-- `reviewer`
-  - 可审核（通过/驳回）
-  - 不可发布
-- `editor`
-  - 可编辑配置与规则
-  - 可创建提审请求
-  - 不可审核/发布
+必填（否则无法登录）：
 
-### 2.1 角色绑定操作
+- `ADMIN_GEO_PASSWORD`
+- `ADMIN_SESSION_SECRET`
 
-在后台“Phase 3 - 权限与审批”区：
+数据库（PostgreSQL）：
 
-1. 输入 `user_id`
-2. 选择 `role`
-3. 点击“保存角色绑定”
+- `DATABASE_URL`：连接串，例如 `postgresql://user:pass@127.0.0.1:5432/kibouflow`。未配置时表单/埋点/历史写入会失败或降级（见各 API 行为）。
+- 修改 `.env.local` 后需重启 `next dev` / `next start`。
+- 自托管库：在目标库中按文件名序号执行 `supabase/migrations/` 下全部 SQL 即可完成建表（迁移已不含 Supabase 专用 RLS）。
 
-建议：
+未配置 `DATABASE_URL` 时，GEO 体检仍可运行，但 **不会保存历史**。
 
-- 始终保留至少 1 个 `admin`
-- 不要把所有账号降为 `editor`
+其它可选：
+
+- `GEO_AUDIT_SKIP=1`：CI 等场景跳过真实 Python 子进程。
+- `GEO_AUDIT_USE_LLM=1` + `OPENAI_API_KEY`：在脚本输出末尾附加「LLM 归纳与建议（附录）」；模型默认 `GEO_AUDIT_OPENAI_MODEL=chatgpt-5.4-mini`（请以 OpenAI 文档为准）。
 
 ---
 
-## 3. 站点与页面配置（Phase 1）
+## 2. 使用流程
 
-## 3.1 站点配置
-
-可维护字段：
-
-- `site_name`
-- `default_title_template`
-- `default_description`
-- `site_url`
-
-操作步骤：
-
-1. 点击“加载站点配置”
-2. 修改字段
-3. 点击“保存站点配置”
-
-## 3.2 页面配置
-
-可维护字段：
-
-- `locale + path`
-- `meta_title`
-- `meta_description`
-- `canonical_url`
-- `noindex`
-- `jsonld_overrides`
-
-操作步骤：
-
-1. 选择 `locale` 并输入 `path`
-2. 点击“查询页面配置”
-3. 修改后点击“保存页面配置”
-4. 查看“JSON 预览”确认生效内容
-
-注意：
-
-- `path` 建议固定使用前导 `/`
-- `jsonld_overrides` 必须是合法 JSON
+1. 打开登录页，输入 `ADMIN_GEO_PASSWORD`。
+2. 进入主页后点击 **运行 GEO 体检**。
+3. 等待完成后阅读 **渲染报告**；需要可复制 **原始 Markdown**。
+4. 点击 **历史记录** 查看过往运行；点某条进入详情。
 
 ---
 
-## 4. 规则与 Schema 开关（Phase 2）
+## 3. API（仅供维护）
 
-## 4.1 抽取规则
+- `POST /api/admin/geo-audit/run`：执行 `scripts/geo_principles_audit.py --json` 并（若已配置）写入 `geo_audit_runs`。
+- `GET /api/admin/geo-audit/history`：历史列表。
+- `GET /api/admin/geo-audit/history/{id}`：单次详情。
 
-可配置项：
-
-- FAQ 排除标题规则（regex 数组）
-- FAQ 最小条目数
-- HowTo section 规则（regex 数组）
-- HowTo 最小步骤数
-
-操作步骤：
-
-1. 点击“加载规则”
-2. 调整规则参数
-3. 点击“保存规则”
-
-## 4.2 页面 Schema 开关
-
-可按页面控制：
-
-- `enable_article`
-- `enable_faqpage`
-- `enable_howto`
-- `enable_breadcrumb`
-- `enable_website`
-
-操作步骤：
-
-1. 输入 `locale + path`
-2. 点击“查询开关”
-3. 调整并点击“保存开关”
-
-注意：
-
-- 关键页受保护，关闭关键输出会被服务端拒绝（403）
-
-## 4.3 规则预览（强烈建议）
-
-操作步骤：
-
-1. 在“规则预览”粘贴 markdown
-2. 点击“运行预览”
-3. 确认 FAQ/HowTo 提取结果再保存规则
+均需已登录（`geo_admin_session` Cookie）。
 
 ---
 
-## 5. 提审、审核、发布（Phase 3）
+## 4. 数据库迁移
 
-## 5.1 创建提审请求（editor/admin）
-
-在“Phase 3 - 权限与审批”区填写请求 JSON 并提交。
-
-示例：
-
-```json
-{
-  "scope": "rules",
-  "locale": "zh",
-  "draft_json": {
-    "locale": "zh",
-    "faq_min_items": 2,
-    "howto_min_steps": 2
-  },
-  "status": "pending"
-}
-```
-
-## 5.2 审核（reviewer/admin）
-
-1. 输入 `request_id`
-2. 执行审核动作（通过/驳回）
-
-## 5.3 发布（admin）
-
-1. 输入 `request_id`
-2. 点击“发布”
-3. 紧急场景点击“紧急发布”（必须提供原因，系统会记录审计）
+SQL 文件在 `supabase/migrations/`。在**任意 PostgreSQL** 上按文件名序号执行全部脚本即可。
 
 ---
 
-## 6. 健康看板、审计与导出
+## 5. 说明
 
-## 6.1 健康看板
-
-点击“加载健康看板”，重点观察：
-
-- metadata 完整率
-- JSON-LD 覆盖率
-- 抽取失败数量
-- noindex 页面数量
-- 变更频率
-
-## 6.2 审计日志
-
-点击“加载审计日志”查看：
-
-- 操作人
-- 操作时间
-- 操作类型（request/review/publish/export 等）
-- 是否紧急发布
-
-## 6.3 导出交接包
-
-支持：
-
-- 导出 JSON（结构化快照）
-- 导出 CSV（交接友好）
-
-建议交接时导出：
-
-- 当前全量配置快照
-- 最近 90 天审计日志
-
----
-
-## 7. 推荐日常 SOP
-
-- 编辑：改配置/规则 -> 规则预览 -> 提审
-- 审核人：核对影响面 -> 审核通过/驳回
-- 管理员：发布 -> 健康看板复核 -> 导出归档
-
----
-
-## 8. 常见问题排查
-
-- 保存失败：检查 JSON 格式、URL 格式、`locale/path` 是否合法
-- 开关不生效：检查是否触发关键页保护（403）
-- 发布后无变化：确认请求状态是否已到 `published`
-- 查不到数据：确认当前环境数据库连接可用
-
+前台 `guides` 等内容页仍可能读取 `geo_rules` 等表；与本「体检后台」无菜单级耦合。体检报告中的分数为 **启发式规则结果**，不能替代真实检索与引用环境实测。

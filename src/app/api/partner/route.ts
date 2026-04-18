@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { partnerFormSchema } from "@/lib/schemas";
-import { getSupabase } from "@/lib/supabase";
+import { insertPartnerSubmission } from "@/lib/pg-data";
 import { checkRateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
@@ -28,20 +28,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = getSupabase();
-    if (!supabase) {
+    const result = await insertPartnerSubmission(ip, parsed.data);
+    if (!result.ok && result.reason === "not_configured") {
       return NextResponse.json(
         { error: "Database is not configured" },
         { status: 503 },
       );
     }
-
-    const { error } = await supabase
-      .from("partner_submissions")
-      .insert({ ...parsed.data, ip_address: ip });
-
-    if (error) {
-      console.error("Supabase insert error:", error);
+    if (!result.ok) {
       return NextResponse.json(
         { error: "Failed to save submission" },
         { status: 500 },

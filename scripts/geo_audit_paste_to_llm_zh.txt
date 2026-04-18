@@ -1,0 +1,97 @@
+你正在协助评审站点「kibouFlow / GEO」是否符合《GEO 的五大核心原理》（可召回、可切块、可抽取、可信、可归因）。
+
+获取扫描报告的方式（任选其一）：
+- 在仓库根目录运行：`python scripts/geo_principles_audit.py`（终端若乱码可设环境变量 `PYTHONUTF8=1` 再运行，或直接打开下面生成的文件复制全文）
+- 打开脚本自动生成的：`scripts/geo_principles_audit_last_run.md`（UTF-8）
+
+下面「---机器扫描报告开始---」与「---机器扫描报告结束---」之间的内容，应为上述报告的 **Markdown 全文**（含「观测事实」「启发式评分」「修改建议」各节）。请你：
+
+1. 用简体中文，写成一篇结构清晰的 GEO 体检报告（带小标题），风格接近技术博客：先总览，再逐条对照五原理，每条包含：当前符合点、主要短板、可执行的修改建议（按优先级排序）。
+2. 明确说明：脚本打分仅为粗粒度启发式，不能替代在 Perplexity / Google AI Overviews 等环境中的实测验证。
+3. 若扫描报告与仓库实际情况可能有偏差（例如正则未覆盖的写法），请在文中标注「需人工点开文件确认」的项。
+4. 全文控制在约 800–2000 字（除非扫描内容极多需要略长）。
+
+参考理论（可选复述，勿大段抄书）：GEO 本质是把网页变成「带可信度标签的、可独立摘录的语义原子」；RAG 管线对应召回→切块→抽取→注入→引用。
+
+---机器扫描报告开始---
+
+# GEO 五原理 — 仓库自动体检报告
+
+- 扫描根目录: `E:\workspace\kibouFlow`
+
+- 参考文档存在: `docs/geo-principles.md` → **True**
+
+## 观测事实（机器可读）
+
+### 原理1 可召回
+
+| 项 | 值 |
+|---|---|
+| robots.ts | `src\app\robots.ts` |
+| AI 爬虫显式 allow（GPT/Claude/Perplexity/Google-Extended） | True/True/True/True |
+| llms.txt 路由 | `True` |
+| sitemap 静态页 `lastModified: new Date()` | `True`（true=存在文档所述「时效信号不诚实」风险）|
+| 源码中出现 Wikidata / schema about | wikidata=`False`, about=`False` |
+| Organization sameAs 出现次数（组件内） | `1` |
+
+### 原理2–5 相关结构 / Schema
+
+| FAQPage 组件 | `True` |
+| HowTo 组件 | `True` |
+| BreadcrumbList 组件 | `True` |
+| DefinedTerm（源码） | `False` |
+| ArticleJsonLd 路径 | `src\components\seo\ArticleJsonLd.tsx` |
+| Article author 粗检 | Organization≈`True`, Person≈`False` |
+
+### 内容仓库 MDX（zh+ja 合并统计）
+
+- **mdx_total_zh**: `23`
+- **mdx_total_ja**: `23`
+- **mdx_total_all**: `46`
+- **notSuitableFor_any_locale**: `22`
+- **suitableFor_any_locale**: `22`
+- **tldr_frontmatter_any**: `0`
+- **conclusion_h2_any**: `12`
+> 说明：`conclusion_h2_any` 等为 **中文文件数 + 日文文件数**（同一 slug 的双语版本会计 2 次）。
+
+
+## 启发式评分（0–10，仅供参考）
+
+- **可召回 Retrievability**: **9.0** / 10
+- **可切块 Chunkability**: **5.8** / 10
+- **可抽取 Extractability**: **7.8** / 10
+- **可信 Citation-Worthiness**: **3.7** / 10
+- **可归因 Attributability**: **7.3** / 10
+
+## 与五原理对照的修改建议（脚本规则生成）
+
+### 原理1：可召回
+
+- 强化实体通道：在 Organization / Article JSON-LD 中补充 `sameAs`（含 Wikidata QID）、`about`/`mentions`。
+
+### 原理2：可切块
+
+- 正文前增加 TL;DR：可用 frontmatter `tldr` + 布局组件在 H1 下渲染短摘要。
+- 保持「结论型 H2」与短段落；FAQ 单条控制在少量句子，降低被硬切风险。
+
+### 原理3：可抽取
+
+- 若有术语表/定义块，输出 `DefinedTerm` JSON-LD。
+- 为关键文章补充 `Article.about`（或 geo jsonld overrides）以锚定主题实体。
+
+### 原理4：可信
+
+- **优先**：修正 `sitemap.ts` 静态 URL 的 `lastModified`，避免使用运行时的 `new Date()` 冒充全站每日更新。
+- 将 `Article` 的 `author` 升级为 `Person`（并配作者页 / `memberOf` → Organization）。
+
+### 原理5：可归因
+
+- 保持「一页一主题」与语义化 slug；高价值 FAQ 可考虑从聚合页拆出独立 URL，便于引用锚定。
+
+## 脚本无法替代的部分
+
+以下需要人工或 LLM：竞品检索验证（Perplexity/Google AIO）、富媒体结果测试、对「读起来是否像一篇完整 GEO 评审」的润色。
+
+请将**本报告全文**复制到 `scripts/geo_audit_paste_to_llm_zh.txt` 指示的位置，用 ChatGPT / Claude 生成终稿。
+
+---机器扫描报告结束---

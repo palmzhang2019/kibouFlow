@@ -28,20 +28,3 @@ create table if not exists geo_page_settings (
 
 create index if not exists idx_geo_page_settings_path on geo_page_settings(path);
 create index if not exists idx_geo_page_settings_updated_at on geo_page_settings(updated_at desc);
-
-alter table geo_site_settings enable row level security;
-alter table geo_page_settings enable row level security;
-
-create policy "Service role can manage geo_site_settings"
-  on geo_site_settings
-  for all
-  to service_role
-  using (true)
-  with check (true);
-
-create policy "Service role can manage geo_page_settings"
-  on geo_page_settings
-  for all
-  to service_role
-  using (true)
-  with check (true);

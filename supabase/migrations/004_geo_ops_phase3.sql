@@ -39,14 +39,3 @@ create table if not exists geo_audit_logs (
 
 create index if not exists idx_geo_audit_logs_actor on geo_audit_logs(actor_id);
 create index if not exists idx_geo_audit_logs_created_at on geo_audit_logs(created_at desc);
-
-alter table geo_role_bindings enable row level security;
-alter table geo_publish_requests enable row level security;
-alter table geo_audit_logs enable row level security;
-
-create policy "Service role can manage geo_role_bindings"
-  on geo_role_bindings for all to service_role using (true) with check (true);
-create policy "Service role can manage geo_publish_requests"
-  on geo_publish_requests for all to service_role using (true) with check (true);
-create policy "Service role can manage geo_audit_logs"
-  on geo_audit_logs for all to service_role using (true) with check (true);

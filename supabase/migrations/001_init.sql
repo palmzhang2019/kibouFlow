@@ -62,39 +62,4 @@ create index if not exists idx_tracking_event_name on tracking_events(event_name
 create index if not exists idx_tracking_created_at on tracking_events(created_at desc);
 create index if not exists idx_tracking_session on tracking_events(session_id);
 
--- Row Level Security
-alter table trial_submissions enable row level security;
-alter table partner_submissions enable row level security;
-alter table tracking_events enable row level security;
-
--- Allow inserts from anon key (public API)
-create policy "Allow anonymous inserts on trial_submissions"
-  on trial_submissions for insert
-  to anon
-  with check (true);
-
-create policy "Allow anonymous inserts on partner_submissions"
-  on partner_submissions for insert
-  to anon
-  with check (true);
-
-create policy "Allow anonymous inserts on tracking_events"
-  on tracking_events for insert
-  to anon
-  with check (true);
-
--- Only service role can read
-create policy "Service role can read trial_submissions"
-  on trial_submissions for select
-  to service_role
-  using (true);
-
-create policy "Service role can read partner_submissions"
-  on partner_submissions for select
-  to service_role
-  using (true);
-
-create policy "Service role can read tracking_events"
-  on tracking_events for select
-  to service_role
-  using (true);
+-- 本地 / 自托管 PostgreSQL：访问控制由应用层与数据库用户权限负责，不启用 Supabase 专用 RLS。
