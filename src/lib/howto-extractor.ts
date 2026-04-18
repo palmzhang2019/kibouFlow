@@ -27,14 +27,21 @@ function cleanHowToStepText(raw: string): string {
  * Find the first matching `##` section in HOWTO_SECTION_HEADINGS and collect
  * subsequent `^\d+\.\s` list items until the next `##`.
  */
-export function extractHowToFromMarkdown(markdown: string): HowToExtract | null {
+export function extractHowToFromMarkdown(
+  markdown: string,
+  options?: { sectionPatterns?: RegExp[]; minSteps?: number },
+): HowToExtract | null {
   const lines = markdown.split(/\r?\n/);
+  const minSteps = options?.minSteps ?? 2;
 
   for (let i = 0; i < lines.length; i++) {
     const hm = lines[i].match(/^##\s+(.+)$/);
     if (!hm) continue;
     const title = hm[1].trim();
-    if (!HOWTO_SECTION_HEADINGS.has(title)) continue;
+    const byDefault = HOWTO_SECTION_HEADINGS.has(title);
+    const byCustom =
+      options?.sectionPatterns?.some((pattern) => pattern.test(title)) ?? false;
+    if (!byDefault && !byCustom) continue;
 
     const steps: HowToStep[] = [];
     let j = i + 1;
@@ -45,7 +52,7 @@ export function extractHowToFromMarkdown(markdown: string): HowToExtract | null 
       }
       j++;
     }
-    if (steps.length >= 2) {
+    if (steps.length >= minSteps) {
       return { name: title, steps };
     }
     i = j - 1;

@@ -21,6 +21,7 @@ export interface FaqPair {
 
 export interface FaqExtractorOptions {
   excludeHeadingPatterns?: RegExp[];
+  minItems?: number;
 }
 
 function isExcluded(
@@ -70,5 +71,7 @@ export function extractFaqPairsFromMarkdown(
     }
   }
 
+  const minItems = options?.minItems ?? 1;
+  if (pairs.length < minItems) return [];
   return pairs;
 }

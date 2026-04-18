@@ -18,6 +18,8 @@ import { HowToJsonLd } from "@/components/seo/HowToJsonLd";
 import { buildBreadcrumbItems } from "@/lib/seo/breadcrumbs";
 import { extractFaqPairsFromMarkdown } from "@/lib/faq-extractor";
 import { extractHowToFromMarkdown } from "@/lib/howto-extractor";
+import { getGeoConfigBundle, resolveGeoMetadata } from "@/lib/geo-settings";
+import { compilePatterns, getGeoRules, getGeoSchemaToggles } from "@/lib/geo-rules";
 
 interface PageParams {
   locale: string;
@@ -43,11 +45,13 @@ export async function generateMetadata({
   if (!article) return {};
 
   const url = `/${locale}/guides/${category}/${slug}`;
-
-  return {
-    title: `${article.title} | GEO`,
-    description: article.description,
-    openGraph: {
+  const resolved = await resolveGeoMetadata({
+    locale: locale as "zh" | "ja",
+    path: url,
+    existingTitle: `${article.title} | GEO`,
+    existingDescription: article.description,
+    existingCanonical: url,
+    existingOpenGraph: {
       title: article.title,
       description: article.description,
       locale: locale === "zh" ? "zh_CN" : "ja_JP",
@@ -55,13 +59,20 @@ export async function generateMetadata({
       publishedTime: article.publishedAt,
       modifiedTime: article.updatedAt || article.publishedAt,
     },
+  });
+
+  return {
+    title: resolved.title,
+    description: resolved.description,
+    openGraph: resolved.openGraph,
     alternates: {
-      canonical: url,
+      canonical: resolved.canonical,
       languages: {
         zh: `/zh/guides/${category}/${slug}`,
         ja: `/ja/guides/${category}/${slug}`,
       },
     },
+    robots: resolved.robots,
   };
 }
 
@@ -78,6 +89,17 @@ export default async function ArticlePage({
 
   const article = getArticleBySlug(locale, category, slug);
   if (!article) notFound();
+  const geoBundle = await getGeoConfigBundle(
+    locale as "zh" | "ja",
+    `/${locale}/guides/${category}/${slug}`,
+  );
+  const [rulesResult, togglesResult] = await Promise.all([
+    getGeoRules(locale as "zh" | "ja"),
+    getGeoSchemaToggles(
+      locale as "zh" | "ja",
+      `/${locale}/guides/${category}/${slug}`,
+    ),
+  ]);
 
   const relatedArticles = article.relatedSlugs
     ? getRelatedArticles(locale, article.relatedSlugs)
@@ -95,18 +117,39 @@ export default async function ArticlePage({
   ]);
 
   const faqPairs =
-    article.contentType === "faq" ? extractFaqPairsFromMarkdown(article.content) : [];
+    article.contentType === "faq"
+      ? extractFaqPairsFromMarkdown(article.content, {
+          excludeHeadingPatterns: compilePatterns(
+            rulesResult.data.faq_exclude_heading_patterns,
+          ),
+          minItems: rulesResult.data.faq_min_items,
+        })
+      : [];
   const howTo =
     article.contentType === "framework" || article.contentType === "cluster"
-      ? extractHowToFromMarkdown(article.content)
+      ? extractHowToFromMarkdown(article.content, {
+          sectionPatterns: compilePatterns(rulesResult.data.howto_section_patterns),
+          minSteps: rulesResult.data.howto_min_steps,
+        })
       : null;
+  const toggles = togglesResult.data;
 
   return (
     <>
-      <BreadcrumbJsonLd items={crumbs} id="jsonld-breadcrumb-article" />
-      <ArticleJsonLd article={article} locale={locale} />
-      {faqPairs.length >= 2 ? <FAQPageJsonLd pairs={faqPairs} locale={locale} /> : null}
-      {howTo && howTo.steps.length >= 2 ? (
+      {toggles.enable_breadcrumb ? (
+        <BreadcrumbJsonLd items={crumbs} id="jsonld-breadcrumb-article" />
+      ) : null}
+      {toggles.enable_article ? (
+        <ArticleJsonLd
+          article={article}
+          locale={locale}
+          overrides={geoBundle.page?.jsonld_overrides ?? undefined}
+        />
+      ) : null}
+      {toggles.enable_faqpage && faqPairs.length > 0 ? (
+        <FAQPageJsonLd pairs={faqPairs} locale={locale} />
+      ) : null}
+      {toggles.enable_howto && howTo && howTo.steps.length > 0 ? (
         <HowToJsonLd howTo={howTo} locale={locale} />
       ) : null}
       <ArticleTracking category={category} slug={slug} />

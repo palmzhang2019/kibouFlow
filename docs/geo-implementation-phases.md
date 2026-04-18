@@ -1,11 +1,12 @@
 # GEO 落地开发分阶段计划
 
-> 本文是 [`geo-seo-optimization-plan.md`](./geo-seo-optimization-plan.md) 的**工程落地版**。
+> 本文是 `[geo-seo-optimization-plan.md](./geo-seo-optimization-plan.md)` 的**工程落地版**。
 > 回答的核心问题：**方案能不能落地？应该分几个阶段做？每阶段怎么交付、怎么验收？**
 >
 > 三件套阅读顺序：
-> - [`geo-principles.md`](./geo-principles.md) — **为什么做**（原理）
-> - [`geo-seo-optimization-plan.md`](./geo-seo-optimization-plan.md) — **做什么**（方案）
+>
+> - `[geo-principles.md](./geo-principles.md)` — **为什么做**（原理）
+> - `[geo-seo-optimization-plan.md](./geo-seo-optimization-plan.md)` — **做什么**（方案）
 > - `geo-implementation-phases.md`（本文） — **怎么分阶段做**（工程）
 
 ---
@@ -67,15 +68,17 @@
 
 **目标**：不动一篇内容，只改工程配置，就能让搜索 / AI 爬虫看到一个"合规、有时效、有元信息"的站点。
 
-| 项目 | 动作 | 文件 |
-|---|---|---|
-| ENV | 新增 `NEXT_PUBLIC_SITE_URL` | `.env.local` / Vercel env |
-| robots | 新增动态 robots，删除静态 robots | `src/app/robots.ts` + 删 `public/robots.txt` |
-| sitemap 新鲜度 | `lastModified` 用 frontmatter 的 `updatedAt/publishedAt` | `src/app/sitemap.ts` |
-| sitemap 优先级 | 按 `contentType` 分层 | 同上 |
-| 根元数据 | `metadataBase` / title template / 默认 OG / Twitter card | `src/app/layout.tsx` |
-| hreflang | alternates 加 `x-default` | 各 `generateMetadata` |
-| Organization | 补齐 logo / contactPoint / areaServed / 去占位 | `src/components/seo/OrganizationJsonLd.tsx` |
+
+| 项目           | 动作                                                     | 文件                                          |
+| ------------ | ------------------------------------------------------ | ------------------------------------------- |
+| ENV          | 新增 `NEXT_PUBLIC_SITE_URL`                              | `.env.local` / Vercel env                   |
+| robots       | 新增动态 robots，删除静态 robots                                | `src/app/robots.ts` + 删 `public/robots.txt` |
+| sitemap 新鲜度  | `lastModified` 用 frontmatter 的 `updatedAt/publishedAt` | `src/app/sitemap.ts`                        |
+| sitemap 优先级  | 按 `contentType` 分层                                     | 同上                                          |
+| 根元数据         | `metadataBase` / title template / 默认 OG / Twitter card | `src/app/layout.tsx`                        |
+| hreflang     | alternates 加 `x-default`                               | 各 `generateMetadata`                        |
+| Organization | 补齐 logo / contactPoint / areaServed / 去占位              | `src/components/seo/OrganizationJsonLd.tsx` |
+
 
 **退出标准**
 
@@ -92,12 +95,14 @@
 
 **目标**：打开 GEO 主闸门，让 LLM 爬虫一次性摄入整个站点。
 
-| 项目 | 动作 | 文件 |
-|---|---|---|
-| MDX → MD 工具 | 抽出共用渲染工具（剥 frontmatter、保留 MD 正文） | `src/lib/content.ts` 新增 `getArticleMarkdown()` |
-| `llms.txt` | Route Handler 生成骨架索引 | `src/app/llms.txt/route.ts` |
-| `llms-full.txt` | Route Handler 生成全文拼接（zh + ja） | `src/app/llms-full.txt/route.ts` |
-| Cache 策略 | `revalidate = 3600` 或静态化 | 同上 |
+
+| 项目              | 动作                               | 文件                                             |
+| --------------- | -------------------------------- | ---------------------------------------------- |
+| MDX → MD 工具     | 抽出共用渲染工具（剥 frontmatter、保留 MD 正文） | `src/lib/content.ts` 新增 `getArticleMarkdown()` |
+| `llms.txt`      | Route Handler 生成骨架索引             | `src/app/llms.txt/route.ts`                    |
+| `llms-full.txt` | Route Handler 生成全文拼接（zh + ja）    | `src/app/llms-full.txt/route.ts`               |
+| Cache 策略        | `revalidate = 3600` 或静态化         | 同上                                             |
+
 
 **退出标准**
 
@@ -114,15 +119,17 @@
 
 **目标**：把所有页面从"浏览器可读"升级到"机器可读"，这是 **GEO 收益最大的一个阶段**。
 
-| 项目 | 动作 | 文件 |
-|---|---|---|
-| 抽离 ArticleJsonLd | 从 `guides/[slug]/page.tsx` 内联移出 | `src/components/seo/ArticleJsonLd.tsx` |
-| WebSiteJsonLd | 根 layout 接入，含 `SearchAction` | `src/components/seo/WebSiteJsonLd.tsx` |
-| BreadcrumbJsonLd | 所有二级及以下页面 | `src/components/seo/BreadcrumbJsonLd.tsx` |
-| FAQ 抽取器 | 从 MDX 抽 `##` / `###` 问答对 | `src/lib/faq-extractor.ts` |
-| FAQPageJsonLd | `contentType === "faq"` 时自动挂载 | `src/components/seo/FAQPageJsonLd.tsx` |
-| HowTo 抽取器 | 抽有序列表步骤 | `src/lib/howto-extractor.ts` |
-| HowToJsonLd | `framework` / cluster 入口页 | `src/components/seo/HowToJsonLd.tsx` |
+
+| 项目               | 动作                              | 文件                                        |
+| ---------------- | ------------------------------- | ----------------------------------------- |
+| 抽离 ArticleJsonLd | 从 `guides/[slug]/page.tsx` 内联移出 | `src/components/seo/ArticleJsonLd.tsx`    |
+| WebSiteJsonLd    | 根 layout 接入，含 `SearchAction`    | `src/components/seo/WebSiteJsonLd.tsx`    |
+| BreadcrumbJsonLd | 所有二级及以下页面                       | `src/components/seo/BreadcrumbJsonLd.tsx` |
+| FAQ 抽取器          | 从 MDX 抽 `##` / `###` 问答对        | `src/lib/faq-extractor.ts`                |
+| FAQPageJsonLd    | `contentType === "faq"` 时自动挂载   | `src/components/seo/FAQPageJsonLd.tsx`    |
+| HowTo 抽取器        | 抽有序列表步骤                         | `src/lib/howto-extractor.ts`              |
+| HowToJsonLd      | `framework` / cluster 入口页       | `src/components/seo/HowToJsonLd.tsx`      |
+
 
 **关键工程点**
 
@@ -147,15 +154,17 @@
 
 **目标**：把内容升级到"LLM 友好"结构。**这是第一个与编辑深度耦合的阶段**，建议工程先行出模板，内容分批回填。
 
-| 项目 | 动作 | 涉及 |
-|---|---|---|
-| frontmatter 扩展 | 加 `tldr: string`、可选 `author: string` | `src/lib/content.ts` schema |
-| ArticleLayout 渲染 | `tldr` 渲染为 `<p class="lead">` | `src/components/article/ArticleLayout.tsx` |
-| ArticleJsonLd 字段 | `abstract` 用 `tldr`、`inLanguage` 用 locale | `ArticleJsonLd.tsx` |
-| 框架页模板 | 统一"判断框架 / 适用场景 / 不适用场景"三段 | 5 篇 `framework-*.mdx` |
-| 概念页模板 | 首段加 Definition Block | 4 篇 `concept-*.mdx` |
-| 案例页模板 | 加"判断者 / 判断日期" | 3 篇 `cases/*.mdx` |
-| 内容回填 | 为现存 46 篇补 `tldr` | zh + ja 各 23 篇 |
+
+| 项目               | 动作                                        | 涉及                                         |
+| ---------------- | ----------------------------------------- | ------------------------------------------ |
+| frontmatter 扩展   | 加 `tldr: string`、可选 `author: string`      | `src/lib/content.ts` schema                |
+| ArticleLayout 渲染 | `tldr` 渲染为 `<p class="lead">`             | `src/components/article/ArticleLayout.tsx` |
+| ArticleJsonLd 字段 | `abstract` 用 `tldr`、`inLanguage` 用 locale | `ArticleJsonLd.tsx`                        |
+| 框架页模板            | 统一"判断框架 / 适用场景 / 不适用场景"三段                 | 5 篇 `framework-*.mdx`                      |
+| 概念页模板            | 首段加 Definition Block                      | 4 篇 `concept-*.mdx`                        |
+| 案例页模板            | 加"判断者 / 判断日期"                             | 3 篇 `cases/*.mdx`                          |
+| 内容回填             | 为现存 46 篇补 `tldr`                          | zh + ja 各 23 篇                             |
+
 
 **工程与内容协同**
 
@@ -180,16 +189,18 @@
 
 **目标**：把可信度特征喂给 LLM 的打分器。
 
-| 项目 | 动作 | 文件 |
-|---|---|---|
-| 作者数据源 | 新增 `content/authors/<slug>.mdx`（中日） | 新目录 |
-| 作者加载工具 | `getAuthor(slug, locale)` | `src/lib/authors.ts` |
-| 作者页路由 | `/{locale}/about/<author>` | `src/app/[locale]/about/[author]/page.tsx` |
-| 文章 frontmatter | 加 `author: <slug>` | 所有 MDX |
-| Article schema 升级 | `author.@type = Person`，含 url | `ArticleJsonLd.tsx` |
-| 实体对齐 | frontmatter 加 `entities: [{name, wikidata}]` | schema 层读取，输出 `about / mentions` |
-| 边界显示 | Footer / 文章尾加"我们不处理什么"链接 | `Footer.tsx` / `ArticleLayout.tsx` |
-| 更新徽标 | 文章头展示"发布 X / 更新 Y" | `ArticleLayout.tsx` |
+
+| 项目                | 动作                                           | 文件                                         |
+| ----------------- | -------------------------------------------- | ------------------------------------------ |
+| 作者数据源             | 新增 `content/authors/<slug>.mdx`（中日）          | 新目录                                        |
+| 作者加载工具            | `getAuthor(slug, locale)`                    | `src/lib/authors.ts`                       |
+| 作者页路由             | `/{locale}/about/<author>`                   | `src/app/[locale]/about/[author]/page.tsx` |
+| 文章 frontmatter    | 加 `author: <slug>`                           | 所有 MDX                                     |
+| Article schema 升级 | `author.@type = Person`，含 url                | `ArticleJsonLd.tsx`                        |
+| 实体对齐              | frontmatter 加 `entities: [{name, wikidata}]` | schema 层读取，输出 `about / mentions`           |
+| 边界显示              | Footer / 文章尾加"我们不处理什么"链接                     | `Footer.tsx` / `ArticleLayout.tsx`         |
+| 更新徽标              | 文章头展示"发布 X / 更新 Y"                           | `ArticleLayout.tsx`                        |
+
 
 **退出标准**
 
@@ -204,14 +215,16 @@
 
 **目标**：把 URL 粒度对齐 LLM 引用粒度。
 
-| 项目 | 动作 | 文件 |
-|---|---|---|
-| `/answers` 路由 | 新目录 + 动态路由 | `src/app/[locale]/answers/[slug]/page.tsx` |
-| `/glossary` 路由 | 新目录 + 动态路由 | `src/app/[locale]/glossary/[term]/page.tsx` |
-| 内容 seed | 从现有 FAQ 拆出 8 条问答页 + 10 个术语 | `content/zh\|ja/answers/*` / `content/zh\|ja/glossary/*` |
-| DefinedTerm schema | 每个术语页输出 | `src/components/seo/DefinedTermJsonLd.tsx` |
-| 内链重构 | FAQ 页每条答案反向链到 `/answers/<slug>` | 模板调整 |
-| sitemap 接入 | 新路由加入 sitemap | `src/app/sitemap.ts` |
+
+| 项目                 | 动作                              | 文件                                                     |
+| ------------------ | ------------------------------- | ------------------------------------------------------ |
+| `/answers` 路由      | 新目录 + 动态路由                      | `src/app/[locale]/answers/[slug]/page.tsx`             |
+| `/glossary` 路由     | 新目录 + 动态路由                      | `src/app/[locale]/glossary/[term]/page.tsx`            |
+| 内容 seed            | 从现有 FAQ 拆出 8 条问答页 + 10 个术语      | `content/zh|ja/answers/`* / `content/zh|ja/glossary/*` |
+| DefinedTerm schema | 每个术语页输出                         | `src/components/seo/DefinedTermJsonLd.tsx`             |
+| 内链重构               | FAQ 页每条答案反向链到 `/answers/<slug>` | 模板调整                                                   |
+| sitemap 接入         | 新路由加入 sitemap                   | `src/app/sitemap.ts`                                   |
+
 
 **触发条件建议**：阶段 5 上线 1 个月后，看到 AI referer 数据再决定是否投入这个阶段。不要盲推。
 
@@ -221,12 +234,14 @@
 
 **目标**：从"盲改"升级为"数据驱动"。
 
-| 项目 | 动作 | 文件 |
-|---|---|---|
+
+| 项目            | 动作                                                                                 | 文件                                  |
+| ------------- | ---------------------------------------------------------------------------------- | ----------------------------------- |
 | AI referer 识别 | 识别 `chat.openai.com / perplexity.ai / gemini.google.com / copilot.microsoft.com` 等 | `src/proxy.ts` 或 `TrackingProvider` |
-| 新增事件 | `ai_referrer_visit` | `src/lib/tracking-events.ts` |
-| 核心 query 脚本 | Node 脚本定期用 Perplexity API 查 15 条 query，记录是否命中本站 | `scripts/geo-audit.ts` |
-| 月度报告模板 | Markdown 模板输出"引用率 / AI 流量 / 被引用 URL Top10" | `docs/geo-monthly-report.md` |
+| 新增事件          | `ai_referrer_visit`                                                                | `src/lib/tracking-events.ts`        |
+| 核心 query 脚本   | Node 脚本定期用 Perplexity API 查 15 条 query，记录是否命中本站                                    | `scripts/geo-audit.ts`              |
+| 月度报告模板        | Markdown 模板输出"引用率 / AI 流量 / 被引用 URL Top10"                                         | `docs/geo-monthly-report.md`        |
+
 
 ---
 
@@ -234,10 +249,10 @@
 
 1. **分支 / PR 规则**：每个阶段拆 2–4 个 PR，每个 PR ≤ 400 行 diff
 2. **测试要求**：
-   - 阶段 1 / 2：单元测试必过
-   - 阶段 3：每个 schema 组件都要有 fixture 快照测试
-   - 阶段 4：加 frontmatter 校验测试（`tldr` 长度 40–120 字）
-   - 所有阶段：`tests/e2e/core-flows.spec.ts` 不能红
+  - 阶段 1 / 2：单元测试必过
+  - 阶段 3：每个 schema 组件都要有 fixture 快照测试
+  - 阶段 4：加 frontmatter 校验测试（`tldr` 长度 40–120 字）
+  - 所有阶段：`tests/e2e/core-flows.spec.ts` 不能红
 3. **环境变量管理**：`NEXT_PUBLIC_SITE_URL` 在阶段 1 立刻补上，后续所有阶段共用
 4. **i18n 同步**：中日双语必须同阶段上线，避免 hreflang 出现半空壳
 5. **灰度验证**：每阶段上线后用 Rich Results Test + Schema Validator + LLM 抽测三件套做验收
@@ -264,42 +279,50 @@ Month 3: 阶段 5
 建议每个阶段结束时对照勾选：
 
 ### 阶段 1
-- [ ] `NEXT_PUBLIC_SITE_URL` 已在所有环境配置
-- [ ] `src/app/robots.ts` 已上线，`public/robots.txt` 已删除
-- [ ] sitemap 的 `lastModified` 来自内容日期
-- [ ] 首页 Rich Results Test 通过，识别 Organization
-- [ ] `alternates.languages` 含 `x-default`
+
+- `NEXT_PUBLIC_SITE_URL` 已在所有环境配置
+- `src/app/robots.ts` 已上线，`public/robots.txt` 已删除
+- sitemap 的 `lastModified` 来自内容日期
+- 首页 Rich Results Test 通过，识别 Organization
+- `alternates.languages` 含 `x-default`
 
 ### 阶段 2
-- [ ] `/llms.txt` 与 `/llms-full.txt` 均返回 `text/plain`
-- [ ] `/llms-full.txt` 包含全部 46 篇
-- [ ] 人工 LLM 抽测通过 5 条核心 query
+
+- `/llms.txt` 与 `/llms-full.txt` 均返回 `text/plain`
+- `/llms-full.txt` 包含全部 46 篇
+- 人工 LLM 抽测通过 5 条核心 query
 
 ### 阶段 3
-- [ ] 通用 `<JsonLd>` 组件已抽出
-- [ ] 所有 FAQ 文章输出 `FAQPage` 并通过验证器
-- [ ] 所有 framework 文章输出 `HowTo`
-- [ ] 所有非首页页面有 Breadcrumb
-- [ ] 新增两个抽取器的单元测试通过
+
+- 通用 `<JsonLd>` 组件已抽出
+- 所有 FAQ 文章输出 `FAQPage` 并通过验证器
+- 所有 framework 文章输出 `HowTo`
+- 所有非首页页面有 Breadcrumb
+- 新增两个抽取器的单元测试通过
 
 ### 阶段 4
-- [ ] 46 篇文章 100% 有 `tldr`
-- [ ] 5 篇 framework 页步骤结构统一
-- [ ] 4 篇 concept 页含 Definition Block
-- [ ] 测试脚本能校验 frontmatter 完整性
+
+- 46 篇文章 100% 有 `tldr`
+- 5 篇 framework 页步骤结构统一
+- 4 篇 concept 页含 Definition Block
+- 测试脚本能校验 frontmatter 完整性
 
 ### 阶段 5
-- [ ] 作者页上线（中日双语）
-- [ ] Article schema `author` 为 `Person`
-- [ ] 文章头显示发布/更新日期
-- [ ] Footer / 文章尾露出边界声明链接
+
+- 作者页上线（中日双语）
+- Article schema `author` 为 `Person`
+- 文章头显示发布/更新日期
+- Footer / 文章尾露出边界声明链接
 
 ### 阶段 6（可选）
-- [ ] `/answers` 与 `/glossary` 首批内容上线
-- [ ] DefinedTerm schema 正常输出
-- [ ] FAQ 页有反向链接到对应 answer 页
+
+- `/answers` 与 `/glossary` 首批内容上线
+- DefinedTerm schema 正常输出
+- FAQ 页有反向链接到对应 answer 页
 
 ### 阶段 7（可选）
-- [ ] AI referer 识别已生效，有数据进入分析侧
-- [ ] 月度 query 脚本可运行
-- [ ] 第一份月度报告已产出
+
+- AI referer 识别已生效，有数据进入分析侧
+- 月度 query 脚本可运行
+- 第一份月度报告已产出
+

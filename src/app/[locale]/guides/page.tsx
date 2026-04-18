@@ -11,6 +11,8 @@ import {
   CLUSTERS,
 } from "@/lib/content";
 import type { Category } from "@/lib/content";
+import { resolveGeoMetadata } from "@/lib/geo-settings";
+import { getGeoSchemaToggles } from "@/lib/geo-rules";
 
 export async function generateMetadata({
   params,
@@ -19,18 +21,28 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "metadata.guides" });
-
-  return {
-    title: t("title"),
-    description: t("description"),
-    openGraph: {
+  const resolved = await resolveGeoMetadata({
+    locale: locale as "zh" | "ja",
+    path: `/${locale}/guides`,
+    existingTitle: t("title"),
+    existingDescription: t("description"),
+    existingCanonical: `/${locale}/guides`,
+    existingOpenGraph: {
       title: t("title"),
       description: t("description"),
       locale: locale === "zh" ? "zh_CN" : "ja_JP",
     },
+  });
+
+  return {
+    title: resolved.title,
+    description: resolved.description,
+    openGraph: resolved.openGraph,
     alternates: {
+      canonical: resolved.canonical,
       languages: { zh: "/zh/guides", ja: "/ja/guides" },
     },
+    robots: resolved.robots,
   };
 }
 
@@ -42,6 +54,7 @@ export default async function GuidesIndexPage({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "guides" });
   const tNav = await getTranslations({ locale, namespace: "common.nav" });
+  const toggles = await getGeoSchemaToggles(locale as "zh" | "ja", `/${locale}/guides`);
   const allArticles = getAllArticles(locale);
   const crumbs = buildBreadcrumbItems([
     { path: `/${locale}`, name: tNav("home") },
@@ -64,7 +77,9 @@ export default async function GuidesIndexPage({
 
   return (
     <>
-      <BreadcrumbJsonLd items={crumbs} id="jsonld-breadcrumb-guides" />
+      {toggles.data.enable_breadcrumb ? (
+        <BreadcrumbJsonLd items={crumbs} id="jsonld-breadcrumb-guides" />
+      ) : null}
       <Section>
       <div className="max-w-3xl mx-auto text-center">
         <h1 className="text-3xl sm:text-4xl font-bold">{t("title")}</h1>

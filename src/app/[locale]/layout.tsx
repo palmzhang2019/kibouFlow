@@ -6,6 +6,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { TrackingProvider } from "@/components/tracking/TrackingProvider";
 import { WebSiteJsonLd } from "@/components/seo/WebSiteJsonLd";
+import { getGeoSchemaToggles } from "@/lib/geo-rules";
 
 export default async function LocaleLayout({
   children,
@@ -20,11 +21,12 @@ export default async function LocaleLayout({
   }
 
   const messages = await getMessages();
+  const toggles = await getGeoSchemaToggles(locale as "zh" | "ja", `/${locale}`);
 
   return (
     <html lang={locale} className="h-full antialiased" suppressHydrationWarning>
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
-        <WebSiteJsonLd locale={locale} />
+        {toggles.data.enable_website ? <WebSiteJsonLd locale={locale} /> : null}
         <NextIntlClientProvider messages={messages}>
           <TrackingProvider>
             <Header />

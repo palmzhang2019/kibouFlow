@@ -7,8 +7,17 @@ import {
   organizationId,
   websiteIdForLocale,
 } from "@/lib/seo/site-url";
+import { mergeJsonLd } from "@/lib/geo-settings";
 
-export function ArticleJsonLd({ article, locale }: { article: Article; locale: string }) {
+export function ArticleJsonLd({
+  article,
+  locale,
+  overrides,
+}: {
+  article: Article;
+  locale: string;
+  overrides?: Record<string, unknown>;
+}) {
   const site = getSiteUrl();
   const pagePath = `/${locale}${article.href}`;
   const pageUrl = absoluteUrl(pagePath, site);
@@ -32,5 +41,5 @@ export function ArticleJsonLd({ article, locale }: { article: Article; locale: s
     isPartOf: { "@id": websiteIdForLocale(locale, site) },
   };
 
-  return <JsonLd data={data} id="jsonld-article" />;
+  return <JsonLd data={mergeJsonLd(data, overrides)} id="jsonld-article" />;
 }

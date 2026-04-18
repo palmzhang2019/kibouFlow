@@ -8,26 +8,37 @@ import { GuidesPreview } from "@/components/home/GuidesPreview";
 import { Section } from "@/components/shared/Section";
 import { CTAButtons } from "@/components/layout/CTAButtons";
 import { OrganizationJsonLd } from "@/components/seo/OrganizationJsonLd";
+import { resolveGeoMetadata } from "@/lib/geo-settings";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "metadata.home" });
-
-  return {
-    title: t("title"),
-    description: t("description"),
-    openGraph: {
+  const resolved = await resolveGeoMetadata({
+    locale: locale as "zh" | "ja",
+    path: `/${locale}`,
+    existingTitle: t("title"),
+    existingDescription: t("description"),
+    existingCanonical: `/${locale}`,
+    existingOpenGraph: {
       title: t("title"),
       description: t("description"),
       locale: locale === "zh" ? "zh_CN" : "ja_JP",
       type: "website",
     },
+  });
+
+  return {
+    title: resolved.title,
+    description: resolved.description,
+    openGraph: resolved.openGraph,
     alternates: {
+      canonical: resolved.canonical,
       languages: {
         zh: "/zh",
         ja: "/ja",
       },
     },
+    robots: resolved.robots,
   };
 }
 

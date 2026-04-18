@@ -1,0 +1,176 @@
+import type { Metadata } from "next";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { getServiceSupabase } from "@/lib/supabase";
+
+export interface GeoSiteSettingsRow {
+  site_name: string;
+  default_title_template: string;
+  default_description: string;
+  default_locale: "zh" | "ja";
+  site_url: string;
+  robots_policy: string | null;
+  updated_by: string | null;
+  updated_at: string;
+}
+
+export interface GeoPageSettingsRow {
+  locale: "zh" | "ja";
+  path: string;
+  meta_title: string | null;
+  meta_description: string | null;
+  canonical_url: string | null;
+  og_title: string | null;
+  og_description: string | null;
+  og_image: string | null;
+  noindex: boolean;
+  jsonld_overrides: Record<string, unknown> | null;
+  updated_by: string | null;
+  updated_at: string;
+}
+
+export interface GeoMetadataInput {
+  locale: "zh" | "ja";
+  path: string;
+  existingTitle?: string;
+  existingDescription?: string;
+  existingCanonical?: string;
+  existingOpenGraph?: Metadata["openGraph"];
+}
+
+interface GeoMetadataResolved {
+  title: string;
+  description: string;
+  canonical?: string;
+  openGraph: Metadata["openGraph"];
+  robots?: Metadata["robots"];
+}
+
+export interface GeoConfigBundle {
+  site: GeoSiteSettingsRow | null;
+  page: GeoPageSettingsRow | null;
+  source: "db" | "none";
+}
+
+const DEFAULT_SITE_SETTINGS: Pick<
+  GeoSiteSettingsRow,
+  "site_name" | "default_title_template" | "default_description" | "default_locale" | "site_url"
+> = {
+  site_name: "GEO",
+  default_title_template: "%s | GEO",
+  default_description: "先整理希望，再判断路径，再导向下一步",
+  default_locale: "zh",
+  site_url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://kibouflow.com",
+};
+
+export function normalizeGeoPath(pathname: string): string {
+  const trimmed = pathname.trim();
+  if (!trimmed) return "/";
+  const withLeadingSlash = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+  return withLeadingSlash.replace(/\/{2,}/g, "/").replace(/\/$/, "") || "/";
+}
+
+export function mergeJsonLd(
+  base: Record<string, unknown>,
+  overrides?: Record<string, unknown> | null,
+): Record<string, unknown> {
+  if (!overrides) return base;
+  const out: Record<string, unknown> = { ...base };
+  for (const [key, value] of Object.entries(overrides)) {
+    if (
+      value &&
+      typeof value === "object" &&
+      !Array.isArray(value) &&
+      typeof out[key] === "object" &&
+      out[key] !== null &&
+      !Array.isArray(out[key])
+    ) {
+      out[key] = mergeJsonLd(
+        out[key] as Record<string, unknown>,
+        value as Record<string, unknown>,
+      );
+      continue;
+    }
+    out[key] = value;
+  }
+  return out;
+}
+
+async function readSiteSettings(
+  supabase: SupabaseClient,
+): Promise<GeoSiteSettingsRow | null> {
+  const { data, error } = await supabase
+    .from("geo_site_settings")
+    .select("*")
+    .order("updated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) return null;
+  return (data as GeoSiteSettingsRow | null) ?? null;
+}
+
+async function readPageSettings(
+  supabase: SupabaseClient,
+  locale: string,
+  path: string,
+): Promise<GeoPageSettingsRow | null> {
+  const { data, error } = await supabase
+    .from("geo_page_settings")
+    .select("*")
+    .eq("locale", locale)
+    .eq("path", path)
+    .maybeSingle();
+  if (error) return null;
+  return (data as GeoPageSettingsRow | null) ?? null;
+}
+
+export async function getGeoConfigBundle(
+  locale: "zh" | "ja",
+  path: string,
+): Promise<GeoConfigBundle> {
+  const supabase = getServiceSupabase();
+  const normalizedPath = normalizeGeoPath(path);
+  if (!supabase) {
+    return { site: null, page: null, source: "none" };
+  }
+
+  const [site, page] = await Promise.all([
+    readSiteSettings(supabase),
+    readPageSettings(supabase, locale, normalizedPath),
+  ]);
+  return { site, page, source: site || page ? "db" : "none" };
+}
+
+export async function resolveGeoMetadata(
+  input: GeoMetadataInput,
+): Promise<GeoMetadataResolved> {
+  const { site, page } = await getGeoConfigBundle(input.locale, input.path);
+  const title =
+    page?.meta_title ||
+    input.existingTitle ||
+    site?.default_title_template.replace("%s", DEFAULT_SITE_SETTINGS.site_name) ||
+    DEFAULT_SITE_SETTINGS.site_name;
+  const description =
+    page?.meta_description ||
+    input.existingDescription ||
+    site?.default_description ||
+    DEFAULT_SITE_SETTINGS.default_description;
+  const canonical = page?.canonical_url || input.existingCanonical;
+  const openGraph = {
+    ...(input.existingOpenGraph ?? {}),
+    title: page?.og_title || input.existingTitle || title,
+    description: page?.og_description || input.existingDescription || description,
+    images:
+      page?.og_image && page.og_image.length > 0
+        ? [{ url: page.og_image }]
+        : (input.existingOpenGraph?.images ?? undefined),
+  };
+  const robots = page?.noindex ? { index: false, follow: false } : undefined;
+
+  return {
+    title: title || DEFAULT_SITE_SETTINGS.site_name,
+    description,
+    canonical,
+    openGraph,
+    robots,
+  };
+}
