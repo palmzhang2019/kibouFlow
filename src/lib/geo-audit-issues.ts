@@ -34,8 +34,6 @@ export interface GeoAuditIssueRow {
 }
 
 /** 列表用：含 `geo_audit_decisions` 条数 */
-export type GeoAuditIssueListRow = GeoAuditIssueRow & { decision_count: number };
-
 export interface GeoAuditIssueInput {
   code: string;
   title: string;
@@ -143,12 +141,6 @@ function parseJsonbObject(v: unknown): Record<string, unknown> | null {
   return null;
 }
 
-function intFromUnknown(v: unknown): number {
-  if (typeof v === "number" && Number.isFinite(v)) return v;
-  if (typeof v === "string") return parseInt(v, 10) || 0;
-  return 0;
-}
-
 function mapIssueRow(r: Record<string, unknown>): GeoAuditIssueRow {
   const ev = parseJsonbObject(r.evidence);
   const fs = parseJsonbObject(r.facts_snapshot);
@@ -214,39 +206,137 @@ export async function listGeoAuditIssuesByRunId(runId: string): Promise<GeoAudit
 }
 
 /** 问题中心列表：附带每条已提交的决策条数（`geo_audit_decisions`）。 */
-export async function listGeoAuditIssuesByRunIdWithDecisionStats(runId: string): Promise<GeoAuditIssueListRow[]> {
-  const sql = getPg();
-  if (!sql) return [];
-  try {
-    const rows = await sql<Record<string, unknown>[]>`
-      select i.*, coalesce(dc.cnt, 0)::int as decision_count
-      from geo_audit_issues i
-      left join (
-        select issue_id, count(*)::int as cnt from geo_audit_decisions group by issue_id
-      ) dc on dc.issue_id = i.id
-      where i.run_id = ${runId}::uuid
-      order by
-        case i.severity
-          when 'critical' then 1
-          when 'high' then 2
-          when 'medium' then 3
-          when 'low' then 4
-          else 5
-        end,
-        i.code asc
-    `;
-    return rows.map((r) => ({
-      ...mapIssueRow(r),
-      decision_count: intFromUnknown(r.decision_count),
-    }));
-  } catch (e) {
-    if (isMissingRelationError(e)) {
-      const base = await listGeoAuditIssuesByRunId(runId);
-      return base.map((i) => ({ ...i, decision_count: 0 }));
-    }
-    console.error("listGeoAuditIssuesByRunIdWithDecisionStats", e);
-    return [];
+/* ----------------------------------------------------------------------------
+ * 批量型问题的 evidence 结构
+ *
+ * 与 `scripts/geo_principles_audit.py` 的 `build_issues()` 输出对齐：
+ *   - `CONTENT_TLDR_COVERAGE_ZERO`  → kind: "batch_mdx_frontmatter"
+ *   - `SCORE_PRINCIPLE_BELOW_THRESHOLD` → kind: "principle_score_batch"
+ *
+ * 这里只做宽松解析与容错降级：旧 run（evidence 无 `kind`）返回 null，
+ * 由批量页自行展示降级提示，不影响其它未涉及的 issue code。
+ * -------------------------------------------------------------------------- */
+
+export type AffectedMdxPath = {
+  locale: string;
+  category?: string;
+  slug?: string;
+  filePath: string;
+  title?: string;
+  reasons?: string[];
+};
+
+export type BatchMdxFrontmatterEvidence = {
+  kind: "batch_mdx_frontmatter";
+  missingField: string;
+  totalAffected: number;
+  affectedPaths: AffectedMdxPath[];
+  sampleSuggestion?: string;
+};
+
+export type LowPrinciple = {
+  principleKey: string;
+  score: number;
+  summary?: string;
+  recommendedAction?: string;
+  siteLevel?: boolean;
+};
+
+export type PrincipleScoreBatchEvidence = {
+  kind: "principle_score_batch";
+  threshold: number;
+  lowPrinciples: LowPrinciple[];
+  affectedPaths: AffectedMdxPath[];
+};
+
+export type BatchEvidence = BatchMdxFrontmatterEvidence | PrincipleScoreBatchEvidence;
+
+function asString(v: unknown, fallback = ""): string {
+  return typeof v === "string" ? v : fallback;
+}
+
+function asNumber(v: unknown, fallback = 0): number {
+  if (typeof v === "number" && Number.isFinite(v)) return v;
+  if (typeof v === "string") {
+    const n = Number.parseFloat(v);
+    return Number.isFinite(n) ? n : fallback;
   }
+  return fallback;
+}
+
+function asStringArray(v: unknown): string[] {
+  if (!Array.isArray(v)) return [];
+  return v.filter((x): x is string => typeof x === "string");
+}
+
+function parseAffectedPaths(v: unknown): AffectedMdxPath[] {
+  if (!Array.isArray(v)) return [];
+  const out: AffectedMdxPath[] = [];
+  for (const item of v) {
+    if (!isRecord(item)) continue;
+    const filePath = asString(item.filePath);
+    if (!filePath) continue;
+    const row: AffectedMdxPath = {
+      locale: asString(item.locale),
+      filePath,
+    };
+    if (typeof item.category === "string") row.category = item.category;
+    if (typeof item.slug === "string") row.slug = item.slug;
+    if (typeof item.title === "string") row.title = item.title;
+    const reasons = asStringArray(item.reasons);
+    if (reasons.length > 0) row.reasons = reasons;
+    out.push(row);
+  }
+  return out;
+}
+
+function parseLowPrinciples(v: unknown): LowPrinciple[] {
+  if (!Array.isArray(v)) return [];
+  const out: LowPrinciple[] = [];
+  for (const item of v) {
+    if (!isRecord(item)) continue;
+    const key = asString(item.principleKey);
+    if (!key) continue;
+    const row: LowPrinciple = {
+      principleKey: key,
+      score: asNumber(item.score, 0),
+    };
+    if (typeof item.summary === "string") row.summary = item.summary;
+    if (typeof item.recommendedAction === "string") row.recommendedAction = item.recommendedAction;
+    if (typeof item.siteLevel === "boolean") row.siteLevel = item.siteLevel;
+    else if (typeof item.site_level === "boolean") row.siteLevel = item.site_level;
+    out.push(row);
+  }
+  return out;
+}
+
+/**
+ * 解析批量型 issue 的 evidence。
+ * 未知 kind / 空 evidence / 老 run 均返回 null，由调用方展示降级提示。
+ */
+export function readBatchEvidence(evidence: Record<string, unknown> | null | undefined): BatchEvidence | null {
+  if (!evidence || !isRecord(evidence)) return null;
+  const kind = asString(evidence.kind);
+  if (kind === "batch_mdx_frontmatter") {
+    const affectedPaths = parseAffectedPaths(evidence.affectedPaths);
+    return {
+      kind,
+      missingField: asString(evidence.missingField, "tldr"),
+      totalAffected: asNumber(evidence.totalAffected, affectedPaths.length),
+      affectedPaths,
+      sampleSuggestion:
+        typeof evidence.sampleSuggestion === "string" ? evidence.sampleSuggestion : undefined,
+    };
+  }
+  if (kind === "principle_score_batch") {
+    return {
+      kind,
+      threshold: asNumber(evidence.threshold, 5.5),
+      lowPrinciples: parseLowPrinciples(evidence.lowPrinciples),
+      affectedPaths: parseAffectedPaths(evidence.affectedPaths),
+    };
+  }
+  return null;
 }
 
 export async function countOpenGeoAuditIssuesByRunId(runId: string): Promise<number> {

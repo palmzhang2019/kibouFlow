@@ -22,6 +22,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
   const contentTypeLabel = article.contentType
     ? t(`contentTypes.${article.contentType}`)
     : null;
+  const summary = article.tldr?.[0] || article.description;
 
   return (
     <Link
@@ -43,7 +44,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
         {article.title}
       </h3>
       <p className="mt-2 text-sm text-muted line-clamp-3">
-        {article.description}
+        {summary}
       </p>
       <span className="mt-4 inline-block text-sm font-medium text-primary">
         {t("readMore")} →

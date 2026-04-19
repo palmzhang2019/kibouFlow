@@ -1,4 +1,5 @@
 import type { MDXComponents } from "mdx/types";
+import { resolveHeadingId } from "@/lib/article-anchors";
 
 function Callout({
   children,
@@ -64,17 +65,23 @@ export function getMDXComponents(): MDXComponents {
     Callout,
     StepList,
     Step,
-    h2: (props) => (
+    h2: ({ children, id, ...props }) => (
       <h2
         {...props}
+        id={resolveHeadingId(children, id)}
         className="scroll-mt-20 text-xl font-bold mt-10 mb-4 text-foreground"
-      />
+      >
+        {children}
+      </h2>
     ),
-    h3: (props) => (
+    h3: ({ children, id, ...props }) => (
       <h3
         {...props}
+        id={resolveHeadingId(children, id)}
         className="scroll-mt-20 text-lg font-semibold mt-8 mb-3 text-foreground"
-      />
+      >
+        {children}
+      </h3>
     ),
     a: (props) => (
       <a

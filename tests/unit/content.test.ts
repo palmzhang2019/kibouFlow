@@ -1,10 +1,13 @@
 import {
+  buildFaqArticleSuggestions,
   getAllArticleSlugs,
   getArticleBySlug,
   getArticleMarkdown,
   getArticlesByCategory,
   getArticlesByContentType,
   getArticlesByCluster,
+  getClusterEntryForArticle,
+  getStrategicRelatedArticles,
 } from "@/lib/content";
 import { extractFaqPairsFromMarkdown } from "@/lib/faq-extractor";
 import { extractHowToFromMarkdown } from "@/lib/howto-extractor";
@@ -53,6 +56,66 @@ describe("content utilities", () => {
     expect(article?.contentType).toBe("cluster");
     expect(article?.cluster).toBe("job-prep");
     expect(article?.audience).toEqual(["individual"]);
+    expect(article?.tldr).toEqual([
+      "这页是求职准备主题簇入口，帮你把简历、顺序、面试准备等问题拆成可阅读的路径。",
+      "如果你还不知道先看哪篇，这里给出推荐阅读顺序。",
+    ]);
+    expect(article?.about).toEqual(["求职准备", "主题入口"]);
+  });
+
+  it("keeps legacy articles compatible when new summary fields are absent", () => {
+    const article = getArticleBySlug("zh", "problems", "resume-vs-japanese");
+    expect(article).not.toBeNull();
+    expect(article?.tldr).toBeUndefined();
+    expect(article?.about).toBeUndefined();
+    expect(article?.mentions).toBeUndefined();
+  });
+
+  it("derives about for high-value articles when frontmatter omits it", () => {
+    const article = getArticleBySlug("zh", "boundaries", "faq-japanese-path");
+    expect(article).not.toBeNull();
+    expect(article?.about).toEqual([
+      "日语学习路径 FAQ",
+      "日语学习路径",
+    ]);
+  });
+
+  it("prioritizes the cluster hub in strategic related articles", () => {
+    const article = getArticleBySlug("zh", "boundaries", "concept-path-judgment");
+    expect(article).not.toBeNull();
+    const related = getStrategicRelatedArticles("zh", article!);
+    expect(related.length).toBeGreaterThan(0);
+    expect(related[0].slug).toBe("direction-sorting-cluster-entry");
+  });
+
+  it("finds the cluster hub for a clustered article", () => {
+    const article = getArticleBySlug("zh", "paths", "framework-japanese-or-job-first");
+    expect(article).not.toBeNull();
+    const hub = getClusterEntryForArticle("zh", article!);
+    expect(hub?.slug).toBe("japanese-learning-path-cluster-entry");
+  });
+
+  it("prepares stable standalone FAQ article suggestions", () => {
+    const article = getArticleBySlug("zh", "boundaries", "faq-job-prep");
+    expect(article).not.toBeNull();
+    const suggestions = buildFaqArticleSuggestions("zh", article!, [
+      "要不要先改简历？",
+      "语言不够能不能先投？",
+    ]);
+    expect(suggestions).toEqual([
+      {
+        question: "要不要先改简历？",
+        anchorId: "要不要先改简历",
+        suggestedSlug: "faq-job-prep-q01",
+        suggestedHref: "/zh/guides/boundaries/faq-job-prep-q01",
+      },
+      {
+        question: "语言不够能不能先投？",
+        anchorId: "语言不够能不能先投",
+        suggestedSlug: "faq-job-prep-q02",
+        suggestedHref: "/zh/guides/boundaries/faq-job-prep-q02",
+      },
+    ]);
   });
 
   it("filters articles by contentType", () => {
@@ -71,13 +134,16 @@ describe("content utilities", () => {
     const md = getArticleMarkdown(
       "zh",
       "boundaries",
-      "faq-japanese-path",
+      "concept-hope-sorting",
       "https://kibouflow.com",
     );
     expect(md).not.toBeNull();
     expect(md!).toContain(
-      "- URL: https://kibouflow.com/zh/guides/boundaries/faq-japanese-path",
+      "- URL: https://kibouflow.com/zh/guides/boundaries/concept-hope-sorting",
     );
+    expect(md!).toContain("## TL;DR");
+    expect(md!).toContain("## Common Mistakes");
+    expect(md!).toContain("## Key Takeaways");
     expect(md!.startsWith("---\ntitle:")).toBe(false);
     expect(md!.endsWith("\n")).toBe(true);
   });

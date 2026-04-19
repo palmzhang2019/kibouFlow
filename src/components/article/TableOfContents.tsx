@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { slugifyHeading } from "@/lib/article-anchors";
 
 interface TocItem {
   id: string;
@@ -21,11 +22,7 @@ export function TableOfContents() {
 
     headings.forEach((h) => {
       if (!h.id) {
-        h.id = h.textContent
-          ?.trim()
-          .toLowerCase()
-          .replace(/\s+/g, "-")
-          .replace(/[^\w\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff-]/g, "") || "";
+        h.id = slugifyHeading(h.textContent || "");
       }
       tocItems.push({
         id: h.id,

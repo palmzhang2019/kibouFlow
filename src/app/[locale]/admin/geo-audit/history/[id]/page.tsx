@@ -11,8 +11,8 @@ import { listGeoAuditIssuesByRunId, normalizeIssueInputs, type GeoAuditIssueInpu
 
 export const dynamic = "force-dynamic";
 
-function scoreCell(v: number | null) {
-  return v == null ? "—" : String(v);
+function scoreCell(value: number | null) {
+  return value == null ? "—" : String(value);
 }
 
 export default async function GeoAuditHistoryDetailPage({
@@ -44,21 +44,22 @@ export default async function GeoAuditHistoryDetailPage({
   if (dbIssues.length === 0 && reportPayload) {
     fallbackIssues = normalizeIssueInputs(reportPayload.issues);
   }
+
   const issueRows =
     dbIssues.length > 0
-      ? dbIssues.map((i) => ({
-          key: i.id,
-          severity: i.severity,
-          layer: i.layer,
-          code: i.code,
-          title: i.title,
+      ? dbIssues.map((issue) => ({
+          key: issue.id,
+          severity: issue.severity,
+          layer: issue.layer,
+          code: issue.code,
+          title: issue.title,
         }))
-      : fallbackIssues.map((i, idx) => ({
-          key: `json-${idx}`,
-          severity: i.severity,
-          layer: i.layer,
-          code: i.code,
-          title: i.title,
+      : fallbackIssues.map((issue, index) => ({
+          key: `json-${index}`,
+          severity: issue.severity,
+          layer: issue.layer,
+          code: issue.code,
+          title: issue.title,
         }));
 
   return (
@@ -90,7 +91,7 @@ export default async function GeoAuditHistoryDetailPage({
             <dd>{scoreCell(scores.extractability_score)}</dd>
           </div>
           <div>
-            <dt className="text-muted-foreground">可信</dt>
+            <dt className="text-muted-foreground">可信度</dt>
             <dd>{scoreCell(scores.trust_score)}</dd>
           </div>
           <div>
@@ -102,7 +103,7 @@ export default async function GeoAuditHistoryDetailPage({
 
       <dl className="grid gap-2 rounded-lg border border-border bg-muted/20 p-4 text-sm sm:grid-cols-2">
         <div>
-          <dt className="text-muted-foreground">创建时间</dt>
+          <dt className="text-muted-foreground">开始时间</dt>
           <dd>{new Date(row.started_at).toLocaleString("zh-CN")}</dd>
         </div>
         <div>
@@ -123,9 +124,7 @@ export default async function GeoAuditHistoryDetailPage({
         </div>
         <div>
           <dt className="text-muted-foreground">调用 LLM</dt>
-          <dd>
-            {meta.used_llm ? `是（${meta.llm_model ?? "未知模型"}）` : "否"}
-          </dd>
+          <dd>{meta.used_llm ? `是（${meta.llm_model ?? "未知模型"}）` : "否"}</dd>
         </div>
       </dl>
 
@@ -138,19 +137,16 @@ export default async function GeoAuditHistoryDetailPage({
 
       <section className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h3 className="text-sm font-medium">结构化问题</h3>
+          <h3 className="text-sm font-medium">结构化问题快照</h3>
           {dbIssues.length === 0 && fallbackIssues.length > 0 ? (
             <span className="text-xs text-amber-800 dark:text-amber-200">
-              来自报告内嵌 JSON（Markdown 尾部 <code className="font-mono">--- JSON ---</code> 或 report_json；未写入
-              geo_audit_issues 表）
+              当前展示的数据来自报告内嵌 JSON，尚未写入问题表。
             </span>
           ) : null}
-          <Link href={`/admin/geo-audit/issues?runId=${id}`} className="text-xs text-primary underline">
-            在问题中心打开
-          </Link>
         </div>
+        <p className="text-xs text-muted-foreground">这里仅作为报告附带快照展示，不再继续扩展成独立的问题流转入口。</p>
         {issueRows.length === 0 ? (
-          <p className="text-sm text-muted-foreground">本条记录无结构化问题数据。</p>
+          <p className="text-sm text-muted-foreground">本条记录没有结构化问题数据。</p>
         ) : (
           <div className="overflow-x-auto rounded-lg border border-border">
             <table className="w-full min-w-[640px] border-collapse text-left text-sm">
@@ -163,25 +159,12 @@ export default async function GeoAuditHistoryDetailPage({
                 </tr>
               </thead>
               <tbody>
-                {issueRows.map((i) => (
-                  <tr key={i.key} className="border-b border-border last:border-0">
-                    <td className="px-3 py-2 align-top">{i.severity}</td>
-                    <td className="px-3 py-2 align-top">{i.layer}</td>
-                    <td className="px-3 py-2 align-top font-mono text-xs">
-                      {String(i.key).startsWith("json-") ? (
-                        <Link
-                          href={`/admin/geo-audit/issues/by-code?runId=${encodeURIComponent(id)}&code=${encodeURIComponent(i.code)}`}
-                          className="text-primary underline"
-                        >
-                          {i.code}
-                        </Link>
-                      ) : (
-                        <Link href={`/admin/geo-audit/issues/${i.key}`} className="text-primary underline">
-                          {i.code}
-                        </Link>
-                      )}
-                    </td>
-                    <td className="px-3 py-2 align-top">{i.title}</td>
+                {issueRows.map((issue) => (
+                  <tr key={issue.key} className="border-b border-border last:border-0">
+                    <td className="px-3 py-2 align-top">{issue.severity}</td>
+                    <td className="px-3 py-2 align-top">{issue.layer}</td>
+                    <td className="px-3 py-2 align-top font-mono text-xs">{issue.code}</td>
+                    <td className="px-3 py-2 align-top">{issue.title}</td>
                   </tr>
                 ))}
               </tbody>
@@ -191,7 +174,7 @@ export default async function GeoAuditHistoryDetailPage({
       </section>
 
       <section>
-        <h3 className="mb-3 text-sm font-medium">报告（渲染）</h3>
+        <h3 className="mb-3 text-sm font-medium">报告预览</h3>
         <div className="rounded-lg border border-border bg-background p-4">
           <GeoAuditMarkdown markdown={row.report_markdown ?? ""} />
         </div>

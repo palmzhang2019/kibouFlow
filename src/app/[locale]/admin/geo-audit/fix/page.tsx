@@ -1,28 +1,14 @@
-import { Link } from "@/i18n/navigation";
-import { listAdminRepoFileDescriptors } from "@/lib/admin-repo-files";
+import { redirect } from "next/navigation";
+import { getGeoAuditIssueById } from "@/lib/geo-audit-issues";
 
 export const dynamic = "force-dynamic";
 
-export default function GeoAuditFixIndexPage() {
-  const files = listAdminRepoFileDescriptors();
-  return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-lg font-semibold">源码修复</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          在后台直接打开并保存白名单内的源码文件，用于处理体检报告中的可落点问题（sitemap、JSON-LD、robots 等）。
-        </p>
-      </div>
-      <ul className="space-y-2 text-sm">
-        {files.map((f) => (
-          <li key={f.key}>
-            <Link href={`/admin/geo-audit/fix/${f.key}`} className="font-medium text-primary underline">
-              {f.label}
-            </Link>
-            <span className="ml-2 text-muted-foreground">({f.relativePath})</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+type SearchParams = Promise<{ issueId?: string }>;
+
+export default async function GeoAuditFixPage({ searchParams }: { searchParams: SearchParams }) {
+  const sp = await searchParams;
+  const issueId = sp.issueId ?? "";
+  const issue = await getGeoAuditIssueById(issueId);
+
+  redirect(issue ? `/admin/geo-audit/history/${issue.run_id}` : "/admin/geo-audit/history");
 }

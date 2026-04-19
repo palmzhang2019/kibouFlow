@@ -392,6 +392,10 @@
       "frameworks": "判断框架",
       "concepts": "概念与术语"
     },
+    "sectionLeads": {
+      "clusters": "优先从主题簇入口开始，先找到你所在的主题，再进入对应的框架页、概念页和 FAQ。",
+      "faqs": "FAQ 保持一页一组高频问题，先导航到具体问题，再决定哪些问题后续值得拆成独立 URL。"
+    },
     "contentTypes": {
       "problem": "问题解答",
       "path": "路径判断",
@@ -411,12 +415,46 @@
     "readMore": "阅读详情",
     "relatedArticles": "相关文章",
     "publishedAt": "发布于",
+    "updatedAt": "更新于",
     "backToGuides": "返回路径判断",
     "nextSteps": {
       "title": "下一步建议",
       "subtitle": "如果你还不确定下一步，请先看这些页面。",
       "caseLibrary": "查看案例库，找到与你最接近的样本",
       "clusterFaq": "查看本主题 FAQ，快速排除常见误判"
+    },
+    "template": {
+      "clusterHub": {
+        "title": "所属主题簇入口",
+        "subtitle": "先回到主题簇入口页，能更稳定地理解这篇内容在整个知识网络中的位置。"
+      },
+      "cluster": {
+        "themeFocus": "主题说明",
+        "readingOrder": "推荐阅读顺序"
+      },
+      "framework": {
+        "useWhen": "适用场景",
+        "outcome": "判断后你会得到什么",
+        "mistakes": "常见误区"
+      },
+      "concept": {
+        "definition": "一句话定义",
+        "useWhen": "适用场景",
+        "notFor": "非适用场景"
+      },
+      "faq": {
+        "mainQuestion": "FAQ 主题",
+        "questionNav": "问题导航",
+        "futureArticlePrep": "后续可独立承接的问题",
+        "futureArticlePrepHint": "这一页先保留 FAQ 聚合形态，同时把最值得拆分的问题稳定收束到少量主题。"
+      },
+      "case": {
+        "background": "背景与判断前提",
+        "reusableConclusion": "可复用结论"
+      },
+      "conclusion": {
+        "title": "结论"
+      }
     },
     "articleCta": {
       "title": "想整理一下你的情况？",

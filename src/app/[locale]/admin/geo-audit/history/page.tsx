@@ -5,8 +5,8 @@ import { getMissingDatabaseEnv } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
-function scoreCell(v: number | null) {
-  return v == null ? "—" : String(v);
+function scoreCell(value: number | null) {
+  return value == null ? "—" : String(value);
 }
 
 export default async function GeoAuditHistoryPage() {
@@ -26,10 +26,11 @@ export default async function GeoAuditHistoryPage() {
           ))}
         </ul>
         <p className="mt-2 text-muted-foreground">
-          请把连接串写在 <code className="rounded bg-amber-100 px-1">.env.local</code> 后<strong>重启</strong>{" "}
+          请把连接串写入 <code className="rounded bg-amber-100 px-1">.env.local</code> 后重启{" "}
           <code className="rounded bg-amber-100 px-1">npm run dev</code> /{" "}
-          <code className="rounded bg-amber-100 px-1">npm run start</code>。并在该库按序执行{" "}
-          <code className="rounded bg-amber-100 px-1">supabase/migrations/</code> 下全部 SQL 完成建表。
+          <code className="rounded bg-amber-100 px-1">npm run start</code>，并确认已经执行
+          <code className="mx-1 rounded bg-amber-100 px-1">supabase/migrations/</code>
+          下的全部 SQL。
         </p>
       </div>
     );
@@ -41,7 +42,7 @@ export default async function GeoAuditHistoryPage() {
     return (
       <div className="space-y-4">
         <h2 className="text-lg font-semibold">历史记录</h2>
-        <p className="text-sm text-muted-foreground">暂无记录。请在「运行体检」页执行一次 GEO 体检。</p>
+        <p className="text-sm text-muted-foreground">暂无记录。请先在“运行体检”页执行一次 GEO 体检。</p>
         <Link href="/admin/geo-audit/run" className="text-sm font-medium text-primary underline">
           去运行体检
         </Link>
@@ -67,32 +68,32 @@ export default async function GeoAuditHistoryPage() {
               <th className="px-3 py-2 font-medium">总分</th>
               <th className="px-3 py-2 font-medium">五项</th>
               <th className="px-3 py-2 font-medium">LLM</th>
-              <th className="px-3 py-2 font-medium">未关问题</th>
+              <th className="px-3 py-2 font-medium">问题数（未关闭）</th>
               <th className="px-3 py-2 font-medium">摘要</th>
             </tr>
           </thead>
           <tbody>
-            {rows.map((r) => (
-              <tr key={r.id} className="border-b border-border last:border-0 hover:bg-muted/30">
+            {rows.map((row) => (
+              <tr key={row.id} className="border-b border-border last:border-0 hover:bg-muted/30">
                 <td className="px-3 py-2 align-top">
                   <Link
-                    href={`/admin/geo-audit/history/${r.id}`}
+                    href={`/admin/geo-audit/history/${row.id}`}
                     className="text-primary underline decoration-primary/40 underline-offset-2"
                   >
-                    {new Date(r.started_at).toLocaleString("zh-CN")}
+                    {new Date(row.started_at).toLocaleString("zh-CN")}
                   </Link>
                 </td>
-                <td className="px-3 py-2 align-top">{r.status}</td>
-                <td className="px-3 py-2 align-top">{scoreCell(r.overall_score)}</td>
+                <td className="px-3 py-2 align-top">{row.status}</td>
+                <td className="px-3 py-2 align-top">{scoreCell(row.overall_score)}</td>
                 <td className="px-3 py-2 align-top font-mono text-xs text-muted-foreground">
-                  R {scoreCell(r.retrievability_score)} / C {scoreCell(r.chunkability_score)} / E{" "}
-                  {scoreCell(r.extractability_score)} / T {scoreCell(r.trust_score)} / A{" "}
-                  {scoreCell(r.attributability_score)}
+                  R {scoreCell(row.retrievability_score)} / C {scoreCell(row.chunkability_score)} / E{" "}
+                  {scoreCell(row.extractability_score)} / T {scoreCell(row.trust_score)} / A{" "}
+                  {scoreCell(row.attributability_score)}
                 </td>
-                <td className="px-3 py-2 align-top">{r.used_llm ? "是" : "否"}</td>
-                <td className="px-3 py-2 align-top font-mono text-xs">{r.issue_open_count}</td>
+                <td className="px-3 py-2 align-top">{row.used_llm ? "是" : "否"}</td>
+                <td className="px-3 py-2 align-top font-mono text-xs">{row.issue_open_count}</td>
                 <td className="max-w-xs px-3 py-2 align-top text-muted-foreground">
-                  {summaryFromMarkdown(r.report_markdown ?? "", 120)}
+                  {summaryFromMarkdown(row.report_markdown ?? "", 120)}
                 </td>
               </tr>
             ))}

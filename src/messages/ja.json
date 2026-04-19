@@ -392,6 +392,10 @@
       "frameworks": "判断フレーム",
       "concepts": "概念・用語"
     },
+    "sectionLeads": {
+      "clusters": "まずはテーマクラスター入口から入り、自分の論点に近いフレーム、概念、FAQ へ順番に進める構成です。",
+      "faqs": "FAQ は高頻度の質問を短く整理し、必要なら後続で独立 URL に分けられるように整えてあります。"
+    },
     "contentTypes": {
       "problem": "よくある悩み",
       "path": "進め方の判断",
@@ -412,11 +416,45 @@
     "relatedArticles": "関連記事",
     "publishedAt": "公開日",
     "backToGuides": "ガイドに戻る",
+    "updatedAt": "更新日",
     "nextSteps": {
       "title": "次のステップ",
       "subtitle": "まだ迷う場合は、次のページから進めてください。",
       "caseLibrary": "ケースライブラリで近いサンプルを確認する",
       "clusterFaq": "このテーマのFAQで誤判定を先に減らす"
+    },
+    "template": {
+      "clusterHub": {
+        "title": "所属テーマクラスター",
+        "subtitle": "先にクラスター入口へ戻ると、このページが知識ネットワークのどこにあるかを安定してつかめます。"
+      },
+      "cluster": {
+        "themeFocus": "テーマの整理",
+        "readingOrder": "おすすめの読む順番"
+      },
+      "framework": {
+        "useWhen": "使う場面",
+        "outcome": "判断すると何が分かるか",
+        "mistakes": "よくある誤り"
+      },
+      "concept": {
+        "definition": "ひとことで定義",
+        "useWhen": "向いている場面",
+        "notFor": "向いていない場面"
+      },
+      "faq": {
+        "mainQuestion": "FAQ のテーマ",
+        "questionNav": "質問ナビ",
+        "futureArticlePrep": "将来独立 URL にしやすい質問",
+        "futureArticlePrepHint": "今回は FAQ 集約ページのままにしつつ、独立記事に切り出しやすい論点だけを少数に整理しています。"
+      },
+      "case": {
+        "background": "背景と判断前提",
+        "reusableConclusion": "再利用しやすい結論"
+      },
+      "conclusion": {
+        "title": "結論"
+      }
     },
     "articleCta": {
       "title": "あなたの状況を整理してみませんか？",

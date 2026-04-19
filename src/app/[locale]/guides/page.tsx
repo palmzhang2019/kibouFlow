@@ -90,6 +90,9 @@ export default async function GuidesIndexPage({
         {clusterEntries.length > 0 && (
           <div>
             <h2 className="text-xl font-bold mb-6">{t("sections.clusters")}</h2>
+            <p className="mb-6 max-w-2xl text-sm leading-6 text-muted">
+              {t("sectionLeads.clusters")}
+            </p>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {clusterEntries.map((article) => (
                 <ArticleCard key={article.href} article={article} />
@@ -118,6 +121,9 @@ export default async function GuidesIndexPage({
         {faqEntries.length > 0 && (
           <div>
             <h2 className="text-xl font-bold mb-6">{t("sections.faqs")}</h2>
+            <p className="mb-6 max-w-2xl text-sm leading-6 text-muted">
+              {t("sectionLeads.faqs")}
+            </p>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {faqEntries.map((article) => (
                 <ArticleCard key={article.href} article={article} />

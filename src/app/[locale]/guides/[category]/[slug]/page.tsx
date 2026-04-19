@@ -3,8 +3,10 @@ import { getTranslations } from "next-intl/server";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import {
   getArticleBySlug,
-  getRelatedArticles,
+  getClusterEntryForArticle,
   getAllArticleSlugs,
+  getStrategicRelatedArticles,
+  buildFaqArticleSuggestions,
   CATEGORIES,
   type Category,
 } from "@/lib/content";
@@ -13,6 +15,7 @@ import { ArticleTracking } from "@/components/article/ArticleTracking";
 import { getMDXComponents } from "@/components/article/mdx-components";
 import { ArticleJsonLd } from "@/components/seo/ArticleJsonLd";
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
+import { DefinedTermJsonLd } from "@/components/seo/DefinedTermJsonLd";
 import { FAQPageJsonLd } from "@/components/seo/FAQPageJsonLd";
 import { HowToJsonLd } from "@/components/seo/HowToJsonLd";
 import { buildBreadcrumbItems } from "@/lib/seo/breadcrumbs";
@@ -101,9 +104,8 @@ export default async function ArticlePage({
     ),
   ]);
 
-  const relatedArticles = article.relatedSlugs
-    ? getRelatedArticles(locale, article.relatedSlugs)
-    : [];
+  const clusterEntry = getClusterEntryForArticle(locale, article);
+  const relatedArticles = getStrategicRelatedArticles(locale, article);
 
   const tNav = await getTranslations({ locale, namespace: "common.nav" });
   const tGuides = await getTranslations({ locale, namespace: "guides" });
@@ -133,6 +135,14 @@ export default async function ArticlePage({
         })
       : null;
   const toggles = togglesResult.data;
+  const faqSuggestions =
+    article.contentType === "faq" && faqPairs.length > 0
+      ? buildFaqArticleSuggestions(
+          locale,
+          article,
+          faqPairs.map((pair) => pair.name),
+        )
+      : [];
 
   return (
     <>
@@ -146,6 +156,9 @@ export default async function ArticlePage({
           overrides={geoBundle.page?.jsonld_overrides ?? undefined}
         />
       ) : null}
+      {article.contentType === "concept" ? (
+        <DefinedTermJsonLd article={article} locale={locale} />
+      ) : null}
       {toggles.enable_faqpage && faqPairs.length > 0 ? (
         <FAQPageJsonLd pairs={faqPairs} locale={locale} />
       ) : null}
@@ -153,7 +166,13 @@ export default async function ArticlePage({
         <HowToJsonLd howTo={howTo} locale={locale} />
       ) : null}
       <ArticleTracking category={category} slug={slug} />
-      <ArticleLayout article={article} relatedArticles={relatedArticles}>
+      <ArticleLayout
+        article={article}
+        relatedArticles={relatedArticles}
+        clusterEntry={clusterEntry}
+        faqPairs={faqPairs}
+        faqSuggestions={faqSuggestions}
+      >
         <MDXRemote
           source={article.content}
           components={getMDXComponents()}

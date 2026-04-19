@@ -93,6 +93,51 @@ def count_mdx_signals(content_dir: Path) -> dict:
     }
 
 
+def _strip_quoted(value: str) -> str:
+    """去掉 frontmatter 值外层的成对引号（如果存在）。"""
+    v = value.strip()
+    if len(v) >= 2 and ((v[0] == '"' and v[-1] == '"') or (v[0] == "'" and v[-1] == "'")):
+        return v[1:-1]
+    return v
+
+
+def collect_mdx_records(root: Path, locale: str) -> list[dict]:
+    """逐篇扫描 content/{locale}/ 下的 MDX，返回定位 + 关键 frontmatter 标志，供批量修复工作台使用。"""
+    content_dir = root / "content" / locale
+    records: list[dict] = []
+    if not content_dir.is_dir():
+        return records
+    for p in iter_mdx(content_dir):
+        raw = read_text(p)
+        fm, main = parse_frontmatter_keys(raw)
+        try:
+            rel_from_locale_dir = p.relative_to(content_dir)
+        except ValueError:
+            continue
+        parts = rel_from_locale_dir.parts
+        category = parts[0] if len(parts) > 1 else ""
+        try:
+            rel_path = p.relative_to(root)
+        except ValueError:
+            rel_path = p
+        records.append(
+            {
+                "locale": locale,
+                "category": category,
+                "slug": p.stem,
+                "filePath": str(rel_path).replace("\\", "/"),
+                "title": _strip_quoted(fm.get("title", "")),
+                "hasTldr": "tldr" in fm,
+                "hasNotSuitableFor": ("notSuitableFor" in fm) or ("not_suitable_for" in fm),
+                "hasConclusionH2": bool(
+                    re.search(r"^##\s*鍏堣缁撹", main, re.MULTILINE)
+                    or re.search(r"^##\s*绲愯珫", main, re.MULTILINE)
+                ),
+            }
+        )
+    return records
+
+
 def grep_src(src: Path, pattern: str) -> bool:
     if not src.is_dir():
         return False
@@ -128,9 +173,12 @@ class AuditFacts:
     org_same_as_lines: int = 0
     content_signals: dict = field(default_factory=dict)
     doc_geo_principles_exists: bool = False
+    # 逐篇 MDX 元信息；仅供 build_issues 生成 affectedPaths，不进入 facts JSON 以免膨胀
+    mdx_records: list[dict] = field(default_factory=list)
 
     def to_dict(self) -> dict:
         d = asdict(self)
+        d.pop("mdx_records", None)
         return d
 
 
@@ -182,6 +230,7 @@ def collect_facts(root: Path) -> AuditFacts:
 
     zh = count_mdx_signals(root / "content" / "zh")
     ja = count_mdx_signals(root / "content" / "ja")
+    f.mdx_records = collect_mdx_records(root, "zh") + collect_mdx_records(root, "ja")
     f.content_signals = {
         "mdx_total_zh": zh["mdx_total"],
         "mdx_total_ja": ja["mdx_total"],
@@ -276,6 +325,78 @@ def heuristic_scores(f: AuditFacts) -> dict[str, float]:
     }
 
 
+_PRINCIPLE_RECOMMENDATIONS: dict[str, str] = {
+    "可召回 Retrievability": "完善 robots.ts / sitemap / llms.txt，确保可发现性与常见 AI 爬虫显式策略",
+    "可切块 Chunkability": "补 tldr、小标题、列表块，增强首屏摘要与段落切分",
+    "可抽取 Extractability": "强化 Article/DefinedTerm JSON-LD 字段（about / sameAs / author.Person 等）",
+    "可信 Citation-Worthiness": "补作者与审校者归因、引用源、结论边界（如 notSuitableFor）",
+    "可归因 Attributability": "完善 Organization.sameAs 外部实体映射与 Person 级作者归因",
+}
+
+
+def principle_recommended_action(key: str) -> str:
+    return _PRINCIPLE_RECOMMENDATIONS.get(key, "复核对应原理的观测信号并补齐缺失项")
+
+
+def _build_tldr_affected_paths(records: list[dict]) -> list[dict]:
+    out: list[dict] = []
+    for r in records:
+        if r.get("hasTldr"):
+            continue
+        out.append(
+            {
+                "locale": r.get("locale", ""),
+                "category": r.get("category", ""),
+                "slug": r.get("slug", ""),
+                "filePath": r.get("filePath", ""),
+                "title": r.get("title", ""),
+            }
+        )
+    return out
+
+
+def _build_principle_affected_paths(records: list[dict], low_keys: list[str], limit: int = 20) -> list[dict]:
+    """根据当前低分原理从 MDX 记录中反推受影响文件。保持轻量：仅覆盖能直接映射的信号。"""
+    reason_order: list[str] = []
+    for key in low_keys:
+        mapped: list[str] = []
+        if "Chunkability" in key:
+            mapped = ["missing_tldr", "missing_conclusion_h2"]
+        elif "Citation-Worthiness" in key:
+            mapped = ["missing_not_suitable_for", "missing_tldr"]
+        for reason in mapped:
+            if reason not in reason_order:
+                reason_order.append(reason)
+    if not reason_order:
+        return []
+    out: list[dict] = []
+    for r in records:
+        reasons = [
+            reason
+            for reason in reason_order
+            if (
+                (reason == "missing_tldr" and not r.get("hasTldr"))
+                or (reason == "missing_not_suitable_for" and not r.get("hasNotSuitableFor"))
+                or (reason == "missing_conclusion_h2" and not r.get("hasConclusionH2"))
+            )
+        ]
+        if not reasons:
+            continue
+        out.append(
+            {
+                "locale": r.get("locale", ""),
+                "category": r.get("category", ""),
+                "slug": r.get("slug", ""),
+                "filePath": r.get("filePath", ""),
+                "title": r.get("title", ""),
+                "reasons": reasons,
+            }
+        )
+        if len(out) >= limit:
+            break
+    return out
+
+
 def build_issues(f: AuditFacts, scores: dict[str, float]) -> list[dict[str, object]]:
     """从观测事实生成结构化问题列表（供治理后台落库与展示）。"""
     issues: list[dict[str, object]] = []
@@ -344,12 +465,21 @@ def build_issues(f: AuditFacts, scores: dict[str, float]) -> list[dict[str, obje
             {"article_jsonld_path": f.article_jsonld_path or None},
         )
     if tldr_any == 0 and mdx_all > 0:
+        affected_paths = _build_tldr_affected_paths(f.mdx_records)
         add(
             "CONTENT_TLDR_COVERAGE_ZERO",
             "所有 MDX 均未检测到 tldr frontmatter：首段/可切块摘要不足",
             "medium",
             "page",
-            {"mdx_total_all": mdx_all},
+            {
+                "kind": "batch_mdx_frontmatter",
+                "missingField": "tldr",
+                "totalAffected": len(affected_paths),
+                "affectedPaths": affected_paths,
+                "sampleSuggestion": "请在 frontmatter 中补充 1-2 句可切块摘要 tldr",
+                # 保留历史字段以便 facts_snapshot 与旧消费者兼容
+                "mdx_total_all": mdx_all,
+            },
         )
     if mdx_all > 0 and ch_any / mdx_all < 0.15:
         add(
@@ -400,14 +530,37 @@ def build_issues(f: AuditFacts, scores: dict[str, float]) -> list[dict[str, obje
             {},
         )
     # 分项分数偏低时补充一条汇总型问题（与启发式分数同源，便于总览台对比）
-    low = [k for k, v in scores.items() if isinstance(v, (int, float)) and float(v) < 5.5]
+    threshold = 5.5
+    low = [k for k, v in scores.items() if isinstance(v, (int, float)) and float(v) < threshold]
     if low:
+        low_principles = [
+            {
+                "principleKey": k,
+                "score": float(scores[k]),
+                "recommendedAction": principle_recommended_action(k),
+                **(
+                    {"site_level": True}
+                    if any(token in k for token in ("Retrievability", "Extractability", "Attributability"))
+                    else {}
+                ),
+            }
+            for k in low
+        ]
+        affected_paths = _build_principle_affected_paths(f.mdx_records, low)
         add(
             "SCORE_PRINCIPLE_BELOW_THRESHOLD",
-            f"以下原理启发式分数偏低（<5.5），建议优先复核：{', '.join(low)}",
+            f"以下原理启发式分数偏低（<{threshold}），建议优先复核：{', '.join(low)}",
             "medium",
             "site",
-            {"principles": low, "scores": {k: scores[k] for k in low}},
+            {
+                "kind": "principle_score_batch",
+                "threshold": threshold,
+                "lowPrinciples": low_principles,
+                "affectedPaths": affected_paths,
+                # 保留历史字段以便与旧消费者兼容
+                "principles": low,
+                "scores": {k: scores[k] for k in low},
+            },
         )
 
     return issues
