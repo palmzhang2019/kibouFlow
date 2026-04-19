@@ -10,9 +10,11 @@ type RunResponse = {
   ok: boolean;
   id: string | null;
   persisted: boolean;
+  issues_inserted?: number;
   exitCode: number | null;
   markdown: string;
   json: unknown;
+  issues?: { code: string; title: string; severity: string; layer: string }[];
   stderr: string;
   command: string[];
   error?: string;
@@ -51,9 +53,11 @@ export function GeoAuditRunner() {
           ok: data.ok ?? false,
           id: data.id ?? null,
           persisted: data.persisted ?? false,
+          issues_inserted: typeof data.issues_inserted === "number" ? data.issues_inserted : undefined,
           exitCode: data.exitCode ?? null,
           markdown: data.markdown ?? "",
           json: data.json ?? null,
+          issues: Array.isArray(data.issues) ? data.issues : undefined,
           stderr: data.stderr ?? "",
           command: data.command ?? [],
           used_llm: data.used_llm,
@@ -69,9 +73,11 @@ export function GeoAuditRunner() {
         ok: data.ok,
         id: data.id ?? null,
         persisted: data.persisted ?? false,
+        issues_inserted: typeof data.issues_inserted === "number" ? data.issues_inserted : undefined,
         exitCode: data.exitCode,
         markdown: data.markdown,
         json: data.json,
+        issues: Array.isArray(data.issues) ? data.issues : undefined,
         stderr: data.stderr,
         command: data.command,
         used_llm: data.used_llm,
@@ -149,6 +155,10 @@ export function GeoAuditRunner() {
           <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
             <span>退出码: {result.exitCode ?? "—"}</span>
             {result.overall_score != null ? <span>总分: {result.overall_score}</span> : null}
+            {result.issues ? <span>结构化问题: {result.issues.length} 条</span> : null}
+            {result.persisted && result.ok && result.issues_inserted != null ? (
+              <span>已写入 geo_audit_issues: {result.issues_inserted} 行</span>
+            ) : null}
             <span>LLM: {result.used_llm ? `是（${result.llm_model ?? "—"}）` : "否"}</span>
             {result.script_version ? <span>脚本: {result.script_version}</span> : null}
             <span className={result.ok ? "text-emerald-700 dark:text-emerald-400" : "text-red-700 dark:text-red-400"}>

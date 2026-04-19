@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getGeoAuditRunById } from "@/lib/geo-audit-runs";
+import { getGeoAuditRunById, mergeGeoAuditRunMetaFromReportJson, resolveGeoAuditReportPayload } from "@/lib/geo-audit-runs";
+import { mergeScoreColumnsWithReportJson } from "@/lib/geo-audit-scores";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { requireAdminApiAuth } from "@/lib/require-admin-api";
 
@@ -28,23 +29,37 @@ export async function GET(request: NextRequest, ctx: Params) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
+  const meta = mergeGeoAuditRunMetaFromReportJson(row);
+  const payload = resolveGeoAuditReportPayload(row);
+  const scores = mergeScoreColumnsWithReportJson(
+    {
+      overall_score: row.overall_score,
+      retrievability_score: row.retrievability_score,
+      chunkability_score: row.chunkability_score,
+      extractability_score: row.extractability_score,
+      trust_score: row.trust_score,
+      attributability_score: row.attributability_score,
+    },
+    payload,
+  );
+
   return NextResponse.json({
     id: row.id,
     status: row.status,
     started_at: row.started_at,
     finished_at: row.finished_at,
-    overall_score: row.overall_score,
-    retrievability_score: row.retrievability_score,
-    chunkability_score: row.chunkability_score,
-    extractability_score: row.extractability_score,
-    trust_score: row.trust_score,
-    attributability_score: row.attributability_score,
+    overall_score: scores.overall_score,
+    retrievability_score: scores.retrievability_score,
+    chunkability_score: scores.chunkability_score,
+    extractability_score: scores.extractability_score,
+    trust_score: scores.trust_score,
+    attributability_score: scores.attributability_score,
     report_markdown: row.report_markdown ?? "",
     report_json: row.report_json,
     error_message: row.error_message,
-    used_llm: row.used_llm,
-    llm_model: row.llm_model,
-    script_version: row.script_version,
-    target_path: row.target_path,
+    used_llm: meta.used_llm,
+    llm_model: meta.llm_model,
+    script_version: meta.script_version,
+    target_path: meta.target_path,
   });
 }

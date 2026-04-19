@@ -5,6 +5,7 @@ import {
   getSiteUrl,
   localeToInLanguage,
   organizationId,
+  primaryPersonAuthorId,
   websiteIdForLocale,
 } from "@/lib/seo/site-url";
 import { mergeJsonLd } from "@/lib/geo-settings";
@@ -30,7 +31,12 @@ export function ArticleJsonLd({
     description: article.description,
     datePublished: article.publishedAt,
     dateModified: article.updatedAt || article.publishedAt,
-    author: { "@type": "Organization", name: "GEO" },
+    author: {
+      "@type": "Person",
+      "@id": primaryPersonAuthorId(site),
+      name: "GEO",
+      url: site,
+    },
     publisher: { "@type": "Organization", name: "GEO", "@id": organizationId(site) },
     inLanguage: localeToInLanguage(locale),
     url: pageUrl,

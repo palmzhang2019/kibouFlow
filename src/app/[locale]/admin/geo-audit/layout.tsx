@@ -21,7 +21,7 @@ export default async function GeoAuditLayout({
   if (!secrets) {
     return (
       <div className="mx-auto max-w-4xl px-4 py-10">
-        <h1 className="text-2xl font-bold">GEO 体检后台</h1>
+        <h1 className="text-2xl font-bold">GEO 治理后台</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           未配置 <code className="rounded bg-muted px-1">ADMIN_GEO_PASSWORD</code> /{" "}
           <code className="rounded bg-muted px-1">ADMIN_SESSION_SECRET</code>，无法使用登录与体检功能。

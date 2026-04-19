@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { runGeoPrinciplesAuditScript } from "@/lib/geo-principles-audit-runner";
+import {
+  coalesceAuditJsonForPersist,
+  runGeoPrinciplesAuditScript,
+  type PrinciplesAuditJson,
+} from "@/lib/geo-principles-audit-runner";
 import { checkRateLimit } from "@/lib/rate-limit";
 import {
   canPersistGeoAuditRuns,
@@ -7,10 +11,9 @@ import {
   serializeReportJsonForDb,
   updateGeoAuditRun,
 } from "@/lib/geo-audit-runs";
+import { insertGeoAuditIssuesForRun, normalizeIssueInputs } from "@/lib/geo-audit-issues";
 import { extractScoresFromAuditJson } from "@/lib/geo-audit-scores";
 import { requireAdminApiAuth } from "@/lib/require-admin-api";
-import type { PrinciplesAuditJson } from "@/lib/geo-principles-audit-runner";
-
 function readMeta(j: PrinciplesAuditJson | null) {
   if (!j) {
     return {
@@ -44,8 +47,10 @@ export async function POST(request: NextRequest) {
   const runId = canPersistGeoAuditRuns() ? await insertGeoAuditRunRunning() : null;
 
   const result = await runGeoPrinciplesAuditScript();
-  const scores = extractScoresFromAuditJson(result.json);
-  const meta = readMeta(result.json);
+  const merged = coalesceAuditJsonForPersist(result.json, result.markdown);
+  const scores = extractScoresFromAuditJson(merged);
+  const meta = readMeta(merged);
+  const issuesPayload = normalizeIssueInputs(merged?.issues);
   const finishedAt = new Date().toISOString();
 
   const errMsg = result.ok
@@ -53,19 +58,23 @@ export async function POST(request: NextRequest) {
     : [result.stderr, result.exitCode != null ? `exitCode=${result.exitCode}` : ""].filter(Boolean).join("\n") ||
       "audit_failed";
 
+  let issues_inserted = 0;
   if (runId) {
     await updateGeoAuditRun(runId, {
       status: result.ok ? "success" : "failed",
       finished_at: finishedAt,
       ...scores,
       report_markdown: result.markdown,
-      report_json: serializeReportJsonForDb(result.json),
+      report_json: serializeReportJsonForDb(merged),
       error_message: errMsg,
       used_llm: meta.used_llm,
       llm_model: meta.llm_model,
       script_version: meta.script_version,
       target_path: meta.target_path,
     });
+    if (result.ok && issuesPayload.length > 0) {
+      issues_inserted = await insertGeoAuditIssuesForRun(runId, issuesPayload);
+    }
   }
 
   return NextResponse.json(
@@ -73,9 +82,11 @@ export async function POST(request: NextRequest) {
       ok: result.ok,
       id: runId,
       persisted: Boolean(runId),
+      issues_inserted,
       exitCode: result.exitCode,
       markdown: result.markdown,
-      json: result.json,
+      json: merged ?? result.json,
+      issues: issuesPayload,
       stderr: result.stderr,
       command: result.command,
       error: result.ok ? undefined : errMsg ?? undefined,

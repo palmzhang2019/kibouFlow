@@ -32,6 +32,7 @@ export async function GET(request: NextRequest) {
     summary: summaryFromMarkdown(r.report_markdown ?? ""),
     used_llm: r.used_llm,
     script_version: r.script_version,
+    issue_open_count: r.issue_open_count,
   }));
 
   return NextResponse.json({ items });

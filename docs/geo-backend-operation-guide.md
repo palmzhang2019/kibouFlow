@@ -26,7 +26,6 @@
 
 其它可选：
 
-- `GEO_AUDIT_SKIP=1`：CI 等场景跳过真实 Python 子进程。
 - `GEO_AUDIT_USE_LLM=1` + `OPENAI_API_KEY`：在脚本输出末尾附加「LLM 归纳与建议（附录）」；模型默认 `GEO_AUDIT_OPENAI_MODEL=chatgpt-5.4-mini`（请以 OpenAI 文档为准）。
 
 ---

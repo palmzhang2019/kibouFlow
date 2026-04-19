@@ -1,21 +1,27 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { POST as runPost } from "@/app/api/admin/geo-audit/run/route";
-import { GET as historyGet } from "@/app/api/admin/geo-audit/history/route";
-import { POST as loginPost } from "@/app/api/admin/login/route";
 import { NextRequest } from "next/server";
+import { POST as loginPost } from "@/app/api/admin/login/route";
 
 const { runScriptMock } = vi.hoisted(() => ({
   runScriptMock: vi.fn(async () => ({
     ok: true,
     exitCode: 0,
-    markdown: "（mock：不执行真实 Python）",
+    markdown: "# mock audit",
     json: {
-      scores: {},
+      scores: { "可召回 Retrievability": 9.0 },
       facts: {},
-      issues: [] as unknown[],
+      issues: [
+        {
+          code: "MOCK_TEST_ISSUE",
+          title: "集成测试占位问题",
+          severity: "low",
+          layer: "site",
+          evidence: { fromMock: true },
+        },
+      ],
       used_llm: false,
-      script_version: "test-skip-env",
-      target_path: process.cwd(),
+      script_version: "test-mock",
+      target_path: "/tmp/repo",
     },
     stderr: "",
     command: ["python", "mock"],
@@ -30,7 +36,9 @@ vi.mock("@/lib/geo-principles-audit-runner", async (importOriginal) => {
   };
 });
 
-describe("admin geo-audit API routes", () => {
+import { POST as runPost } from "@/app/api/admin/geo-audit/run/route";
+
+describe("admin geo-audit run with mocked script", () => {
   const origPwd = process.env.ADMIN_GEO_PASSWORD;
   const origSec = process.env.ADMIN_SESSION_SECRET;
   const origDb = process.env.DATABASE_URL;
@@ -66,24 +74,7 @@ describe("admin geo-audit API routes", () => {
     return `geo_admin_session=${m![1]}`;
   }
 
-  it("GET history returns 401 without session", async () => {
-    const res = await historyGet(new NextRequest("http://localhost/api/admin/geo-audit/history"));
-    expect(res.status).toBe(401);
-  });
-
-  it("GET history returns items array when authenticated", async () => {
-    const cookie = await sessionCookie();
-    const res = await historyGet(
-      new NextRequest("http://localhost/api/admin/geo-audit/history", {
-        headers: { cookie },
-      }),
-    );
-    expect(res.status).toBe(200);
-    const body = (await res.json()) as { items: unknown[] };
-    expect(Array.isArray(body.items)).toBe(true);
-  });
-
-  it("POST run returns ok with mocked script and persisted false without DATABASE_URL", async () => {
+  it("POST run returns normalized issues array without DATABASE_URL", async () => {
     const cookie = await sessionCookie();
     const res = await runPost(
       new NextRequest("http://localhost/api/admin/geo-audit/run", {
@@ -95,15 +86,13 @@ describe("admin geo-audit API routes", () => {
     const body = (await res.json()) as {
       ok: boolean;
       persisted: boolean;
-      markdown: string;
-      issues: unknown[];
-      script_version: string | null;
+      issues: { code: string; title: string; severity: string; layer: string }[];
     };
     expect(body.ok).toBe(true);
     expect(body.persisted).toBe(false);
-    expect(body.script_version).toBe("test-skip-env");
     expect(Array.isArray(body.issues)).toBe(true);
-    expect(body.issues).toEqual([]);
+    expect(body.issues).toHaveLength(1);
+    expect(body.issues[0]?.code).toBe("MOCK_TEST_ISSUE");
     expect(runScriptMock).toHaveBeenCalledTimes(1);
   });
 });

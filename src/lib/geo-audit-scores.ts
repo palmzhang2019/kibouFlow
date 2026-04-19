@@ -8,6 +8,35 @@ function pickScore(scores: Record<string, number> | undefined, needle: string): 
   return typeof v === "number" && Number.isFinite(v) ? v : null;
 }
 
+/** 与 geo_audit_runs 表中分数列对应（用于 DB + report_json 合并） */
+export type GeoAuditScoreColumns = {
+  overall_score: number | null;
+  retrievability_score: number | null;
+  chunkability_score: number | null;
+  extractability_score: number | null;
+  trust_score: number | null;
+  attributability_score: number | null;
+};
+
+/**
+ * 当入库分数列为空（例如旧数据、解析失败）时，从 report_json.scores 回算，
+ * 优先保留非空的 DB 列。
+ */
+export function mergeScoreColumnsWithReportJson(
+  db: GeoAuditScoreColumns,
+  report_json: Record<string, unknown> | null | undefined,
+): GeoAuditScoreColumns {
+  const fromJson = extractScoresFromAuditJson(report_json as PrinciplesAuditJson | null);
+  return {
+    overall_score: db.overall_score ?? fromJson.overall_score,
+    retrievability_score: db.retrievability_score ?? fromJson.retrievability_score,
+    chunkability_score: db.chunkability_score ?? fromJson.chunkability_score,
+    extractability_score: db.extractability_score ?? fromJson.extractability_score,
+    trust_score: db.trust_score ?? fromJson.trust_score,
+    attributability_score: db.attributability_score ?? fromJson.attributability_score,
+  };
+}
+
 export function extractScoresFromAuditJson(json: PrinciplesAuditJson | null): {
   overall_score: number | null;
   retrievability_score: number | null;

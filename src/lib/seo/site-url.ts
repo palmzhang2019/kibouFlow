@@ -6,6 +6,11 @@ export function organizationId(siteUrl?: string): string {
   return `${(siteUrl ?? getSiteUrl()).replace(/\/$/, "")}/#organization`;
 }
 
+/** 与 Organization 区分，用于 Article.author 的 Person @id */
+export function primaryPersonAuthorId(siteUrl?: string): string {
+  return `${(siteUrl ?? getSiteUrl()).replace(/\/$/, "")}/#person`;
+}
+
 export function websiteIdForLocale(locale: string, siteUrl?: string): string {
   const base = (siteUrl ?? getSiteUrl()).replace(/\/$/, "");
   return `${base}/${locale}/#website`;

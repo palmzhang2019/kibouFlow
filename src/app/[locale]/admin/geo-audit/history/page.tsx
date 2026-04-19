@@ -41,9 +41,9 @@ export default async function GeoAuditHistoryPage() {
     return (
       <div className="space-y-4">
         <h2 className="text-lg font-semibold">历史记录</h2>
-        <p className="text-sm text-muted-foreground">暂无记录。请在主页运行一次 GEO 体检。</p>
-        <Link href="/admin/geo-audit" className="text-sm font-medium text-primary underline">
-          返回主页
+        <p className="text-sm text-muted-foreground">暂无记录。请在「运行体检」页执行一次 GEO 体检。</p>
+        <Link href="/admin/geo-audit/run" className="text-sm font-medium text-primary underline">
+          去运行体检
         </Link>
       </div>
     );
@@ -54,7 +54,7 @@ export default async function GeoAuditHistoryPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold">历史记录</h2>
         <Link href="/admin/geo-audit" className="text-sm text-primary underline">
-          返回主页
+          返回总览
         </Link>
       </div>
 
@@ -67,6 +67,7 @@ export default async function GeoAuditHistoryPage() {
               <th className="px-3 py-2 font-medium">总分</th>
               <th className="px-3 py-2 font-medium">五项</th>
               <th className="px-3 py-2 font-medium">LLM</th>
+              <th className="px-3 py-2 font-medium">未关问题</th>
               <th className="px-3 py-2 font-medium">摘要</th>
             </tr>
           </thead>
@@ -89,6 +90,7 @@ export default async function GeoAuditHistoryPage() {
                   {scoreCell(r.attributability_score)}
                 </td>
                 <td className="px-3 py-2 align-top">{r.used_llm ? "是" : "否"}</td>
+                <td className="px-3 py-2 align-top font-mono text-xs">{r.issue_open_count}</td>
                 <td className="max-w-xs px-3 py-2 align-top text-muted-foreground">
                   {summaryFromMarkdown(r.report_markdown ?? "", 120)}
                 </td>

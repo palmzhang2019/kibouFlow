@@ -37,7 +37,7 @@ export function AdminLoginForm() {
     <form onSubmit={submit} className="mx-auto max-w-sm space-y-4 rounded-lg border border-border p-6">
       <div>
         <h1 className="text-xl font-semibold">GEO 后台登录</h1>
-        <p className="mt-1 text-sm text-muted">登录后仅可使用「运行 GEO 仓库体检」功能。</p>
+        <p className="mt-1 text-sm text-muted">登录后可使用 GEO 治理总览、体检运行与历史记录。</p>
       </div>
       <label className="block text-sm font-medium">
         密码

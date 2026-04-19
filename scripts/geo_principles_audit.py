@@ -26,7 +26,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
 
-SCRIPT_VERSION = "2.0.0"
+SCRIPT_VERSION = "2.1.0"
 
 
 def repo_root() -> Path:
@@ -274,6 +274,143 @@ def heuristic_scores(f: AuditFacts) -> dict[str, float]:
         "可信 Citation-Worthiness": round(p4, 1),
         "可归因 Attributability": round(p5, 1),
     }
+
+
+def build_issues(f: AuditFacts, scores: dict[str, float]) -> list[dict[str, object]]:
+    """从观测事实生成结构化问题列表（供治理后台落库与展示）。"""
+    issues: list[dict[str, object]] = []
+    n_bots = sum(
+        [
+            f.robots_has_gptbot,
+            f.robots_has_claude,
+            f.robots_has_perplexity,
+            f.robots_has_google_extended,
+        ]
+    )
+    mdx_all = int(f.content_signals.get("mdx_total_all", 0) or 0)
+    ch_any = int(f.content_signals.get("conclusion_h2_any", 0) or 0)
+    tldr_any = int(f.content_signals.get("tldr_frontmatter_any", 0) or 0)
+    ns = int(f.content_signals.get("notSuitableFor_any_locale", 0) or 0)
+
+    def add(code: str, title: str, severity: str, layer: str, evidence: dict[str, object]) -> None:
+        issues.append(
+            {
+                "code": code,
+                "title": title,
+                "severity": severity,
+                "layer": layer,
+                "evidence": evidence,
+            }
+        )
+
+    if not f.robots_path:
+        add(
+            "SITE_ROBOTS_MISSING",
+            "未找到 robots.ts：可发现性与爬虫策略可能缺失",
+            "critical",
+            "site",
+            {"robots_path": f.robots_path or None},
+        )
+    if f.sitemap_static_fake_lastmod:
+        add(
+            "SITE_SITEMAP_FAKE_LASTMOD",
+            "sitemap 静态 URL 使用运行时 lastModified（new Date()），更新时间可信度存疑",
+            "high",
+            "site",
+            {"sitemap_path": f.sitemap_path or None},
+        )
+    if not f.llms_txt_route_exists:
+        add(
+            "SITE_LLMS_TXT_MISSING",
+            "未检测到 llms.txt 路由：模型可读入口说明不足",
+            "medium",
+            "site",
+            {},
+        )
+    if f.robots_path and n_bots < 4:
+        add(
+            "SITE_ROBOTS_AI_CRAWLERS_INCOMPLETE",
+            f"robots.ts 中常见 AI 爬虫显式配置不足（已配置 {n_bots}/4 类）",
+            "medium",
+            "site",
+            {"robots_path": f.robots_path, "configured_bots": n_bots},
+        )
+    if f.article_author_is_organization and not f.article_author_is_person:
+        add(
+            "TEMPLATE_ARTICLE_AUTHOR_ORGANIZATION_ONLY",
+            "Article JSON-LD 作者仍为 Organization：Person 级归因可增强引用可信度",
+            "high",
+            "template",
+            {"article_jsonld_path": f.article_jsonld_path or None},
+        )
+    if tldr_any == 0 and mdx_all > 0:
+        add(
+            "CONTENT_TLDR_COVERAGE_ZERO",
+            "所有 MDX 均未检测到 tldr frontmatter：首段/可切块摘要不足",
+            "medium",
+            "page",
+            {"mdx_total_all": mdx_all},
+        )
+    if mdx_all > 0 and ch_any / mdx_all < 0.15:
+        add(
+            "CONTENT_CONCLUSION_H2_LOW",
+            "带「先说结论/結論」类 H2 的 MDX 占比偏低：结论段稳定性可能不足",
+            "medium",
+            "page",
+            {"mdx_total_all": mdx_all, "conclusion_h2_any": ch_any},
+        )
+    if ns < 3 and mdx_all > 0:
+        add(
+            "CONTENT_NOT_SUITABLE_SPARSE",
+            "notSuitableFor 信号覆盖篇数偏少：边界声明与可信度叙事可能不足",
+            "medium",
+            "page",
+            {"notSuitableFor_any_locale": ns, "mdx_total_all": mdx_all},
+        )
+    if not f.has_defined_term:
+        add(
+            "TEMPLATE_DEFINED_TERM_MISSING",
+            "未观测到 DefinedTerm 相关输出：术语/定义的结构化抽取通道偏弱",
+            "low",
+            "template",
+            {},
+        )
+    if not f.src_article_about_key:
+        add(
+            "TEMPLATE_ARTICLE_ABOUT_MISSING",
+            "源码中未稳定出现 Article.about：主题实体锚点可能不足",
+            "medium",
+            "template",
+            {},
+        )
+    if f.org_same_as_lines < 2:
+        add(
+            "SITE_ORG_SAMEAS_SPARSE",
+            "Organization sameAs 映射条数偏少：外部实体归因可能不足",
+            "low",
+            "site",
+            {"org_same_as_lines": f.org_same_as_lines},
+        )
+    if not f.doc_geo_principles_exists:
+        add(
+            "DOC_GEO_PRINCIPLES_MISSING",
+            "未找到 docs/geo-principles.md：站内 GEO 原则文档缺失",
+            "low",
+            "site",
+            {},
+        )
+    # 分项分数偏低时补充一条汇总型问题（与启发式分数同源，便于总览台对比）
+    low = [k for k, v in scores.items() if isinstance(v, (int, float)) and float(v) < 5.5]
+    if low:
+        add(
+            "SCORE_PRINCIPLE_BELOW_THRESHOLD",
+            f"以下原理启发式分数偏低（<5.5），建议优先复核：{', '.join(low)}",
+            "medium",
+            "site",
+            {"principles": low, "scores": {k: scores[k] for k in low}},
+        )
+
+    return issues
 
 
 def _append_machine_readable_observations(lines: list[str], f: AuditFacts) -> None:
@@ -600,6 +737,7 @@ def main() -> int:
         payload = {
             "scores": scores,
             "facts": facts.to_dict(),
+            "issues": build_issues(facts, scores),
             "used_llm": used_llm,
             "llm_model": llm_model if used_llm else None,
             "script_version": SCRIPT_VERSION,

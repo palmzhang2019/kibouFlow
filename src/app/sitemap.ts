@@ -8,6 +8,16 @@ const BASE_URL =
 const LOCALES = ["zh", "ja"] as const;
 const STATIC_PAGES = ["", "/trial", "/partner", "/faq", "/guides"] as const;
 
+/** 静态营销页不写「每次请求都更新」的 lastModified；可用 ISO 日期覆盖 */
+const STATIC_SITEMAP_LAST_MODIFIED = (() => {
+  const raw = process.env.SITEMAP_STATIC_LASTMOD?.trim();
+  if (raw) {
+    const d = new Date(raw);
+    if (!Number.isNaN(d.getTime())) return d;
+  }
+  return new Date("2024-06-01T00:00:00.000Z");
+})();
+
 function priorityOf(contentType?: ContentType): number {
   switch (contentType) {
     case "cluster":
@@ -42,7 +52,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     for (const page of STATIC_PAGES) {
       entries.push({
         url: `${BASE_URL}/${locale}${page}`,
-        lastModified: new Date(),
+        lastModified: STATIC_SITEMAP_LAST_MODIFIED,
         changeFrequency: staticChangeFrequency(page),
         priority: staticPriority(page),
         alternates: {
