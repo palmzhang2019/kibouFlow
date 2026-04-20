@@ -212,7 +212,7 @@ export function ArticleLayout({
               id="article-tldr"
               className="text-sm font-semibold uppercase tracking-[0.18em] text-foreground/70"
             >
-              TL;DR
+              {t("template.tldr.title")}
             </h2>
             <ul className="mt-3 space-y-2 text-sm leading-6 text-foreground/85">
               {article.tldr.map((item) => (

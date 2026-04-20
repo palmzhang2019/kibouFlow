@@ -452,6 +452,9 @@
         "background": "背景与判断前提",
         "reusableConclusion": "可复用结论"
       },
+      "tldr": {
+        "title": "先看结论"
+      },
       "conclusion": {
         "title": "结论"
       }

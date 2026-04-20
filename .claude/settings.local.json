@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(awk '/^tldr:/,/^[^[:space:]]/' \"e:/workspace/kibouFlow/content/zh/problems/resume-vs-japanese.mdx\")",
+      "Bash(awk '/^tldr:/,/^[^[:space:]]/' \"e:/workspace/kibouFlow/content/ja/problems/resume-vs-japanese.mdx\")",
+      "Bash(npm run *)",
+      "Bash(git checkout *)",
+      "Bash(git ls-files *)",
+      "Bash(python -c ' *)",
+      "Bash(python)",
+      "Bash(python e:/workspace/kibouFlow/scripts/geo_principles_audit_new_func.py)",
+      "Bash(python scripts/geo_principles_audit.py --json)",
+      "Bash(python -c \"import json; print\\('ok'\\)\")",
+      "Bash(ls -la scripts/audit_last_run.json)",
+      "Bash(python scripts/extract_records.py)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3456/zh)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/zh)",
+      "WebFetch(domain:localhost)",
+      "Bash(node -e ' *)",
+      "Bash(node check-pages.js)"
+    ]
+  }
+}

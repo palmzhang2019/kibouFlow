@@ -452,6 +452,9 @@
         "background": "背景と判断前提",
         "reusableConclusion": "再利用しやすい結論"
       },
+      "tldr": {
+        "title": "まず結論"
+      },
       "conclusion": {
         "title": "結論"
       }

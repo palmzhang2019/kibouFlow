@@ -123,15 +123,47 @@ function inferCluster(category: Category, slug: string): ClusterType {
   return "direction-sorting";
 }
 
+function normalizeFrontmatterString(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+
+  let normalized = value.trim();
+  const quotePairs: Array<[string, string]> = [
+    ['"', '"'],
+    ["'", "'"],
+    ["“", "”"],
+    ["‘", "’"],
+  ];
+
+  for (const [start, end] of quotePairs) {
+    if (normalized.startsWith(start) && normalized.endsWith(end)) {
+      normalized = normalized.slice(start.length, normalized.length - end.length).trim();
+      break;
+    }
+  }
+
+  return normalized.length > 0 ? normalized : undefined;
+}
+
 function normalizeStringArray(value: unknown): string[] | undefined {
   if (!Array.isArray(value)) return undefined;
 
   const normalized = value
+    .map((item) => normalizeFrontmatterString(item))
     .filter((item): item is string => typeof item === "string")
-    .map((item) => item.trim())
     .filter((item) => item.length > 0);
 
   return normalized.length > 0 ? normalized : undefined;
+}
+
+function normalizeEnumValue<T extends string>(
+  value: unknown,
+  validValues: readonly T[],
+  aliases: Record<string, T> = {},
+): T | undefined {
+  const normalized = normalizeFrontmatterString(value);
+  if (!normalized) return undefined;
+  if (validValues.includes(normalized as T)) return normalized as T;
+  return aliases[normalized];
 }
 
 function uniqueStrings(values: (string | undefined)[]): string[] | undefined {
@@ -158,7 +190,7 @@ function buildDerivedAbout(
   if (explicitAbout) return explicitAbout;
   if (!HIGH_VALUE_CONTENT_TYPES.has(contentType)) return undefined;
 
-  const title = frontmatter.title?.trim();
+  const title = normalizeFrontmatterString(frontmatter.title);
   const clusterLabel = getClusterLabel(locale, cluster);
 
   switch (contentType) {
@@ -180,10 +212,18 @@ function normalizeFrontmatter(
   locale: string,
 ): ArticleFrontmatter {
   const normalizedCategory = category as Category;
+  const normalizedSlug =
+    normalizeFrontmatterString(frontmatter.slug) || frontmatter.slug;
   const normalizedContentType =
-    frontmatter.contentType || inferContentType(normalizedCategory);
+    normalizeEnumValue(frontmatter.contentType, CONTENT_TYPES, {
+      problems: "problem",
+      paths: "path",
+      boundaries: "boundary",
+      cases: "case",
+    }) || inferContentType(normalizedCategory);
   const normalizedCluster =
-    frontmatter.cluster || inferCluster(normalizedCategory, frontmatter.slug);
+    normalizeEnumValue(frontmatter.cluster, CLUSTERS) ||
+    inferCluster(normalizedCategory, normalizedSlug);
   const normalizedAudience =
     (normalizeStringArray(frontmatter.audience) as
       | ("individual" | "partner" | "both")[]
@@ -191,10 +231,19 @@ function normalizeFrontmatter(
 
   return {
     ...frontmatter,
+    title: normalizeFrontmatterString(frontmatter.title) || frontmatter.title,
+    description:
+      normalizeFrontmatterString(frontmatter.description) || frontmatter.description,
     category: normalizedCategory,
+    slug: normalizedSlug,
+    publishedAt:
+      normalizeFrontmatterString(frontmatter.publishedAt) || frontmatter.publishedAt,
+    updatedAt: normalizeFrontmatterString(frontmatter.updatedAt),
     contentType: normalizedContentType,
     cluster: normalizedCluster,
-    ctaType: frontmatter.ctaType || "trial",
+    ctaType:
+      normalizeEnumValue(frontmatter.ctaType, ["trial", "partner", "both"]) ||
+      "trial",
     audience: normalizedAudience,
     suitableFor: normalizeStringArray(frontmatter.suitableFor),
     notSuitableFor: normalizeStringArray(frontmatter.notSuitableFor),

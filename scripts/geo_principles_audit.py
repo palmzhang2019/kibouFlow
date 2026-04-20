@@ -26,7 +26,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
 
-SCRIPT_VERSION = "2.1.0"
+SCRIPT_VERSION = "2.2.0"
 
 
 def repo_root() -> Path:
@@ -70,6 +70,8 @@ def count_mdx_signals(content_dir: Path) -> dict:
     with_suitable = 0
     with_tldr_key = 0
     with_conclusion_heading = 0
+    with_next_steps = 0
+    with_long_paragraphs = 0
     for p in iter_mdx(content_dir):
         total += 1
         raw = read_text(p)
@@ -80,18 +82,21 @@ def count_mdx_signals(content_dir: Path) -> dict:
             with_suitable += 1
         if "tldr" in fm:
             with_tldr_key += 1
-        if re.search(r"^##\s*先说结论", main, re.MULTILINE) or re.search(
-            r"^##\s*結論", main, re.MULTILINE
-        ):
+        if _has_conclusion_h2(main):
             with_conclusion_heading += 1
+        if _has_next_steps(main):
+            with_next_steps += 1
+        if _count_long_paragraphs(main) > 0:
+            with_long_paragraphs += 1
     return {
         "mdx_total": total,
         "mdx_with_notSuitableFor_line": with_not_suitable,
         "mdx_with_suitableFor_line": with_suitable,
         "mdx_with_tldr_frontmatter": with_tldr_key,
         "mdx_with_conclusion_h2": with_conclusion_heading,
+        "mdx_with_next_steps": with_next_steps,
+        "mdx_with_long_paragraphs": with_long_paragraphs,
     }
-
 
 def _strip_quoted(value: str) -> str:
     """去掉 frontmatter 值外层的成对引号（如果存在）。"""
@@ -99,6 +104,42 @@ def _strip_quoted(value: str) -> str:
     if len(v) >= 2 and ((v[0] == '"' and v[-1] == '"') or (v[0] == "'" and v[-1] == "'")):
         return v[1:-1]
     return v
+
+
+def _has_conclusion_h2(text: str) -> bool:
+    """检测正文是否含「先说结论」或「結論」类 H2。"""
+    return bool(
+        re.search(r"^##\s*先说结论", text, re.MULTILINE)
+        or re.search(r"^##\s*結論", text, re.MULTILINE)
+    )
+
+
+def _count_long_paragraphs(text: str, threshold: int = 200) -> int:
+    """统计超过 threshold 字的段落数量（不含标题行）。"""
+    count = 0
+    for para in re.split(r"\n\n+", text):
+        stripped = para.strip()
+        if stripped.startswith("#") or not stripped or stripped.startswith(("- ", "* ", "+ ")):
+            continue
+        if len(stripped) > threshold:
+            count += 1
+    return count
+
+
+def _has_next_steps(text: str) -> bool:
+    """保守检测「下一步建议」类区块。"""
+    next_steps_patterns = [
+        r"^##\s*下一步建议",
+        r"^##\s*次へ",
+        r"^##\s*下一步",
+        r"^##\s*下一步行动",
+        r"^##\s*次のステップ",
+        r"^##\s*推荐的下一步",
+    ]
+    for pat in next_steps_patterns:
+        if re.search(pat, text, re.MULTILINE):
+            return True
+    return False
 
 
 def collect_mdx_records(root: Path, locale: str) -> list[dict]:
@@ -120,19 +161,21 @@ def collect_mdx_records(root: Path, locale: str) -> list[dict]:
             rel_path = p.relative_to(root)
         except ValueError:
             rel_path = p
+        slug = p.stem
         records.append(
             {
                 "locale": locale,
                 "category": category,
-                "slug": p.stem,
+                "slug": slug,
                 "filePath": str(rel_path).replace("\\", "/"),
                 "title": _strip_quoted(fm.get("title", "")),
+                "contentType": _strip_quoted(fm.get("contentType", "")),
                 "hasTldr": "tldr" in fm,
+                "hasSuitableFor": ("suitableFor" in fm) or ("suitable_for" in fm),
                 "hasNotSuitableFor": ("notSuitableFor" in fm) or ("not_suitable_for" in fm),
-                "hasConclusionH2": bool(
-                    re.search(r"^##\s*鍏堣缁撹", main, re.MULTILINE)
-                    or re.search(r"^##\s*绲愯珫", main, re.MULTILINE)
-                ),
+                "hasConclusionH2": _has_conclusion_h2(main),
+                "hasNextSteps": _has_next_steps(main),
+                "longParagraphCount": _count_long_paragraphs(main),
             }
         )
     return records
@@ -240,6 +283,8 @@ def collect_facts(root: Path) -> AuditFacts:
         "suitableFor_any_locale": zh["mdx_with_suitableFor_line"] + ja["mdx_with_suitableFor_line"],
         "tldr_frontmatter_any": zh["mdx_with_tldr_frontmatter"] + ja["mdx_with_tldr_frontmatter"],
         "conclusion_h2_any": zh["mdx_with_conclusion_h2"] + ja["mdx_with_conclusion_h2"],
+        "next_steps_any": zh.get("mdx_with_next_steps", 0) + ja.get("mdx_with_next_steps", 0),
+        "long_paragraphs_any": zh.get("mdx_with_long_paragraphs", 0) + ja.get("mdx_with_long_paragraphs", 0),
     }
 
     f.doc_geo_principles_exists = (root / "docs" / "geo-principles.md").is_file()
@@ -353,6 +398,74 @@ def _build_tldr_affected_paths(records: list[dict]) -> list[dict]:
             }
         )
     return out
+
+
+def _build_page_level_issues(records: list[dict], limit: int = 20) -> list[dict[str, object]]:
+    """
+    逐 MDX 生成页面级 issue。
+    每篇 MDX 每个问题类型只产生 1 条 issue，总量上限 limit 条。
+    """
+    # 检查项定义：(field_key, code, title)
+    CHECK_DEFS = [
+        ("hasTldr",        "CONTENT_PAGE_MISSING_TLDR",       "页面缺少 tldr frontmatter"),
+        ("hasConclusionH2","CONTENT_PAGE_MISSING_CONCLUSION_H2","页面缺少「先说结论/結論」类 H2"),
+        ("hasSuitableFor", "CONTENT_PAGE_MISSING_SUITABLE_FOR", "页面缺少 suitableFor frontmatter"),
+        ("hasNotSuitableFor","CONTENT_PAGE_MISSING_NOT_SUITABLE_FOR","页面缺少 notSuitableFor frontmatter"),
+        ("hasNextSteps",   "CONTENT_PAGE_MISSING_NEXT_STEPS",  "页面缺少下一步建议区块"),
+        ("longParagraphCount","CONTENT_PAGE_LONG_PARAGRAPH",    "页面存在过长段落（超过 200 字）"),
+    ]
+
+    issues: list[dict[str, object]] = []
+    added: set = set()
+
+    for r in records:
+        for field, code, title in CHECK_DEFS:
+            if field == "longParagraphCount":
+                val = r.get(field, 0)
+                if val and val > 0:
+                    key = (r.get("filePath", ""), code)
+                    if key not in added:
+                        added.add(key)
+                        issues.append({
+                            "code": code,
+                            "title": title,
+                            "severity": "medium",
+                            "layer": "page",
+                            "evidence": {
+                                "kind": "page_check",
+                                "checkItem": field,
+                                "locale": r.get("locale", ""),
+                                "category": r.get("category", ""),
+                                "slug": r.get("slug", ""),
+                                "filePath": r.get("filePath", ""),
+                                "title": r.get("title", ""),
+                                "longParagraphCount": val,
+                            },
+                        })
+            else:
+                if not r.get(field):
+                    key = (r.get("filePath", ""), code)
+                    if key not in added:
+                        added.add(key)
+                        issues.append({
+                            "code": code,
+                            "title": title,
+                            "severity": "medium",
+                            "layer": "page",
+                            "evidence": {
+                                "kind": "page_check",
+                                "checkItem": field,
+                                "locale": r.get("locale", ""),
+                                "category": r.get("category", ""),
+                                "slug": r.get("slug", ""),
+                                "filePath": r.get("filePath", ""),
+                                "title": r.get("title", ""),
+                            },
+                        })
+        if len(issues) >= limit:
+            break
+    return issues
+
 
 
 def _build_principle_affected_paths(records: list[dict], low_keys: list[str], limit: int = 20) -> list[dict]:
@@ -470,7 +583,7 @@ def build_issues(f: AuditFacts, scores: dict[str, float]) -> list[dict[str, obje
             "CONTENT_TLDR_COVERAGE_ZERO",
             "所有 MDX 均未检测到 tldr frontmatter：首段/可切块摘要不足",
             "medium",
-            "page",
+            "site",
             {
                 "kind": "batch_mdx_frontmatter",
                 "missingField": "tldr",
@@ -486,7 +599,7 @@ def build_issues(f: AuditFacts, scores: dict[str, float]) -> list[dict[str, obje
             "CONTENT_CONCLUSION_H2_LOW",
             "带「先说结论/結論」类 H2 的 MDX 占比偏低：结论段稳定性可能不足",
             "medium",
-            "page",
+            "site",
             {"mdx_total_all": mdx_all, "conclusion_h2_any": ch_any},
         )
     if ns < 3 and mdx_all > 0:
@@ -563,6 +676,34 @@ def build_issues(f: AuditFacts, scores: dict[str, float]) -> list[dict[str, obje
             },
         )
 
+    # 页面级 issues：每个 MDX 每个问题类型只产生 1 条，总量限制 20 条
+    page_issues = _build_page_level_issues(f.mdx_records, limit=20)
+    issues.extend(page_issues)
+
+    # 新增 aggregate site-level issues
+    next_any = int(f.content_signals.get("next_steps_any", 0) or 0)
+    lp_any = int(f.content_signals.get("long_paragraphs_any", 0) or 0)
+
+    # next_steps 覆盖率低（阈值：70%）
+    if mdx_all > 0 and next_any / mdx_all < 0.7:
+        add(
+            "CONTENT_NEXT_STEPS_LOW",
+            "带下一步建议区块的 MDX 占比偏低：CTA 承接与引用锚点稳定性可能不足",
+            "medium",
+            "site",
+            {"mdx_total_all": mdx_all, "next_steps_any": next_any},
+        )
+
+    # 长段落问题（阈值：超过 5 篇有长段落）
+    if lp_any > 5:
+        add(
+            "CONTENT_LONG_PARAGRAPH_SPARSE",
+            "存在过长段落的 MDX 篇数偏多：chunk 切分稳定性可能受影响",
+            "medium",
+            "site",
+            {"mdx_total_all": mdx_all, "long_paragraphs_any": lp_any},
+        )
+
     return issues
 
 
@@ -604,6 +745,58 @@ def _append_machine_readable_observations(lines: list[str], f: AuditFacts) -> No
         "> 说明：`conclusion_h2_any` 等为 **中文文件数 + 日文文件数**（同一 slug 的双语版本会计 2 次）。\n"
     )
     lines.append("")
+
+    lines.extend(_build_compliance_matrix_table(f.mdx_records))
+
+
+
+
+def _build_compliance_matrix_table(records: list[dict]) -> list[str]:
+    """
+    Generate content compliance matrix Markdown table.
+    High-value pages (contentType cluster/framework/faq) shown first, rest truncated.
+    """
+    PRIORITY = {"cluster": 0, "framework": 1, "faq": 2, "cases": 3,
+                 "problems": 4, "boundaries": 5, "paths": 6, "": 9}
+
+    def sort_key(r: dict):
+        ct = r.get("contentType", "")
+        priority = PRIORITY.get(ct, 9)
+        locale_rank = 0 if r.get("locale") == "zh" else 1
+        return (priority, locale_rank, r.get("slug", ""))
+
+    sorted_records = sorted(records, key=sort_key)
+
+    HIGH_VALUE_TYPES = {"cluster", "framework", "faq", "cases", "problems", "boundaries"}
+    high_value = [r for r in sorted_records if r.get("contentType", "") in HIGH_VALUE_TYPES]
+    other = [r for r in sorted_records if r.get("contentType", "") not in HIGH_VALUE_TYPES]
+
+    result: list[str] = []
+    result.append("### 内容合规矩阵（高价值页面）\n")
+    result.append(
+        "| locale | category | slug | tldr | conclusion_h2 | "
+        "suitableFor | notSuitableFor | nextSteps | longPara |"
+    )
+    result.append("|" + "|".join(["---"] * 9) + "|")
+
+    def row(r: dict) -> str:
+        def m(k): return "OK" if r.get(k) else "FAIL"
+        return (
+            f"| {r.get('locale', '')} | {r.get('category', '')} | {r.get('slug', '')} | "
+            f"{m('hasTldr')} | {m('hasConclusionH2')} | {m('hasSuitableFor')} | "
+            f"{m('hasNotSuitableFor')} | {m('hasNextSteps')} | "
+            f"{r.get('longParagraphCount', 0)} |"
+        )
+
+    for r in high_value:
+        result.append(row(r))
+
+    if other:
+        result.append(f"> 其余 {len(other)} 篇普通页面详见完整 JSON 输出。\n")
+
+    return result
+
+
 
 
 def build_report(root: Path, f: AuditFacts, scores: dict[str, float]) -> str:

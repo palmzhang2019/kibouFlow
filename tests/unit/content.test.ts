@@ -74,10 +74,19 @@ describe("content utilities", () => {
   it("derives about for high-value articles when frontmatter omits it", () => {
     const article = getArticleBySlug("zh", "boundaries", "faq-japanese-path");
     expect(article).not.toBeNull();
+    expect(article?.slug).toBe("faq-japanese-path");
+    expect(article?.contentType).toBe("faq");
     expect(article?.about).toEqual([
       "日语学习路径 FAQ",
       "日语学习路径",
     ]);
+  });
+
+  it("normalizes malformed frontmatter enum values", () => {
+    const article = getArticleBySlug("zh", "boundaries", "what-we-dont-handle-yet");
+    expect(article).not.toBeNull();
+    expect(article?.contentType).toBe("boundary");
+    expect(article?.slug).toBe("what-we-dont-handle-yet");
   });
 
   it("prioritizes the cluster hub in strategic related articles", () => {

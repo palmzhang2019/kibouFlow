@@ -1,0 +1,572 @@
+# GEO 五原理 — 仓库自动体检报告
+
+## 总览
+
+- **本次检查时间（脚本运行环境）**: 2026-04-20 21:48:26 东京标准时间
+
+- **检查范围**: `E:\workspace\kibouFlow`
+
+- **参考文档**: `docs/geo-principles.md` → **True**
+
+- **五维均分（启发式）**: **8.4** / 10
+
+- **总体结论（规则归纳）**: 整体结构信号偏完整，建议按 P0/P1 清单做增量优化并在真实检索环境抽检。
+
+- **需要人工复核的项目**: 无单项强制复核；仍建议在真实检索与 LLM 引用场景做端到端抽检。
+
+
+## 五大原理逐项结果
+
+### 1. 可召回（Retrievability）
+
+- **分数**: **10** / 10（启发式，非搜索引擎真实分）
+
+- **当前符合点**:
+
+  - 已发现 `robots` 源文件：`src\app\robots.ts`
+  - 已提供 `llms.txt` 路由入口
+  - robots 中对常见 AI 爬虫显式配置：4/4
+
+- **主要短板**:
+
+- **需要加强的地方**:
+
+  - 把「可发现 + 可解释边界 + 可引用实体」三件事拆成可验收清单（按页面类型覆盖）
+
+- **修改建议**:
+
+### 2. 可切块（Chunkability）
+
+- **分数**: **7.0** / 10（启发式）
+
+- **当前符合点**:
+
+  - 具备「结论型 H2」的 MDX 篇数（粗统计）：13（合计口径见观测事实）
+  - 部分文章已提供 `tldr` frontmatter
+
+- **主要短板**:
+
+- **需要加强的地方**:
+
+  - 统一「TL;DR + 结论 H2 + 短段落」模板，降低被模型硬切后语义漂移
+
+- **修改建议**:
+
+  - 保持「结论型 H2」与短段落；FAQ 单条控制在少量句子，降低被硬切风险。
+
+### 3. 可抽取（Extractability）
+
+- **分数**: **9.8** / 10（启发式）
+
+- **当前符合点**:
+
+  - FAQ/HowTo/Breadcrumb 组件存在性：True/True/True
+  - 观测到 DefinedTerm 相关信号
+
+- **主要短板**:
+
+- **需要加强的地方**:
+
+  - 把「问题—步骤—结论」结构映射到可抽取 JSON-LD（FAQ/HowTo/Breadcrumb）
+
+- **修改建议**:
+
+### 4. 可信（Citation-Worthiness / Trust）
+
+- **分数**: **8.0** / 10（启发式）
+
+- **当前符合点**:
+
+  - Article author 更偏向 Person（更利于引用可信度叙事）
+
+- **主要短板**:
+
+- **需要加强的地方**:
+
+  - 把边界声明（notSuitableFor）与可验证事实（作者/机构/时间）对齐展示
+
+- **修改建议**:
+
+### 5. 可归因（Attributability）
+
+- **分数**: **7.3** / 10（启发式）
+
+- **当前符合点**:
+
+  - 具备 BreadcrumbList 组件信号
+  - 具备 FAQPage 组件信号
+
+- **主要短板**:
+
+  - 需结合信息架构核对：是否存在「高价值答案聚合在单页」导致引用锚点不稳
+
+- **需要加强的地方**:
+
+  - 高价值内容尽量落到稳定 URL + 稳定标题层级，减少引用漂移
+
+- **修改建议**:
+
+  - 保持「一页一主题」与语义化 slug；高价值 FAQ 可考虑从聚合页拆出独立 URL，便于引用锚定。
+
+## 修改建议汇总（按优先级）
+
+### P0（应尽快处理）
+
+- （无脚本判定的 P0 阻断项；仍以真实环境抽检为准）
+
+### P1（建议本周内落地）
+
+- （无脚本判定的 P1 项；可优先处理内容模板与抽取一致性）
+
+### P2（可排期优化）
+
+- （无脚本判定的 P2 项；可做体验与可读性增强）
+
+## 观测事实（机器可读）
+
+### 原理1 可召回
+
+| 项 | 值 |
+|---|---|
+| robots.ts | `src\app\robots.ts` |
+| AI 爬虫显式 allow（GPT/Claude/Perplexity/Google-Extended） | True/True/True/True |
+| llms.txt 路由 | `True` |
+| sitemap 静态页 `lastModified: new Date()` | `False`（true=存在文档所述「时效信号不诚实」风险）|
+| 源码中出现 Wikidata / schema about | wikidata=`False`, about=`True` |
+| Organization sameAs 出现次数（组件内） | `3` |
+
+### 原理2–5 相关结构 / Schema
+
+| FAQPage 组件 | `True` |
+| HowTo 组件 | `True` |
+| BreadcrumbList 组件 | `True` |
+| DefinedTerm（源码） | `True` |
+| ArticleJsonLd 路径 | `src\components\seo\ArticleJsonLd.tsx` |
+| Article author 粗检 | Organization≈`False`, Person≈`True` |
+
+### 内容仓库 MDX（zh+ja 合并统计）
+
+- **mdx_total_zh**: `24`
+- **mdx_total_ja**: `24`
+- **mdx_total_all**: `48`
+- **notSuitableFor_any_locale**: `34`
+- **suitableFor_any_locale**: `34`
+- **tldr_frontmatter_any**: `30`
+- **conclusion_h2_any**: `13`
+- **next_steps_any**: `7`
+- **long_paragraphs_any**: `7`
+> 说明：`conclusion_h2_any` 等为 **中文文件数 + 日文文件数**（同一 slug 的双语版本会计 2 次）。
+
+
+### 内容合规矩阵（高价值页面）
+
+| locale | category | slug | tldr | conclusion_h2 | suitableFor | notSuitableFor | nextSteps | longPara |
+|---|---|---|---|---|---|---|---|---|
+| zh | paths | direction-sorting-cluster-entry | OK | FAIL | OK | OK | OK | 0 |
+| zh | paths | japanese-learning-path-cluster-entry | OK | FAIL | OK | OK | OK | 1 |
+| zh | paths | job-prep-cluster-entry | OK | FAIL | OK | OK | OK | 1 |
+| ja | paths | direction-sorting-cluster-entry | OK | FAIL | OK | OK | FAIL | 0 |
+| ja | paths | japanese-learning-path-cluster-entry | OK | FAIL | OK | OK | FAIL | 1 |
+| ja | paths | job-prep-cluster-entry | OK | FAIL | OK | OK | FAIL | 1 |
+| zh | paths | framework-japanese-or-job-first | OK | FAIL | FAIL | FAIL | FAIL | 0 |
+| zh | paths | framework-not-ready-signals | OK | FAIL | FAIL | FAIL | FAIL | 0 |
+| ja | paths | framework-japanese-or-job-first | OK | OK | FAIL | FAIL | FAIL | 0 |
+| ja | paths | framework-not-ready-signals | OK | OK | FAIL | FAIL | FAIL | 0 |
+| zh | boundaries | faq-japanese-path | OK | FAIL | FAIL | FAIL | OK | 0 |
+| zh | boundaries | faq-job-prep | OK | FAIL | FAIL | FAIL | OK | 0 |
+| zh | boundaries | faq-partner-collaboration | OK | FAIL | FAIL | FAIL | OK | 0 |
+| zh | boundaries | faq-resume-or-japanese-first | OK | OK | OK | OK | FAIL | 0 |
+| ja | boundaries | faq-japanese-path | OK | FAIL | FAIL | FAIL | FAIL | 0 |
+| ja | boundaries | faq-job-prep | OK | FAIL | FAIL | FAIL | FAIL | 0 |
+| ja | boundaries | faq-partner-collaboration | OK | FAIL | FAIL | FAIL | FAIL | 0 |
+| ja | boundaries | faq-resume-or-japanese-first | OK | FAIL | OK | OK | FAIL | 0 |
+> 其余 30 篇普通页面详见完整 JSON 输出。
+
+## 启发式评分（0–10，仅供参考）
+
+- **可召回 Retrievability**: **10** / 10
+- **可切块 Chunkability**: **7.0** / 10
+- **可抽取 Extractability**: **9.8** / 10
+- **可信 Citation-Worthiness**: **8.0** / 10
+- **可归因 Attributability**: **7.3** / 10
+
+## 重要说明：评分性质与实测边界
+
+> **本报告中的分数与结论均为启发式规则扫描结果**，用于快速发现仓库内可改进点；**不能替代**真实搜索引擎、AI 概览或第三方引用环境中的实测验证。
+
+> 若需要严谨结论，请在真实检索与 LLM 引用场景中进行对照实验（含竞品与富媒体结果）。
+
+## 脚本无法替代的部分（可选人工 / 外部 LLM）
+
+竞品检索验证（Perplexity/Google AIO）、富媒体结果测试、以及面向业务的措辞润色，仍建议由人工或外部工作流完成；也可将本报告粘贴到 `scripts/geo_audit_paste_to_llm_zh.txt` 指定位置再扩写。
+
+
+--- JSON ---
+
+{
+  "scores": {
+    "可召回 Retrievability": 10,
+    "可切块 Chunkability": 7.0,
+    "可抽取 Extractability": 9.8,
+    "可信 Citation-Worthiness": 8.0,
+    "可归因 Attributability": 7.3
+  },
+  "facts": {
+    "robots_path": "src\\app\\robots.ts",
+    "robots_has_gptbot": true,
+    "robots_has_claude": true,
+    "robots_has_perplexity": true,
+    "robots_has_google_extended": true,
+    "llms_txt_route_exists": true,
+    "sitemap_path": "src\\app\\sitemap.ts",
+    "sitemap_static_fake_lastmod": false,
+    "article_jsonld_path": "src\\components\\seo\\ArticleJsonLd.tsx",
+    "article_author_is_organization": false,
+    "article_author_is_person": true,
+    "has_faqpage_component": true,
+    "has_howto_component": true,
+    "has_breadcrumb_component": true,
+    "has_defined_term": true,
+    "src_mentions_wikidata": false,
+    "src_article_about_key": true,
+    "org_same_as_lines": 3,
+    "content_signals": {
+      "mdx_total_zh": 24,
+      "mdx_total_ja": 24,
+      "mdx_total_all": 48,
+      "notSuitableFor_any_locale": 34,
+      "suitableFor_any_locale": 34,
+      "tldr_frontmatter_any": 30,
+      "conclusion_h2_any": 13,
+      "next_steps_any": 7,
+      "long_paragraphs_any": 7
+    },
+    "doc_geo_principles_exists": true
+  },
+  "issues": [
+    {
+      "code": "CONTENT_PAGE_MISSING_CONCLUSION_H2",
+      "title": "页面缺少「先说结论/結論」类 H2",
+      "severity": "medium",
+      "layer": "page",
+      "evidence": {
+        "kind": "page_check",
+        "checkItem": "hasConclusionH2",
+        "locale": "zh",
+        "category": "boundaries",
+        "slug": "concept-hope-sorting",
+        "filePath": "content/zh/boundaries/concept-hope-sorting.mdx",
+        "title": "什么是希望整理"
+      }
+    },
+    {
+      "code": "CONTENT_PAGE_MISSING_NEXT_STEPS",
+      "title": "页面缺少下一步建议区块",
+      "severity": "medium",
+      "layer": "page",
+      "evidence": {
+        "kind": "page_check",
+        "checkItem": "hasNextSteps",
+        "locale": "zh",
+        "category": "boundaries",
+        "slug": "concept-hope-sorting",
+        "filePath": "content/zh/boundaries/concept-hope-sorting.mdx",
+        "title": "什么是希望整理"
+      }
+    },
+    {
+      "code": "CONTENT_PAGE_MISSING_CONCLUSION_H2",
+      "title": "页面缺少「先说结论/結論」类 H2",
+      "severity": "medium",
+      "layer": "page",
+      "evidence": {
+        "kind": "page_check",
+        "checkItem": "hasConclusionH2",
+        "locale": "zh",
+        "category": "boundaries",
+        "slug": "concept-path-judgment",
+        "filePath": "content/zh/boundaries/concept-path-judgment.mdx",
+        "title": "什么是路径判断"
+      }
+    },
+    {
+      "code": "CONTENT_PAGE_MISSING_NEXT_STEPS",
+      "title": "页面缺少下一步建议区块",
+      "severity": "medium",
+      "layer": "page",
+      "evidence": {
+        "kind": "page_check",
+        "checkItem": "hasNextSteps",
+        "locale": "zh",
+        "category": "boundaries",
+        "slug": "concept-path-judgment",
+        "filePath": "content/zh/boundaries/concept-path-judgment.mdx",
+        "title": "什么是路径判断"
+      }
+    },
+    {
+      "code": "CONTENT_PAGE_MISSING_CONCLUSION_H2",
+      "title": "页面缺少「先说结论/結論」类 H2",
+      "severity": "medium",
+      "layer": "page",
+      "evidence": {
+        "kind": "page_check",
+        "checkItem": "hasConclusionH2",
+        "locale": "zh",
+        "category": "boundaries",
+        "slug": "faq-japanese-path",
+        "filePath": "content/zh/boundaries/faq-japanese-path.mdx",
+        "title": "日语学习路径 FAQ"
+      }
+    },
+    {
+      "code": "CONTENT_PAGE_MISSING_SUITABLE_FOR",
+      "title": "页面缺少 suitableFor frontmatter",
+      "severity": "medium",
+      "layer": "page",
+      "evidence": {
+        "kind": "page_check",
+        "checkItem": "hasSuitableFor",
+        "locale": "zh",
+        "category": "boundaries",
+        "slug": "faq-japanese-path",
+        "filePath": "content/zh/boundaries/faq-japanese-path.mdx",
+        "title": "日语学习路径 FAQ"
+      }
+    },
+    {
+      "code": "CONTENT_PAGE_MISSING_NOT_SUITABLE_FOR",
+      "title": "页面缺少 notSuitableFor frontmatter",
+      "severity": "medium",
+      "layer": "page",
+      "evidence": {
+        "kind": "page_check",
+        "checkItem": "hasNotSuitableFor",
+        "locale": "zh",
+        "category": "boundaries",
+        "slug": "faq-japanese-path",
+        "filePath": "content/zh/boundaries/faq-japanese-path.mdx",
+        "title": "日语学习路径 FAQ"
+      }
+    },
+    {
+      "code": "CONTENT_PAGE_MISSING_CONCLUSION_H2",
+      "title": "页面缺少「先说结论/結論」类 H2",
+      "severity": "medium",
+      "layer": "page",
+      "evidence": {
+        "kind": "page_check",
+        "checkItem": "hasConclusionH2",
+        "locale": "zh",
+        "category": "boundaries",
+        "slug": "faq-job-prep",
+        "filePath": "content/zh/boundaries/faq-job-prep.mdx",
+        "title": "求职准备 FAQ"
+      }
+    },
+    {
+      "code": "CONTENT_PAGE_MISSING_SUITABLE_FOR",
+      "title": "页面缺少 suitableFor frontmatter",
+      "severity": "medium",
+      "layer": "page",
+      "evidence": {
+        "kind": "page_check",
+        "checkItem": "hasSuitableFor",
+        "locale": "zh",
+        "category": "boundaries",
+        "slug": "faq-job-prep",
+        "filePath": "content/zh/boundaries/faq-job-prep.mdx",
+        "title": "求职准备 FAQ"
+      }
+    },
+    {
+      "code": "CONTENT_PAGE_MISSING_NOT_SUITABLE_FOR",
+      "title": "页面缺少 notSuitableFor frontmatter",
+      "severity": "medium",
+      "layer": "page",
+      "evidence": {
+        "kind": "page_check",
+        "checkItem": "hasNotSuitableFor",
+        "locale": "zh",
+        "category": "boundaries",
+        "slug": "faq-job-prep",
+        "filePath": "content/zh/boundaries/faq-job-prep.mdx",
+        "title": "求职准备 FAQ"
+      }
+    },
+    {
+      "code": "CONTENT_PAGE_MISSING_CONCLUSION_H2",
+      "title": "页面缺少「先说结论/結論」类 H2",
+      "severity": "medium",
+      "layer": "page",
+      "evidence": {
+        "kind": "page_check",
+        "checkItem": "hasConclusionH2",
+        "locale": "zh",
+        "category": "boundaries",
+        "slug": "faq-partner-collaboration",
+        "filePath": "content/zh/boundaries/faq-partner-collaboration.mdx",
+        "title": "机构合作 FAQ"
+      }
+    },
+    {
+      "code": "CONTENT_PAGE_MISSING_SUITABLE_FOR",
+      "title": "页面缺少 suitableFor frontmatter",
+      "severity": "medium",
+      "layer": "page",
+      "evidence": {
+        "kind": "page_check",
+        "checkItem": "hasSuitableFor",
+        "locale": "zh",
+        "category": "boundaries",
+        "slug": "faq-partner-collaboration",
+        "filePath": "content/zh/boundaries/faq-partner-collaboration.mdx",
+        "title": "机构合作 FAQ"
+      }
+    },
+    {
+      "code": "CONTENT_PAGE_MISSING_NOT_SUITABLE_FOR",
+      "title": "页面缺少 notSuitableFor frontmatter",
+      "severity": "medium",
+      "layer": "page",
+      "evidence": {
+        "kind": "page_check",
+        "checkItem": "hasNotSuitableFor",
+        "locale": "zh",
+        "category": "boundaries",
+        "slug": "faq-partner-collaboration",
+        "filePath": "content/zh/boundaries/faq-partner-collaboration.mdx",
+        "title": "机构合作 FAQ"
+      }
+    },
+    {
+      "code": "CONTENT_PAGE_MISSING_NEXT_STEPS",
+      "title": "页面缺少下一步建议区块",
+      "severity": "medium",
+      "layer": "page",
+      "evidence": {
+        "kind": "page_check",
+        "checkItem": "hasNextSteps",
+        "locale": "zh",
+        "category": "boundaries",
+        "slug": "faq-resume-or-japanese-first",
+        "filePath": "content/zh/boundaries/faq-resume-or-japanese-first.mdx",
+        "title": "要不要先改简历？"
+      }
+    },
+    {
+      "code": "CONTENT_PAGE_MISSING_TLDR",
+      "title": "页面缺少 tldr frontmatter",
+      "severity": "medium",
+      "layer": "page",
+      "evidence": {
+        "kind": "page_check",
+        "checkItem": "hasTldr",
+        "locale": "zh",
+        "category": "boundaries",
+        "slug": "what-we-dont-handle-yet",
+        "filePath": "content/zh/boundaries/what-we-dont-handle-yet.mdx",
+        "title": "什么问题现在还不适合通过这个网站处理？"
+      }
+    },
+    {
+      "code": "CONTENT_PAGE_MISSING_SUITABLE_FOR",
+      "title": "页面缺少 suitableFor frontmatter",
+      "severity": "medium",
+      "layer": "page",
+      "evidence": {
+        "kind": "page_check",
+        "checkItem": "hasSuitableFor",
+        "locale": "zh",
+        "category": "boundaries",
+        "slug": "what-we-dont-handle-yet",
+        "filePath": "content/zh/boundaries/what-we-dont-handle-yet.mdx",
+        "title": "什么问题现在还不适合通过这个网站处理？"
+      }
+    },
+    {
+      "code": "CONTENT_PAGE_MISSING_NOT_SUITABLE_FOR",
+      "title": "页面缺少 notSuitableFor frontmatter",
+      "severity": "medium",
+      "layer": "page",
+      "evidence": {
+        "kind": "page_check",
+        "checkItem": "hasNotSuitableFor",
+        "locale": "zh",
+        "category": "boundaries",
+        "slug": "what-we-dont-handle-yet",
+        "filePath": "content/zh/boundaries/what-we-dont-handle-yet.mdx",
+        "title": "什么问题现在还不适合通过这个网站处理？"
+      }
+    },
+    {
+      "code": "CONTENT_PAGE_MISSING_NEXT_STEPS",
+      "title": "页面缺少下一步建议区块",
+      "severity": "medium",
+      "layer": "page",
+      "evidence": {
+        "kind": "page_check",
+        "checkItem": "hasNextSteps",
+        "locale": "zh",
+        "category": "boundaries",
+        "slug": "what-we-dont-handle-yet",
+        "filePath": "content/zh/boundaries/what-we-dont-handle-yet.mdx",
+        "title": "什么问题现在还不适合通过这个网站处理？"
+      }
+    },
+    {
+      "code": "CONTENT_PAGE_MISSING_TLDR",
+      "title": "页面缺少 tldr frontmatter",
+      "severity": "medium",
+      "layer": "page",
+      "evidence": {
+        "kind": "page_check",
+        "checkItem": "hasTldr",
+        "locale": "zh",
+        "category": "boundaries",
+        "slug": "when-to-use-hope-sorting",
+        "filePath": "content/zh/boundaries/when-to-use-hope-sorting.mdx",
+        "title": "什么问题适合先做希望整理？"
+      }
+    },
+    {
+      "code": "CONTENT_PAGE_MISSING_NEXT_STEPS",
+      "title": "页面缺少下一步建议区块",
+      "severity": "medium",
+      "layer": "page",
+      "evidence": {
+        "kind": "page_check",
+        "checkItem": "hasNextSteps",
+        "locale": "zh",
+        "category": "boundaries",
+        "slug": "when-to-use-hope-sorting",
+        "filePath": "content/zh/boundaries/when-to-use-hope-sorting.mdx",
+        "title": "什么问题适合先做希望整理？"
+      }
+    },
+    {
+      "code": "CONTENT_NEXT_STEPS_LOW",
+      "title": "带下一步建议区块的 MDX 占比偏低：CTA 承接与引用锚点稳定性可能不足",
+      "severity": "medium",
+      "layer": "site",
+      "evidence": {
+        "mdx_total_all": 48,
+        "next_steps_any": 7
+      }
+    },
+    {
+      "code": "CONTENT_LONG_PARAGRAPH_SPARSE",
+      "title": "存在过长段落的 MDX 篇数偏多：chunk 切分稳定性可能受影响",
+      "severity": "medium",
+      "layer": "site",
+      "evidence": {
+        "mdx_total_all": 48,
+        "long_paragraphs_any": 7
+      }
+    }
+  ],
+  "used_llm": false,
+  "llm_model": null,
+  "script_version": "2.2.0",
+  "target_path": "E:\\workspace\\kibouFlow"
+}
