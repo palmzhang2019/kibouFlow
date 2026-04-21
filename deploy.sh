@@ -15,17 +15,26 @@ set -Eeuo pipefail
 #   APP_DOMAIN=example.com APP_EMAIL=ops@example.com sudo bash deploy.sh
 #   DATABASE_URL=postgresql://... sudo bash deploy.sh
 #   BUILD_ON_SERVER=0 sudo bash deploy.sh   # deploy prebuilt .next/standalone
+#
+# Env precedence for deploy defaults:
+#   process env / inline overrides
+#   -> .env.$NODE_ENV.local -> .env.local -> .env.$NODE_ENV -> .env
+#   -> previously deployed shared/app.env -> shared/deploy.env
 
-APP_NAME="${APP_NAME:-kibouflow}"
-APP_PORT="${APP_PORT:-3000}"
-APP_USER="${APP_USER:-${SUDO_USER:-$(id -un)}}"
-APP_GROUP="${APP_GROUP:-$APP_USER}"
-APP_HOME="${APP_HOME:-/home/${APP_USER}/apps/${APP_NAME}}"
 SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-RELEASES_DIR="${APP_HOME}/releases"
-SHARED_DIR="${APP_HOME}/shared"
-CURRENT_LINK="${APP_HOME}/current"
-SERVICE_NAME="${SERVICE_NAME:-$APP_NAME}"
+
+APP_NAME="${APP_NAME:-}"
+APP_PORT="${APP_PORT:-}"
+APP_USER="${APP_USER:-}"
+APP_GROUP="${APP_GROUP:-}"
+APP_HOME="${APP_HOME:-}"
+SERVICE_NAME="${SERVICE_NAME:-}"
+RELEASES_DIR=""
+SHARED_DIR=""
+CURRENT_LINK=""
+INSTALL_FINGERPRINT_FILE=""
+BUILD_FINGERPRINT_FILE=""
+RELEASE_FINGERPRINT_FILE=""
 
 APP_DOMAIN="${APP_DOMAIN:-}"
 APP_EMAIL="${APP_EMAIL:-}"
@@ -36,41 +45,31 @@ ADMIN_GEO_PASSWORD="${ADMIN_GEO_PASSWORD:-}"
 ADMIN_SESSION_SECRET="${ADMIN_SESSION_SECRET:-}"
 NEXT_SERVER_ACTIONS_ENCRYPTION_KEY="${NEXT_SERVER_ACTIONS_ENCRYPTION_KEY:-}"
 OPENAI_API_KEY="${OPENAI_API_KEY:-}"
-GEO_AUDIT_OPENAI_MODEL="${GEO_AUDIT_OPENAI_MODEL:-chatgpt-5.4-mini}"
+GEO_AUDIT_OPENAI_MODEL="${GEO_AUDIT_OPENAI_MODEL:-}"
 GEO_AUDIT_USE_LLM="${GEO_AUDIT_USE_LLM:-}"
-GEO_AUDIT_PYTHON="${GEO_AUDIT_PYTHON:-python3}"
+GEO_AUDIT_PYTHON="${GEO_AUDIT_PYTHON:-}"
+DEPLOYMENT_VERSION="${DEPLOYMENT_VERSION:-}"
 
-BUILD_ON_SERVER="${BUILD_ON_SERVER:-1}"
-INSTALL_NGINX="${INSTALL_NGINX:-1}"
-ENABLE_SSL="${ENABLE_SSL:-1}"
-INSTALL_LOCAL_POSTGRES="${INSTALL_LOCAL_POSTGRES:-auto}"
-CONFIGURE_SWAP="${CONFIGURE_SWAP:-auto}"
-ENABLE_UFW="${ENABLE_UFW:-0}"
+BUILD_ON_SERVER="${BUILD_ON_SERVER:-}"
+INSTALL_NGINX="${INSTALL_NGINX:-}"
+ENABLE_SSL="${ENABLE_SSL:-}"
+INSTALL_LOCAL_POSTGRES="${INSTALL_LOCAL_POSTGRES:-}"
+CONFIGURE_SWAP="${CONFIGURE_SWAP:-}"
+ENABLE_UFW="${ENABLE_UFW:-}"
 
 TOTAL_MEM_MB="$(awk '/MemTotal/ { printf "%d", $2 / 1024 }' /proc/meminfo)"
 SWAP_MB="$(awk '/SwapTotal/ { printf "%d", $2 / 1024 }' /proc/meminfo)"
 BUILD_HEAP_MB="${BUILD_HEAP_MB:-}"
 RUNTIME_HEAP_MB="${RUNTIME_HEAP_MB:-}"
 
-if [[ -z "$BUILD_HEAP_MB" ]]; then
-  if (( TOTAL_MEM_MB <= 1024 )); then
-    BUILD_HEAP_MB=512
-  elif (( TOTAL_MEM_MB <= 2048 )); then
-    BUILD_HEAP_MB=768
-  else
-    BUILD_HEAP_MB=1024
-  fi
-fi
-
-if [[ -z "$RUNTIME_HEAP_MB" ]]; then
-  if (( TOTAL_MEM_MB <= 1024 )); then
-    RUNTIME_HEAP_MB=256
-  elif (( TOTAL_MEM_MB <= 2048 )); then
-    RUNTIME_HEAP_MB=384
-  else
-    RUNTIME_HEAP_MB=512
-  fi
-fi
+SERVICE_UNIT_CHANGED=0
+SERVICE_ENV_CHANGED=0
+SERVICE_RESTART_REQUIRED=0
+NGINX_CONFIG_CHANGED=0
+RELEASE_CHANGED=0
+BUILD_CHANGED=0
+NEW_RELEASE_ID=""
+NEW_RELEASE_DIR=""
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -148,6 +147,313 @@ command_exists() {
   command -v "$1" >/dev/null 2>&1
 }
 
+trim_whitespace() {
+  local value="$1"
+  value="${value#"${value%%[![:space:]]*}"}"
+  value="${value%"${value##*[![:space:]]}"}"
+  printf '%s' "$value"
+}
+
+strip_matching_quotes() {
+  local value="$1"
+
+  if [[ ${#value} -ge 2 && "${value:0:1}" == '"' && "${value: -1}" == '"' ]]; then
+    value="${value:1:${#value}-2}"
+    value="${value//\\n/$'\n'}"
+    value="${value//\\r/$'\r'}"
+    value="${value//\\t/$'\t'}"
+    value="${value//\\\"/\"}"
+    value="${value//\\\\/\\}"
+  elif [[ ${#value} -ge 2 && "${value:0:1}" == "'" && "${value: -1}" == "'" ]]; then
+    value="${value:1:${#value}-2}"
+  fi
+
+  printf '%s' "$value"
+}
+
+load_env_file_if_present() {
+  local env_file="$1"
+  local display_name="$2"
+
+  if [[ ! -f "$env_file" ]]; then
+    return
+  fi
+
+  info "Loading env defaults from ${display_name}"
+
+  while IFS= read -r raw_line || [[ -n "$raw_line" ]]; do
+    local line key value
+    line="${raw_line%$'\r'}"
+    line="$(trim_whitespace "$line")"
+
+    if [[ -z "$line" || "$line" == \#* ]]; then
+      continue
+    fi
+
+    if [[ "$line" == export\ * ]]; then
+      line="$(trim_whitespace "${line#export }")"
+    fi
+
+    if [[ "$line" != *=* ]]; then
+      warn "Skipping invalid env line in ${display_name}: ${raw_line}"
+      continue
+    fi
+
+    key="$(trim_whitespace "${line%%=*}")"
+    value="$(trim_whitespace "${line#*=}")"
+
+    if [[ ! "$key" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
+      warn "Skipping invalid env key in ${display_name}: ${key}"
+      continue
+    fi
+
+    if [[ -n "${!key:-}" ]]; then
+      continue
+    fi
+
+    value="$(strip_matching_quotes "$value")"
+    printf -v "$key" '%s' "$value"
+  done < "$env_file"
+}
+
+load_project_env_defaults() {
+  local node_env="${NODE_ENV:-production}"
+
+  case "$node_env" in
+    production|development|test) ;;
+    *)
+      warn "Unsupported NODE_ENV=${node_env}; falling back to production-style env file order."
+      node_env="production"
+      ;;
+  esac
+
+  load_env_file_if_present "${SOURCE_DIR}/.env.${node_env}.local" ".env.${node_env}.local"
+
+  if [[ "$node_env" != "test" ]]; then
+    load_env_file_if_present "${SOURCE_DIR}/.env.local" ".env.local"
+  fi
+
+  load_env_file_if_present "${SOURCE_DIR}/.env.${node_env}" ".env.${node_env}"
+  load_env_file_if_present "${SOURCE_DIR}/.env" ".env"
+}
+
+apply_config_defaults() {
+  APP_NAME="${APP_NAME:-kibouflow}"
+  APP_PORT="${APP_PORT:-3000}"
+  APP_USER="${APP_USER:-${SUDO_USER:-$(id -un)}}"
+  APP_GROUP="${APP_GROUP:-$APP_USER}"
+  APP_HOME="${APP_HOME:-/home/${APP_USER}/apps/${APP_NAME}}"
+  RELEASES_DIR="${APP_HOME}/releases"
+  SHARED_DIR="${APP_HOME}/shared"
+  CURRENT_LINK="${APP_HOME}/current"
+  INSTALL_FINGERPRINT_FILE="${SHARED_DIR}/.install-fingerprint"
+  BUILD_FINGERPRINT_FILE="${SHARED_DIR}/.build-fingerprint"
+  RELEASE_FINGERPRINT_FILE="${SHARED_DIR}/.release-fingerprint"
+  SERVICE_NAME="${SERVICE_NAME:-$APP_NAME}"
+
+  BUILD_ON_SERVER="${BUILD_ON_SERVER:-1}"
+  INSTALL_NGINX="${INSTALL_NGINX:-1}"
+  ENABLE_SSL="${ENABLE_SSL:-1}"
+  INSTALL_LOCAL_POSTGRES="${INSTALL_LOCAL_POSTGRES:-auto}"
+  CONFIGURE_SWAP="${CONFIGURE_SWAP:-auto}"
+  ENABLE_UFW="${ENABLE_UFW:-0}"
+  GEO_AUDIT_OPENAI_MODEL="${GEO_AUDIT_OPENAI_MODEL:-chatgpt-5.4-mini}"
+  GEO_AUDIT_PYTHON="${GEO_AUDIT_PYTHON:-python3}"
+
+  if [[ -z "$BUILD_HEAP_MB" ]]; then
+    if (( TOTAL_MEM_MB <= 1024 )); then
+      BUILD_HEAP_MB=512
+    elif (( TOTAL_MEM_MB <= 2048 )); then
+      BUILD_HEAP_MB=768
+    else
+      BUILD_HEAP_MB=1024
+    fi
+  fi
+
+  if [[ -z "$RUNTIME_HEAP_MB" ]]; then
+    if (( TOTAL_MEM_MB <= 1024 )); then
+      RUNTIME_HEAP_MB=256
+    elif (( TOTAL_MEM_MB <= 2048 )); then
+      RUNTIME_HEAP_MB=384
+    else
+      RUNTIME_HEAP_MB=512
+    fi
+  fi
+}
+
+load_existing_deploy_env() {
+  if [[ -z "$SHARED_DIR" ]]; then
+    return
+  fi
+
+  load_env_file_if_present "${SHARED_DIR}/app.env" "${SHARED_DIR}/app.env"
+  load_env_file_if_present "${SHARED_DIR}/deploy.env" "${SHARED_DIR}/deploy.env"
+}
+
+normalize_env_aliases() {
+  if [[ -z "$ADMIN_GEO_PASSWORD" && -n "${GEO_ADMIN_PASSWORD:-}" ]]; then
+    ADMIN_GEO_PASSWORD="$GEO_ADMIN_PASSWORD"
+  fi
+}
+
+read_file_if_present() {
+  local file_path="$1"
+
+  if [[ -f "$file_path" ]]; then
+    cat "$file_path"
+  fi
+}
+
+write_string_if_changed() {
+  local target_file="$1"
+  local file_mode="$2"
+  local content="$3"
+  local tmp_file
+
+  tmp_file="$(mktemp)"
+  printf '%s' "$content" > "$tmp_file"
+
+  if [[ -f "$target_file" ]] && cmp -s "$tmp_file" "$target_file"; then
+    rm -f "$tmp_file"
+    return 1
+  fi
+
+  install -m "$file_mode" "$tmp_file" "$target_file"
+  rm -f "$tmp_file"
+  return 0
+}
+
+write_file_from_stdin_if_changed() {
+  local target_file="$1"
+  local file_mode="$2"
+  local tmp_file
+
+  tmp_file="$(mktemp)"
+  cat > "$tmp_file"
+
+  if [[ -f "$target_file" ]] && cmp -s "$tmp_file" "$target_file"; then
+    rm -f "$tmp_file"
+    return 1
+  fi
+
+  install -m "$file_mode" "$tmp_file" "$target_file"
+  rm -f "$tmp_file"
+  return 0
+}
+
+hash_existing_paths() {
+  local rel_path
+  local existing_paths=()
+
+  for rel_path in "$@"; do
+    if [[ -e "${SOURCE_DIR}/${rel_path}" ]]; then
+      existing_paths+=("$rel_path")
+    fi
+  done
+
+  if (( ${#existing_paths[@]} == 0 )); then
+    printf 'empty'
+    return
+  fi
+
+  (
+    cd "$SOURCE_DIR"
+    tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner -cf - "${existing_paths[@]}" 2>/dev/null \
+      | sha256sum \
+      | awk '{print $1}'
+  )
+}
+
+compute_install_fingerprint() {
+  hash_existing_paths package.json package-lock.json npm-shrinkwrap.json
+}
+
+compute_build_source_fingerprint() {
+  hash_existing_paths \
+    package.json \
+    package-lock.json \
+    npm-shrinkwrap.json \
+    next.config.ts \
+    next.config.js \
+    next.config.mjs \
+    tsconfig.json \
+    mdx-components.tsx \
+    mdx-components.ts \
+    mdx-components.jsx \
+    mdx-components.js \
+    postcss.config.js \
+    postcss.config.mjs \
+    postcss.config.cjs \
+    tailwind.config.js \
+    tailwind.config.ts \
+    src \
+    public \
+    content
+}
+
+compute_runtime_extra_fingerprint() {
+  hash_existing_paths scripts docs
+}
+
+compute_build_fingerprint() {
+  local install_fingerprint="$1"
+  local build_source_fingerprint
+
+  build_source_fingerprint="$(compute_build_source_fingerprint)"
+
+  printf '%s\n' \
+    "install=${install_fingerprint}" \
+    "source=${build_source_fingerprint}" \
+    "next_public_site_url=${NEXT_PUBLIC_SITE_URL}" \
+    "server_actions_key=${NEXT_SERVER_ACTIONS_ENCRYPTION_KEY}" \
+    | sha256sum \
+    | awk '{print $1}'
+}
+
+compute_release_fingerprint() {
+  local build_fingerprint="$1"
+  local runtime_extra_fingerprint
+
+  runtime_extra_fingerprint="$(compute_runtime_extra_fingerprint)"
+
+  printf '%s\n' \
+    "build=${build_fingerprint}" \
+    "runtime_extra=${runtime_extra_fingerprint}" \
+    | sha256sum \
+    | awk '{print $1}'
+}
+
+service_exists() {
+  local unit_name="$1"
+  systemctl list-unit-files "${unit_name}.service" --no-legend 2>/dev/null | grep -q "^${unit_name}\.service"
+}
+
+service_is_active() {
+  local unit_name="$1"
+  systemctl is-active --quiet "$unit_name"
+}
+
+ensure_apt_packages() {
+  local package_name
+  local missing_packages=()
+
+  for package_name in "$@"; do
+    if ! dpkg -s "$package_name" >/dev/null 2>&1; then
+      missing_packages+=("$package_name")
+    fi
+  done
+
+  if (( ${#missing_packages[@]} == 0 )); then
+    ok "Required APT packages already installed."
+    return
+  fi
+
+  info "Installing missing APT packages: ${missing_packages[*]}"
+  apt-get update -y
+  apt-get install -y "${missing_packages[@]}"
+  ok "Missing APT packages installed."
+}
+
 ensure_directory() {
   mkdir -p "$1"
 }
@@ -200,9 +506,6 @@ ensure_swap_if_needed() {
 }
 
 install_base_packages() {
-  info "Installing base packages."
-  apt-get update -y
-
   local packages=(
     ca-certificates
     curl
@@ -225,8 +528,7 @@ install_base_packages() {
     packages+=(ufw)
   fi
 
-  apt-get install -y "${packages[@]}"
-  ok "Base packages installed."
+  ensure_apt_packages "${packages[@]}"
 }
 
 install_node_if_needed() {
@@ -288,8 +590,7 @@ install_and_tune_postgres() {
 
   prompt_value DB_PASSWORD "PostgreSQL password for kibouflow user" 1
 
-  info "Installing local PostgreSQL."
-  apt-get install -y postgresql postgresql-contrib
+  ensure_apt_packages postgresql postgresql-contrib
   systemctl enable postgresql
   systemctl start postgresql
 
@@ -672,6 +973,10 @@ EOF
 
 main() {
   require_root
+  load_project_env_defaults
+  apply_config_defaults
+  load_existing_deploy_env
+  normalize_env_aliases
 
   echo ""
   echo "============================================================"
