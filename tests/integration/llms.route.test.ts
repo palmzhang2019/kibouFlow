@@ -9,6 +9,7 @@ describe("/llms.txt", () => {
 
     const body = await res.text();
     expect(body).toContain("# GEO");
+    expect(body).not.toContain("http://localhost:3000");
     expect(body).toContain("/zh/guides/paths/job-prep-cluster-entry");
     expect(body).toContain("/ja/guides/paths/job-prep-cluster-entry");
   });
@@ -21,6 +22,7 @@ describe("/llms-full.txt", () => {
     expect(res.headers.get("content-type")).toMatch(/text\/plain/);
 
     const body = await res.text();
+    expect(body).not.toContain("http://localhost:3000");
     expect(body).toContain("## Locale: zh");
     expect(body).toContain("## Locale: ja");
     expect(body).toContain("日语学习路径 FAQ");

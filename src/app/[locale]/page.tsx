@@ -13,17 +13,22 @@ import { resolveGeoMetadata } from "@/lib/geo-settings";
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "metadata.home" });
+  const description =
+    locale === "zh"
+      ? "帮助在日本发展但方向不清的人做希望整理、路径判断与下一步选择。先整理，再决定该先做什么。"
+      : t("description");
   const resolved = await resolveGeoMetadata({
     locale: locale as "zh" | "ja",
     path: `/${locale}`,
     existingTitle: t("title"),
-    existingDescription: t("description"),
+    existingDescription: description,
     existingCanonical: `/${locale}`,
     existingOpenGraph: {
       title: t("title"),
-      description: t("description"),
+      description,
       locale: locale === "zh" ? "zh_CN" : "ja_JP",
       type: "website",
+      url: `/${locale}`,
     },
   });
 

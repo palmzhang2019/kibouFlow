@@ -1,6 +1,18 @@
 import type { MDXComponents } from "mdx/types";
 import { resolveHeadingId } from "@/lib/article-anchors";
 
+function localizeMdxHref(href: string | undefined, locale: string): string | undefined {
+  if (!href || !href.startsWith("/")) return href;
+  if (href.startsWith(`/${locale}/`) || href.startsWith("//")) return href;
+
+  const localizedPrefixes = ["/guides/", "/faq", "/trial", "/partner"];
+  if (!localizedPrefixes.some((prefix) => href === prefix || href.startsWith(prefix))) {
+    return href;
+  }
+
+  return `/${locale}${href}`;
+}
+
 function Callout({
   children,
   type = "info",
@@ -60,7 +72,7 @@ function Step({
   );
 }
 
-export function getMDXComponents(): MDXComponents {
+export function getMDXComponents(locale: string): MDXComponents {
   return {
     Callout,
     StepList,
@@ -83,8 +95,9 @@ export function getMDXComponents(): MDXComponents {
         {children}
       </h3>
     ),
-    a: (props) => (
+    a: ({ href, ...props }) => (
       <a
+        href={localizeMdxHref(href, locale)}
         {...props}
         className="text-primary underline underline-offset-2 hover:text-primary-dark transition-colors"
       />

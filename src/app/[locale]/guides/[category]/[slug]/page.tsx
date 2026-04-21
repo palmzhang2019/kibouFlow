@@ -175,7 +175,7 @@ export default async function ArticlePage({
       >
         <MDXRemote
           source={article.content}
-          components={getMDXComponents()}
+          components={getMDXComponents(locale)}
         />
       </ArticleLayout>
     </>

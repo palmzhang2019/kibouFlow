@@ -1,9 +1,9 @@
 import type { MetadataRoute } from "next";
 import { getAllArticles } from "@/lib/content";
 import type { ContentType } from "@/lib/content";
+import { getSiteUrl } from "@/lib/seo/site-url";
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://kibouflow.com";
+const BASE_URL = getSiteUrl();
 
 const LOCALES = ["zh", "ja"] as const;
 const STATIC_PAGES = ["", "/trial", "/partner", "/faq", "/guides"] as const;

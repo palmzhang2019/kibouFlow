@@ -5,6 +5,7 @@ describe("robots.txt generator", () => {
     const r = robots();
     expect(r.sitemap).toMatch(/\/sitemap\.xml$/);
     expect(r.host).toMatch(/^https?:\/\//);
+    expect(r.host).not.toContain("localhost:3000");
 
     const rules = r.rules ?? [];
     const gpt = rules.find(

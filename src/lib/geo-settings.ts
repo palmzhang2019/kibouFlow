@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getPg } from "@/lib/db";
+import { getSiteUrl } from "@/lib/seo/site-url";
 
 export interface GeoSiteSettingsRow {
   site_name: string;
@@ -58,7 +59,7 @@ const DEFAULT_SITE_SETTINGS: Pick<
   default_title_template: "%s | GEO",
   default_description: "先整理希望，再判断路径，再导向下一步",
   default_locale: "zh",
-  site_url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://kibouflow.com",
+  site_url: getSiteUrl(),
 };
 
 export function normalizeGeoPath(pathname: string): string {
@@ -107,7 +108,10 @@ async function readSiteSettings(): Promise<GeoSiteSettingsRow | null> {
   return rows[0] ?? null;
 }
 
-async function readPageSettings(locale: string, path: string): Promise<GeoPageSettingsRow | null> {
+async function readPageSettings(
+  locale: string,
+  path: string,
+): Promise<GeoPageSettingsRow | null> {
   const sql = getPg();
   if (!sql) return null;
   const rows = await sql<GeoPageSettingsRow[]>`
@@ -155,8 +159,12 @@ export async function resolveGeoMetadata(
   const canonical = page?.canonical_url || input.existingCanonical;
   const openGraph = {
     ...(input.existingOpenGraph ?? {}),
-    title: page?.og_title || input.existingTitle || title,
-    description: page?.og_description || input.existingDescription || description,
+    title: page?.og_title || page?.meta_title || input.existingTitle || title,
+    description:
+      page?.og_description ||
+      page?.meta_description ||
+      input.existingDescription ||
+      description,
     images:
       page?.og_image && page.og_image.length > 0
         ? [{ url: page.og_image }]

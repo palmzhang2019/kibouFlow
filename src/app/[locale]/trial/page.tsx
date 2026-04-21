@@ -4,22 +4,36 @@ import { Card } from "@/components/shared/Card";
 import { TrialForm } from "@/components/forms/TrialForm";
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 import { buildBreadcrumbItems } from "@/lib/seo/breadcrumbs";
+import { resolveGeoMetadata } from "@/lib/geo-settings";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "metadata.trial" });
-
-  return {
-    title: t("title"),
-    description: t("description"),
-    openGraph: {
+  const path = `/${locale}/trial`;
+  const resolved = await resolveGeoMetadata({
+    locale: locale as "zh" | "ja",
+    path,
+    existingTitle: t("title"),
+    existingDescription: t("description"),
+    existingCanonical: path,
+    existingOpenGraph: {
       title: t("title"),
       description: t("description"),
       locale: locale === "zh" ? "zh_CN" : "ja_JP",
+      type: "website",
+      url: path,
     },
+  });
+
+  return {
+    title: resolved.title,
+    description: resolved.description,
+    openGraph: resolved.openGraph,
     alternates: {
-      languages: { zh: "/zh/trial", ja: "/ja/trial" },
+      canonical: resolved.canonical,
+      languages: { "x-default": "/zh/trial", zh: "/zh/trial", ja: "/ja/trial" },
     },
+    robots: resolved.robots,
   };
 }
 

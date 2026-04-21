@@ -1,5 +1,42 @@
+const DEFAULT_SITE_URL = "https://kibouflow.com";
+
+function normalizeCandidateSiteUrl(value?: string): string | null {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+
+  try {
+    const url = new URL(trimmed);
+    if (url.protocol !== "https:" && url.protocol !== "http:") {
+      return null;
+    }
+    url.hash = "";
+    url.search = "";
+    return url.toString().replace(/\/$/, "");
+  } catch {
+    return null;
+  }
+}
+
+function isLoopbackHost(hostname: string): boolean {
+  return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
+}
+
 export function getSiteUrl(): string {
-  return (process.env.NEXT_PUBLIC_SITE_URL || "https://your-domain.com").replace(/\/$/, "");
+  const normalized = normalizeCandidateSiteUrl(process.env.NEXT_PUBLIC_SITE_URL);
+  if (!normalized) return DEFAULT_SITE_URL;
+
+  if (process.env.NODE_ENV === "production") {
+    try {
+      if (isLoopbackHost(new URL(normalized).hostname)) {
+        return DEFAULT_SITE_URL;
+      }
+    } catch {
+      return DEFAULT_SITE_URL;
+    }
+  }
+
+  return normalized;
 }
 
 export function organizationId(siteUrl?: string): string {

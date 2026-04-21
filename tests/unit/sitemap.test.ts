@@ -1,7 +1,7 @@
 import sitemap from "@/app/sitemap";
+import { getSiteUrl } from "@/lib/seo/site-url";
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://kibouflow.com";
+const BASE_URL = getSiteUrl();
 
 describe("sitemap", () => {
   const entries = sitemap();

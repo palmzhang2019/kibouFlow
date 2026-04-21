@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { getAllArticles, getArticleMarkdown } from "@/lib/content";
+import { getSiteUrl } from "@/lib/seo/site-url";
 
 export const dynamic = "force-static";
 export const revalidate = 3600;
 
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://kibouflow.com";
+const SITE_URL = getSiteUrl();
 
 const LOCALES = ["zh", "ja"] as const;
 
