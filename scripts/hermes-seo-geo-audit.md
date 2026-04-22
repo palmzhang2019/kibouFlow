@@ -238,6 +238,30 @@
 #### 建议（锦上添花）
 1. ...
 
+### 错误优先级分组（用于修复排期）
+- P0（阻断级，优先级最高）：
+- P1（高优先级）：
+- P2（中优先级）：
+
+### 最高优先级错误组详单（如果存在错误则必填）
+- 仅展开 1 组：即上面优先级最高且影响范围最大的错误组（通常是 P0）
+- 必须写明：为什么它是当前最高优先级（影响面、风险、阻断性）
+- 必须包含以下字段（字段名不要改）：
+  - group_name:
+  - priority:
+  - impact_scope:
+  - why_top_priority:
+  - common_symptom:
+  - likely_root_cause:
+  - global_fix_strategy:
+  - verification_plan:
+- error_instances（至少 3 条，若不足则全列出），每条必须包含：
+  - code:
+  - page_or_file:
+  - observed_evidence:
+  - expected_behavior:
+  - actionable_fix:
+
 ### 优先修复建议（Top 5）
 1. ...
 2. ...
@@ -249,6 +273,28 @@
 - 新增问题：
 - 已修复问题：
 - 持续存在的问题：
+
+### 机器可解析块（给后续 LLM 直接消费）
+{
+  "highest_priority_error_group": {
+    "group_name": "...",
+    "priority": "P0|P1|P2",
+    "impact_scope": "...",
+    "why_top_priority": "...",
+    "likely_root_cause": "...",
+    "global_fix_strategy": ["...", "..."],
+    "verification_plan": ["...", "..."],
+    "error_instances": [
+      {
+        "code": "...",
+        "page_or_file": "...",
+        "observed_evidence": "...",
+        "expected_behavior": "...",
+        "actionable_fix": "..."
+      }
+    ]
+  }
+}
 ```
 
 ---
@@ -261,6 +307,7 @@
 - 如果某些检查需要查看页面源代码，请查看（比如 JSON-LD、meta 标签）
 - 检查完成后给出完整的总结报告
 - 如果发现特别严重的问题，在该步骤就立即指出
+- 如果存在错误，务必优先展开「最高优先级错误组详单」，并提供可直接用于修复的证据与动作
 
 ---
 
