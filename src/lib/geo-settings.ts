@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getPg } from "@/lib/db";
-import { getSiteUrl } from "@/lib/seo/site-url";
+import { getSiteUrl, getDefaultOgImage } from "@/lib/seo/site-url";
 
 export interface GeoSiteSettingsRow {
   site_name: string;
@@ -168,7 +168,7 @@ export async function resolveGeoMetadata(
     images:
       page?.og_image && page.og_image.length > 0
         ? [{ url: page.og_image }]
-        : (input.existingOpenGraph?.images ?? undefined),
+        : (input.existingOpenGraph?.images ?? [{ url: getDefaultOgImage() }]),
   };
   const robots = page?.noindex ? { index: false, follow: false } : undefined;
 

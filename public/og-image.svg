@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <rect width="1200" height="630" fill="#f8fafc"/>
+  <!-- Brand accent bar -->
+  <rect x="80" y="80" width="8" height="80" rx="4" fill="#2563eb"/>
+  <!-- Main title -->
+  <text x="108" y="142" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="700" fill="#1e293b" letter-spacing="-2">GEO</text>
+  <!-- Subtitle -->
+  <text x="108" y="192" font-family="system-ui, -apple-system, sans-serif" font-size="28" fill="#64748b">在日本发展，先把方向整理清楚</text>
+  <!-- Decorative path graphic -->
+  <g transform="translate(850, 280)">
+    <!-- Three paths converging -->
+    <path d="M-120,-140 Q0,-60 120,0" stroke="#2563eb" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M0,-160 L0,0" stroke="#2563eb" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M120,-140 Q0,-60 -120,0" stroke="#2563eb" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <!-- End node -->
+    <circle cx="0" cy="0" r="24" fill="#2563eb"/>
+    <circle cx="0" cy="0" r="12" fill="#f8fafc"/>
+  </g>
+  <!-- Bottom tagline -->
+  <text x="108" y="560" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#94a3b8">先整理希望，再判断路径，再导向下一步</text>
+</svg>

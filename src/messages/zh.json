@@ -22,7 +22,11 @@
       "contact": "联系方式",
       "privacy": "隐私说明",
       "copyright": "© 2026 GEO. All rights reserved.",
-      "xLink": "在 X 上关注我们"
+      "xLink": "在 X 上关注我们",
+      "clusterDirectionSorting": "方向整理主题簇",
+      "clusterJapanesePath": "日语学习路径主题簇",
+      "clusterJobPrep": "求职准备主题簇",
+      "clusters": "主题簇入口"
     },
     "lang": {
       "zh": "中文",

@@ -11,7 +11,7 @@ export function Footer() {
   return (
     <footer className="border-t border-gray-100 bg-gray-50">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 py-12">
-        <div className="grid gap-8 md:grid-cols-3">
+        <div className="grid gap-8 md:grid-cols-4">
           {/* Brand */}
           <div>
             <p className="text-xl font-bold text-primary mb-2">GEO</p>
@@ -32,6 +32,29 @@ export function Footer() {
             <span className="block text-sm text-muted">
               {t("footer.privacy")}
             </span>
+          </div>
+
+          {/* Cluster entries */}
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-foreground mb-2">{t("footer.clusters")}</p>
+            <Link
+              href="/guides/paths/direction-sorting-cluster-entry"
+              className="block text-sm text-muted hover:text-foreground transition-colors"
+            >
+              {t("footer.clusterDirectionSorting")}
+            </Link>
+            <Link
+              href="/guides/paths/japanese-learning-path-cluster-entry"
+              className="block text-sm text-muted hover:text-foreground transition-colors"
+            >
+              {t("footer.clusterJapanesePath")}
+            </Link>
+            <Link
+              href="/guides/paths/job-prep-cluster-entry"
+              className="block text-sm text-muted hover:text-foreground transition-colors"
+            >
+              {t("footer.clusterJobPrep")}
+            </Link>
           </div>
 
           {/* Contact */}

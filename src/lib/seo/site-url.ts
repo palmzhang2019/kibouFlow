@@ -64,3 +64,7 @@ export function absoluteUrl(path: string, siteUrl?: string): string {
   const p = path.startsWith("/") ? path : `/${path}`;
   return `${base}${p}`;
 }
+
+export function getDefaultOgImage(): string {
+  return `${getSiteUrl()}/og-image.svg`;
+}

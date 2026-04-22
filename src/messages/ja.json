@@ -22,7 +22,11 @@
       "contact": "お問い合わせ",
       "privacy": "プライバシーポリシー",
       "copyright": "© 2026 GEO. All rights reserved.",
-      "xLink": "X でフォローする"
+      "xLink": "X でフォローする",
+      "clusterDirectionSorting": "方向整理クラスター",
+      "clusterJapanesePath": "日本語学習パスクラスター",
+      "clusterJobPrep": "就職準備クラスター",
+      "clusters": "クラスター入口"
     },
     "lang": {
       "zh": "中文",
