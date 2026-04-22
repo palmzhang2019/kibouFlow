@@ -3,7 +3,7 @@
   <!-- Brand accent bar -->
   <rect x="80" y="80" width="8" height="80" rx="4" fill="#2563eb"/>
   <!-- Main title -->
-  <text x="108" y="142" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="700" fill="#1e293b" letter-spacing="-2">GEO</text>
+  <text x="108" y="142" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="700" fill="#1e293b" letter-spacing="-2">kibouFlow</text>
   <!-- Subtitle -->
   <text x="108" y="192" font-family="system-ui, -apple-system, sans-serif" font-size="28" fill="#64748b">在日本发展，先把方向整理清楚</text>
   <!-- Decorative path graphic -->

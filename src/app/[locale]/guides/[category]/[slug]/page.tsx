@@ -51,7 +51,7 @@ export async function generateMetadata({
   const resolved = await resolveGeoMetadata({
     locale: locale as "zh" | "ja",
     path: url,
-    existingTitle: `${article.title} | GEO`,
+    existingTitle: `${article.title} | kibouFlow`,
     existingDescription: article.description,
     existingCanonical: url,
     existingOpenGraph: {
@@ -71,6 +71,7 @@ export async function generateMetadata({
     alternates: {
       canonical: resolved.canonical,
       languages: {
+        "x-default": `/zh/guides/${category}/${slug}`,
         zh: `/zh/guides/${category}/${slug}`,
         ja: `/ja/guides/${category}/${slug}`,
       },

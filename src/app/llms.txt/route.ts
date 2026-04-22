@@ -61,7 +61,7 @@ function renderLocale(locale: string, label: string): string[] {
 
 export async function GET() {
   const body = [
-    "# GEO (kibouFlow)",
+    "# kibouFlow",
     "",
     "> 面向“在日本发展”方向不清的人：先整理希望、再判断路径、再导向下一步。中日双语。",
     "",

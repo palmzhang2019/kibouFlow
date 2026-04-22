@@ -105,7 +105,7 @@ export function GeoAuditRunner() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold">运行 GEO 体检</h2>
+        <h2 className="text-lg font-semibold">运行站点体检</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           在服务器上执行 <code className="text-xs">scripts/geo_principles_audit.py</code>（需 Python；Docker
           镜像已包含脚本与 content/src/docs）。
@@ -119,7 +119,7 @@ export function GeoAuditRunner() {
           className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-60"
           onClick={() => void runAudit()}
         >
-          {runState === "running" ? "运行中…" : "运行 GEO 体检"}
+          {runState === "running" ? "运行中…" : "运行站点体检"}
         </button>
         <span className="text-sm text-muted-foreground">
           状态：<span className="font-medium text-foreground">{statusLabel}</span>

@@ -37,7 +37,7 @@ export function OrganizationJsonLd() {
     "@context": "https://schema.org",
     "@type": "Organization",
     "@id": organizationId(site),
-    name: "GEO",
+    name: "kibouFlow",
     url: site,
     description: "Support for clarifying goals and choosing the next step for people building in Japan.",
     ...(sameAs.length > 0 ? { sameAs } : {}),

@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "GEO - Clarify direction and choose the next step";
+export const alt = "kibouFlow - Clarify direction and choose the next step";
 export const size = {
   width: 1200,
   height: 630,
@@ -43,7 +43,7 @@ export default function OpenGraphImage() {
               background: "rgb(14, 116, 144)",
             }}
           />
-          GEO
+          kibouFlow
         </div>
 
         <div

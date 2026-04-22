@@ -23,7 +23,7 @@ export function Header() {
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="text-xl font-bold text-primary">
-            GEO
+            kibouFlow
           </Link>
 
           {/* Desktop nav */}

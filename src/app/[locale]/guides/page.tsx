@@ -40,7 +40,7 @@ export async function generateMetadata({
     openGraph: resolved.openGraph,
     alternates: {
       canonical: resolved.canonical,
-      languages: { zh: "/zh/guides", ja: "/ja/guides" },
+      languages: { "x-default": "/zh/guides", zh: "/zh/guides", ja: "/ja/guides" },
     },
     robots: resolved.robots,
   };

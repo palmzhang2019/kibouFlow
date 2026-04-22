@@ -68,3 +68,25 @@ ctaType: "trial"
 ## 下一步建议
 
 如果你在上面五种情况里看到了自己的影子，先不要打开招聘网站。用一两周时间把方向理清楚，再精准投递，比海投更有效。
+
+<DecisionBlock
+  heading="何时适合立刻投递"
+  conditions={[
+    { label: "日语能支撑面试", description: "可以回答工作经历和动机等基础面试问题" },
+    { label: "方向基本明确", description: "知道大概想做什么行业/职能" },
+    { label: "有可投递的目标公司", description: "已经找到 3 家以上具体想投的公司" }
+  ]}
+  branches={[
+    {
+      condition: "不适合投递",
+      conclusion: "你符合上面五种情况之一",
+      action: "先做希望整理，把方向和策略制定清楚再投"
+    },
+    {
+      condition: "可以开始投递",
+      conclusion: "日语、方向、目标公司三项基本具备",
+      action: "开始精准投递，每次投递后记录回音，用于优化策略"
+    }
+  ]}
+  defaultAction="若仍不确定，先做希望整理"
+/>

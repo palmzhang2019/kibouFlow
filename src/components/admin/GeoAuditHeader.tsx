@@ -23,7 +23,7 @@ export function GeoAuditHeader() {
 
   return (
     <header className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-4">
-      <h1 className="text-xl font-bold tracking-tight">GEO 后台</h1>
+      <h1 className="text-xl font-bold tracking-tight">kibouFlow 后台</h1>
       <nav className="flex flex-wrap items-center gap-2">
         <Link href="/admin/geo-audit" className={navButtonClass(onDashboard)}>
           总览

@@ -8,7 +8,7 @@ export function WebSiteJsonLd({ locale }: { locale: string }) {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "@id": websiteId,
-    name: "GEO",
+    name: "kibouFlow",
     url: `${site}/${locale}`,
     inLanguage: localeToInLanguage(locale),
     publisher: { "@id": organizationId(site) },

@@ -55,8 +55,8 @@ const DEFAULT_SITE_SETTINGS: Pick<
   GeoSiteSettingsRow,
   "site_name" | "default_title_template" | "default_description" | "default_locale" | "site_url"
 > = {
-  site_name: "GEO",
-  default_title_template: "%s | GEO",
+  site_name: "kibouFlow",
+  default_title_template: "%s | kibouFlow",
   default_description: "先整理希望，再判断路径，再导向下一步",
   default_locale: "zh",
   site_url: getSiteUrl(),

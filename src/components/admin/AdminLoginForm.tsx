@@ -36,8 +36,8 @@ export function AdminLoginForm() {
   return (
     <form onSubmit={submit} className="mx-auto max-w-sm space-y-4 rounded-lg border border-border p-6">
       <div>
-        <h1 className="text-xl font-semibold">GEO 后台登录</h1>
-        <p className="mt-1 text-sm text-muted">登录后可使用 GEO 总览、体检运行、历史记录与报告详情。</p>
+        <h1 className="text-xl font-semibold">kibouFlow 后台登录</h1>
+        <p className="mt-1 text-sm text-muted">登录后可使用后台总览、体检运行、历史记录与报告详情。</p>
       </div>
       <label className="block text-sm font-medium">
         密码

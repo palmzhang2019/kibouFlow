@@ -67,3 +67,30 @@ ctaType: "trial"
 ## 下一步建议
 
 如果你的日语还无法支撑一场基本面试，先集中补日语，而不是继续修改简历。如果日语没问题但方向不清，先整理方向再写简历。
+
+<DecisionBlock
+  heading="不适合立即投递清单"
+  conditions={[
+    { label: "日语未达面试水平", description: "无法用日语完成基础面试问答" },
+    { label: "方向未明确", description: "不知道想做什么类型的工作" },
+    { label: "简历与目标岗位不匹配", description: "简历内容无法对应目标职位要求" }
+  ]}
+  branches={[
+    {
+      condition: "先补日语",
+      conclusion: "日语还撑不起面试，硬投也接不住",
+      action: "暂停投递，集中 1-2 个月补日语实战能力"
+    },
+    {
+      condition: "先整理方向",
+      conclusion: "日语可用但方向模糊，投递没有策略",
+      action: "用希望整理明确目标方向，再针对性改简历"
+    },
+    {
+      condition: "先改简历",
+      conclusion: "日语够用、方向清晰，但简历表达不精准",
+      action: "针对目标岗位改简历，再开始投递"
+    }
+  ]}
+  defaultAction="若三条都不完全符合，先做希望整理"
+/>

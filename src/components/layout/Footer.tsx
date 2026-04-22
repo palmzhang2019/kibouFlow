@@ -14,7 +14,7 @@ export function Footer() {
         <div className="grid gap-8 md:grid-cols-4">
           {/* Brand */}
           <div>
-            <p className="text-xl font-bold text-primary mb-2">GEO</p>
+            <p className="text-xl font-bold text-primary mb-2">kibouFlow</p>
             <p className="text-sm text-muted">{t("footer.tagline")}</p>
           </div>
 

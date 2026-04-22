@@ -19,7 +19,15 @@
       "Bash(node -e ' *)",
       "Bash(node check-pages.js)",
       "Bash(npm install *)",
-      "Bash(pkill -f \"next dev\")"
+      "Bash(pkill -f \"next dev\")",
+      "Bash(xxd)",
+      "Bash(npx tsc *)",
+      "Bash(node --version)",
+      "Bash(nvm use *)",
+      "Bash(curl -s http://localhost:3000/zh/guides/paths/framework-japanese-or-job-first)",
+      "Bash(curl -s http://localhost:3000/ja/faq)",
+      "Bash(curl -s http://localhost:3000/zh)",
+      "Bash(pkill -f \"next start\")"
     ]
   }
 }

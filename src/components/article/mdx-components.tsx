@@ -1,5 +1,7 @@
 import type { MDXComponents } from "mdx/types";
 import { resolveHeadingId } from "@/lib/article-anchors";
+import { DecisionBlock } from "./DecisionBlock";
+import { ThreeSectionBlock } from "./ThreeSectionBlock";
 
 function localizeMdxHref(href: string | undefined, locale: string): string | undefined {
   if (!href || !href.startsWith("/")) return href;
@@ -74,6 +76,8 @@ function Step({
 
 export function getMDXComponents(locale: string): MDXComponents {
   return {
+    DecisionBlock,
+    ThreeSectionBlock,
     Callout,
     StepList,
     Step,

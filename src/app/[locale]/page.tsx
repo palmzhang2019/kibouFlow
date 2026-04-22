@@ -39,6 +39,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     alternates: {
       canonical: resolved.canonical,
       languages: {
+        "x-default": "/zh",
         zh: "/zh",
         ja: "/ja",
       },

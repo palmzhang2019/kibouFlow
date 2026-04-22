@@ -45,7 +45,7 @@ export function ArticleJsonLd({
   const webpageId = `${pageUrl}#webpage`;
   const aboutThings = buildThingList(article.about);
   // 显式归一 about：非空数组才保留，否则为 undefined，交由 stripUndefinedDeep 清理。
-  // 关键点：源码层保持 "about": <value> 稳定存在，便于 GEO 扫描器识别主题实体锚点。
+  // 关键点：源码层保持 "about": <value> 稳定存在，便于语义扫描器识别主题实体锚点。
   const normalizedAbout =
     aboutThings && aboutThings.length > 0 ? aboutThings : undefined;
   const mentions = buildThingList(article.mentions);
@@ -62,10 +62,10 @@ export function ArticleJsonLd({
     author: {
       "@type": "Person",
       "@id": primaryPersonAuthorId(site),
-      name: "GEO",
+      name: "kibouFlow",
       url: site,
     },
-    publisher: { "@type": "Organization", name: "GEO", "@id": organizationId(site) },
+    publisher: { "@type": "Organization", name: "kibouFlow", "@id": organizationId(site) },
     inLanguage: localeToInLanguage(locale),
     url: pageUrl,
     mainEntityOfPage: {

@@ -3,7 +3,7 @@ import type { Article } from "@/lib/content";
 import { absoluteUrl, getSiteUrl, localeToInLanguage } from "@/lib/seo/site-url";
 
 function getDefinedTermSetName(locale: string) {
-  return locale === "ja" ? "GEO Concept Guides" : "GEO Concept Guides";
+  return locale === "ja" ? "kibouFlow Concept Guides" : "kibouFlow Concept Guides";
 }
 
 export function DefinedTermJsonLd({

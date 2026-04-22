@@ -42,7 +42,7 @@ export default async function GeoAuditHistoryPage() {
     return (
       <div className="space-y-4">
         <h2 className="text-lg font-semibold">历史记录</h2>
-        <p className="text-sm text-muted-foreground">暂无记录。请先在“运行体检”页执行一次 GEO 体检。</p>
+        <p className="text-sm text-muted-foreground">暂无记录。请先在“运行体检”页执行一次站点体检。</p>
         <Link href="/admin/geo-audit/run" className="text-sm font-medium text-primary underline">
           去运行体检
         </Link>

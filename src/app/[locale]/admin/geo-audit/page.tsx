@@ -48,7 +48,7 @@ export default async function GeoAuditDashboardPage() {
             href="/admin/geo-audit/run"
             className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
           >
-            运行 GEO 体检
+            运行站点体检
           </Link>
           <Link href="/admin/geo-audit/history" className="rounded-md border border-border px-4 py-2 text-sm">
             历史记录
@@ -117,7 +117,7 @@ export default async function GeoAuditDashboardPage() {
           href="/admin/geo-audit/run"
           className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
         >
-          运行 GEO 体检
+          运行站点体检
         </Link>
         <Link href="/admin/geo-audit/history" className="rounded-md border border-border px-4 py-2 text-sm">
           历史记录

@@ -7,7 +7,7 @@ import { buildBreadcrumbItems } from "@/lib/seo/breadcrumbs";
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   return {
-    title: locale === "zh" ? "提交成功 | GEO" : "送信完了 | GEO",
+    title: locale === "zh" ? "提交成功 | kibouFlow" : "送信完了 | kibouFlow",
     robots: { index: false },
   };
 }

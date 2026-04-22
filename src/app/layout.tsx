@@ -6,12 +6,12 @@ const SITE_URL = getSiteUrl();
 const SITE_DESCRIPTION = "先整理希望，再判断路径，再导向下一步";
 
 export const metadata: Metadata = {
-  title: "GEO",
+  title: "kibouFlow",
   description: SITE_DESCRIPTION,
   metadataBase: new URL(SITE_URL),
   openGraph: {
-    siteName: "GEO",
-    title: "GEO",
+    siteName: "kibouFlow",
+    title: "kibouFlow",
     description: SITE_DESCRIPTION,
     type: "website",
   },

@@ -6,6 +6,8 @@ export const dynamic = "force-static";
 export const revalidate = 3600;
 
 const SITE_URL = getSiteUrl();
+const BUILD_VERSION = process.env.NEXT_PUBLIC_SITE_VERSION ?? "1.0.0";
+const LAST_UPDATED = new Date().toISOString().split("T")[0];
 
 const LOCALES = ["zh", "ja"] as const;
 
@@ -14,7 +16,10 @@ export async function GET() {
 
   chunks.push(
     [
-      "# GEO (kibouFlow) — Full Content",
+      "# kibouFlow — Full Content",
+      "",
+      `<!-- version: ${BUILD_VERSION} -->`,
+      `<!-- last_updated: ${LAST_UPDATED} -->`,
       "",
       "> 本文件是 kibouFlow 全站 Markdown 正文拼接，供生成式引擎一次性摄入。",
       `> 索引见 ${SITE_URL}/llms.txt，网站地图见 ${SITE_URL}/sitemap.xml。`,
