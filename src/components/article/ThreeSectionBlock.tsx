@@ -1,22 +1,19 @@
 interface ThreeSectionBlockProps {
-  /** Input conditions (starting state) */
   inputLabel?: string;
-  inputItems: string[];
-  /** Decision basis (key evidence/signals) */
+  inputItems?: string[];
   decisionLabel?: string;
-  decisionItems: string[];
-  /** Result (recommendation and next steps) */
+  decisionItems?: string[];
   resultLabel?: string;
-  resultItems: string[];
+  resultItems?: string[];
 }
 
 export function ThreeSectionBlock({
   inputLabel = "输入条件",
-  inputItems,
+  inputItems = [],
   decisionLabel = "判断依据",
-  decisionItems,
+  decisionItems = [],
   resultLabel = "结果",
-  resultItems,
+  resultItems = [],
 }: ThreeSectionBlockProps) {
   return (
     <section
@@ -30,7 +27,7 @@ export function ThreeSectionBlock({
             {inputLabel}
           </h3>
           <ul className="space-y-1.5">
-            {inputItems.map((item, i) => (
+            {(inputItems ?? []).map((item, i) => (
               <li key={i} className="text-sm text-foreground/80 flex items-start gap-1.5">
                 <span className="text-gray-400 mt-0.5">•</span>
                 <span>{item}</span>
@@ -45,7 +42,7 @@ export function ThreeSectionBlock({
             {decisionLabel}
           </h3>
           <ul className="space-y-1.5">
-            {decisionItems.map((item, i) => (
+            {(decisionItems ?? []).map((item, i) => (
               <li key={i} className="text-sm text-foreground/80 flex items-start gap-1.5">
                 <span className="text-amber-400 mt-0.5">•</span>
                 <span>{item}</span>
@@ -60,7 +57,7 @@ export function ThreeSectionBlock({
             {resultLabel}
           </h3>
           <ul className="space-y-1.5">
-            {resultItems.map((item, i) => (
+            {(resultItems ?? []).map((item, i) => (
               <li key={i} className="text-sm text-foreground/80 flex items-start gap-1.5">
                 <span className="text-emerald-500 mt-0.5">•</span>
                 <span>{item}</span>

@@ -10,21 +10,13 @@ interface DecisionBranch {
 }
 
 interface DecisionBlockProps {
-  /** Section heading, defaults to "量化判定" */
   heading?: string;
-  /** Label shown above conditions list */
   conditionsLabel?: string;
-  /** Label shown above judgment branches */
   branchesLabel?: string;
-  /** Label for action in each branch */
   actionLabel?: string;
-  /** Note shown at bottom when no branch matches */
   fallbackNote?: string;
-  /** Conditions for the judgment */
-  conditions: DecisionCondition[];
-  /** Decision branches with condition, conclusion, and suggested action */
-  branches: DecisionBranch[];
-  /** Fallback action when no branch matches */
+  conditions?: DecisionCondition[];
+  branches?: DecisionBranch[];
   defaultAction?: string;
 }
 
@@ -34,8 +26,8 @@ export function DecisionBlock({
   branchesLabel = "判断分支",
   actionLabel = "建议动作",
   fallbackNote = "若不符合以上条件",
-  conditions,
-  branches,
+  conditions = [],
+  branches = [],
   defaultAction,
 }: DecisionBlockProps) {
   return (

@@ -264,7 +264,7 @@ export function ArticleLayout({
                 ) : null}
                 {card.items && card.items.length > 0 ? (
                   <ul className="mt-3 space-y-2 text-sm leading-6 text-foreground/85">
-                    {card.items.map((item) => (
+                    {card.items?.map((item) => (
                       <li key={item} className="ml-4 list-disc pl-1">
                         {item}
                       </li>
