@@ -58,17 +58,18 @@ describe("content utilities", () => {
     expect(article?.audience).toEqual(["individual"]);
     expect(article?.tldr).toEqual([
       "这页是求职准备主题簇入口，帮你把简历、顺序、面试准备等问题拆成可阅读的路径。",
-      "如果你还不知道先看哪篇，这里给出推荐阅读顺序。",
+      "推荐顺序：先看问题判断 → 再看框架方法 → 再看 FAQ 定位 → 最后看案例找参考。",
+      "先看全局再进细节，引用锚点更稳定。",
     ]);
     expect(article?.about).toEqual(["求职准备", "主题入口"]);
   });
 
-  it("keeps legacy articles compatible when new summary fields are absent", () => {
+  it("loads article with frontmatter summary fields populated", () => {
+    // resume-vs-japanese.mdx now has tldr/suitableFor/notSuitableFor in its MDX frontmatter
     const article = getArticleBySlug("zh", "problems", "resume-vs-japanese");
     expect(article).not.toBeNull();
-    expect(article?.tldr).toBeUndefined();
-    expect(article?.about).toBeUndefined();
-    expect(article?.mentions).toBeUndefined();
+    expect(article?.tldr).toBeDefined();
+    expect(Array.isArray(article?.tldr)).toBe(true);
   });
 
   it("derives about for high-value articles when frontmatter omits it", () => {

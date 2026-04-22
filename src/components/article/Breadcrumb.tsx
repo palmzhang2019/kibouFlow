@@ -35,7 +35,7 @@ export function Breadcrumb({ category, title }: BreadcrumbProps) {
         </li>
         <li>
           <Link
-            href="/guides"
+            href={`/guides/${category}`}
             className="hover:text-foreground transition-colors"
           >
             {t(`categories.${category}`)}

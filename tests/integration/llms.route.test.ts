@@ -8,7 +8,7 @@ describe("/llms.txt", () => {
     expect(res.headers.get("content-type")).toMatch(/text\/plain/);
 
     const body = await res.text();
-    expect(body).toContain("# GEO");
+    expect(body).toContain("# kibouFlow");
     expect(body).not.toContain("http://localhost:3000");
     expect(body).toContain("/zh/guides/paths/job-prep-cluster-entry");
     expect(body).toContain("/ja/guides/paths/job-prep-cluster-entry");

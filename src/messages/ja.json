@@ -416,6 +416,13 @@
       "boundaries": "対応範囲の説明",
       "cases": "実例紹介"
     },
+    "categoryDescriptions": {
+      "problems": "履歴書・日本語・方向選び・就活のペースなど、よくある悩みをまとめています。",
+      "paths": "状況に応じて、次に何をすべきかの判断とアドバイス。",
+      "boundaries": "私たちにできること・できないことを事前にお伝えします。",
+      "cases": "実際の相談シーンを通じて、判断と決定のプロセスを紹介します。"
+    },
+    "categoryPageTitle": "{category} | kibouFlow",
     "readMore": "詳しく読む",
     "relatedArticles": "関連記事",
     "publishedAt": "公開日",

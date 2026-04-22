@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getAllArticles } from "@/lib/content";
+import { getAllArticles, CATEGORIES } from "@/lib/content";
 import type { ContentType } from "@/lib/content";
 import { getSiteUrl } from "@/lib/seo/site-url";
 
@@ -8,14 +8,14 @@ const BASE_URL = getSiteUrl();
 const LOCALES = ["zh", "ja"] as const;
 const STATIC_PAGES = ["", "/trial", "/partner", "/faq", "/guides"] as const;
 
-/** 静态营销页不写「每次请求都更新」的 lastModified；可用 ISO 日期覆盖 */
+/** 静态营销页的 lastModified；优先用构建时环境变量，兜底用运行时时间 */
 const STATIC_SITEMAP_LAST_MODIFIED = (() => {
   const raw = process.env.SITEMAP_STATIC_LASTMOD?.trim();
   if (raw) {
     const d = new Date(raw);
     if (!Number.isNaN(d.getTime())) return d;
   }
-  return new Date("2024-06-01T00:00:00.000Z");
+  return new Date();
 })();
 
 function priorityOf(contentType?: ContentType): number {
@@ -60,6 +60,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
             "x-default": `${BASE_URL}/zh${page}`,
             zh: `${BASE_URL}/zh${page}`,
             ja: `${BASE_URL}/ja${page}`,
+          },
+        },
+      });
+    }
+  }
+
+  for (const locale of LOCALES) {
+    for (const category of CATEGORIES) {
+      entries.push({
+        url: `${BASE_URL}/${locale}/guides/${category}`,
+        lastModified: STATIC_SITEMAP_LAST_MODIFIED,
+        changeFrequency: "weekly",
+        priority: 0.85,
+        alternates: {
+          languages: {
+            "x-default": `${BASE_URL}/zh/guides/${category}`,
+            zh: `${BASE_URL}/zh/guides/${category}`,
+            ja: `${BASE_URL}/ja/guides/${category}`,
           },
         },
       });

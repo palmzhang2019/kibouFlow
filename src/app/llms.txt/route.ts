@@ -13,8 +13,8 @@ export const revalidate = 3600;
 const SITE_URL = getSiteUrl();
 
 const LOCALES = [
-  { code: "zh", label: "中文" },
-  { code: "ja", label: "日本語" },
+  { code: "zh", label: "Chinese" },
+  { code: "ja", label: "Japanese" },
 ] as const;
 
 const SECTIONS: { heading: string; contentType: ContentType }[] = [
@@ -60,19 +60,24 @@ function renderLocale(locale: string, label: string): string[] {
 }
 
 export async function GET() {
-  const body = [
+  const lines: string[] = [
     "# kibouFlow",
     "",
-    "> 面向“在日本发展”方向不清的人：先整理希望、再判断路径、再导向下一步。中日双语。",
+    "> kibouFlow is a support platform for people whose direction is unclear when considering development in Japan.",
+    "> It helps users sort out their current situation, then evaluate their options, and finally take action.",
+    "> Content is available in both Chinese and Japanese.",
     "",
     `- Site: ${SITE_URL}`,
     `- Full text: ${SITE_URL}/llms-full.txt`,
     `- Sitemap: ${SITE_URL}/sitemap.xml`,
     "",
-    ...LOCALES.flatMap(({ code, label }) => renderLocale(code, label)),
-  ].join("\n");
+  ];
 
-  return new NextResponse(body, {
+  for (const { code, label } of LOCALES) {
+    lines.push(...renderLocale(code, label));
+  }
+
+  return new NextResponse(lines.join("\n"), {
     status: 200,
     headers: {
       "Content-Type": "text/plain; charset=utf-8",

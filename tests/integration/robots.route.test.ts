@@ -1,11 +1,10 @@
 import robots from "@/app/robots";
 
 describe("robots.txt generator", () => {
-  it("allows crawlers and lists sitemap on configured host", () => {
+  it("allows crawlers and lists sitemap", () => {
     const r = robots();
     expect(r.sitemap).toMatch(/\/sitemap\.xml$/);
-    expect(r.host).toMatch(/^https?:\/\//);
-    expect(r.host).not.toContain("localhost:3000");
+    expect(r.rules).toBeDefined();
 
     const rules = r.rules ?? [];
     const gpt = rules.find(

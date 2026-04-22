@@ -115,7 +115,7 @@ export default async function ArticlePage({
   const crumbs = buildBreadcrumbItems([
     { path: `/${locale}`, name: tNav("home") },
     { path: `/${locale}/guides`, name: tNav("guides") },
-    { path: `/${locale}/guides#${category}`, name: categoryLabel },
+    { path: `/${locale}/guides/${category}`, name: categoryLabel },
     { path: `/${locale}/guides/${category}/${slug}`, name: article.title },
   ]);
 

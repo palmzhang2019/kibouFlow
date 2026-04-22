@@ -416,6 +416,13 @@
       "boundaries": "边界说明",
       "cases": "真实案例"
     },
+    "categoryDescriptions": {
+      "problems": "你可能正在遇到的问题——简历、日语、方向选择、求职节奏等。",
+      "paths": "面对不同状态，下一步该怎么走的判断和建议。",
+      "boundaries": "哪些事情我们能帮、哪些不能，提前说清楚。",
+      "cases": "真实的咨询场景，帮你看看别人是怎么判断和决定的。"
+    },
+    "categoryPageTitle": "{category} | kibouFlow",
     "readMore": "阅读详情",
     "relatedArticles": "相关文章",
     "publishedAt": "发布于",
