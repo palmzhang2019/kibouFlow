@@ -14,7 +14,17 @@
     "test:watch": "vitest",
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "verify:local": "node scripts/run-harness-verify.mjs local",
+    "verify:content": "node scripts/content-harness-check.mjs && vitest run tests/unit/content.test.ts tests/unit/article-jsonld.test.ts tests/unit/organization-jsonld.test.ts",
+    "verify:seo-geo": "vitest run tests/unit/seo-site-url.test.ts tests/unit/sitemap.test.ts tests/integration/llms.route.test.ts tests/integration/robots.route.test.ts && next build",
+    "verify:admin-geo": "vitest run tests/integration/geo-audit-admin.route.test.ts tests/integration/geo-admin-login.route.test.ts tests/unit/admin-session.test.ts",
+    "verify:flows": "node scripts/run-harness-verify.mjs flows",
+    "verify:publish": "node scripts/run-harness-verify.mjs publish",
+    "audit:geo:repo": "node scripts/run-python-script.mjs scripts/geo_principles_audit.py",
+    "audit:geo:repo:json": "node scripts/run-python-script.mjs scripts/geo_principles_audit.py --json",
+    "audit:seo-geo:local": "node scripts/run-python-script.mjs scripts/seo-geo-audit.py --skip-online --content-dir content --output scripts/seo-geo-audit-local.json",
+    "audit:admin:selenium": "node scripts/run-python-script.mjs scripts/selenium_geo_admin_flow.py"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",

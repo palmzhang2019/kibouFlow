@@ -44,11 +44,11 @@ test.describe("Core locale and conversion flows", () => {
   test("zh and ja home pages are reachable", async ({ page }) => {
     const zh = await page.goto("/zh");
     expect(zh?.ok()).toBeTruthy();
-    await expect(page.locator("body")).toContainText("GEO");
+    await expect(page.locator("body")).toContainText("kibouFlow");
 
     const ja = await page.goto("/ja");
     expect(ja?.ok()).toBeTruthy();
-    await expect(page.locator("body")).toContainText("GEO");
+    await expect(page.locator("body")).toContainText("kibouFlow");
   });
 
   test("guides list and one detail article are reachable", async ({ page }) => {
