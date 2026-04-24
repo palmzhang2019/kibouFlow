@@ -6,6 +6,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { TrackingProvider } from "@/components/tracking/TrackingProvider";
 import { WebSiteJsonLd } from "@/components/seo/WebSiteJsonLd";
+import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
 import { getGeoSchemaToggles } from "@/lib/geo-rules";
 
 export default async function LocaleLayout({
@@ -34,6 +35,7 @@ export default async function LocaleLayout({
             <Footer />
           </TrackingProvider>
         </NextIntlClientProvider>
+        <GoogleAnalytics />
       </body>
     </html>
   );
