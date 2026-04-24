@@ -3,9 +3,8 @@
 kibouFlow SEO / GEO 自动体检脚本
 =================================
 综合来源：
-  - seo-advice-01.md（四层检测框架）
-  - seo-advice-02.md（代码级审计发现）
-  - 上线后第一周待办清单.md（冒烟 + 内容治理项）
+  - docs/seo-geo-audit.md（检测方法论 + 审计发现）
+  - docs/new-post-sop.md（发文 SOP + 上线后治理清单）
 
 用法：
   pip install requests pyyaml openai   # 首次安装

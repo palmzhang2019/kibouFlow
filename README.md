@@ -65,7 +65,6 @@ tests/
   e2e/                   # 端到端测试（Playwright）
 docs/
   manual-exploratory-checklist.md
-  hermes-manual-test-instruction.md
 ```
 
 ## 内容模型（阶段3对齐）
@@ -95,8 +94,7 @@ docs/
 
 上线前请按以下文档执行：
 
-- 清单：`docs/manual-exploratory-checklist.md`
-- Hermes 执行指令模板：`docs/hermes-manual-test-instruction.md`
+- 清单：`docs/manual-exploratory-checklist.md`（已整合 Hermes 执行指令模板）
 
 手测重点：
 

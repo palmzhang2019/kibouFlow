@@ -1,6 +1,6 @@
 # GEO（Generative Engine Optimization）原理详解
 
-> 本文解释 GEO 的底层工作机制，作为 [`geo-seo-optimization-plan.md`](./geo-seo-optimization-plan.md) 的理论支撑。
+> 本文解释 GEO 的底层工作机制，作为 [`geo-strategy.md`](./geo-strategy.md) 的理论支撑。
 > 读完本文，你应当能独立判断任何一项 GEO 动作"为什么做、做不做、做了有多大收益"。
 
 ---

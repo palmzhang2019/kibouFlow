@@ -1,12 +1,12 @@
 # GEO 落地开发分阶段计划
 
-> 本文是 `[geo-seo-optimization-plan.md](./geo-seo-optimization-plan.md)` 的**工程落地版**。
+> 本文是 `[geo-strategy.md](./geo-strategy.md)` 的**工程落地版**。
 > 回答的核心问题：**方案能不能落地？应该分几个阶段做？每阶段怎么交付、怎么验收？**
 >
 > 三件套阅读顺序：
 >
 > - `[geo-principles.md](./geo-principles.md)` — **为什么做**（原理）
-> - `[geo-seo-optimization-plan.md](./geo-seo-optimization-plan.md)` — **做什么**（方案）
+> - `[geo-strategy.md](./geo-strategy.md)` — **做什么**（方案）
 > - `geo-implementation-phases.md`（本文） — **怎么分阶段做**（工程）
 
 ---
