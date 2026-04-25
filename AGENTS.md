@@ -77,11 +77,13 @@ Common article fields that matter operationally:
 
 When creating or editing MDX, prefer to preserve these invariants:
 
-- complete frontmatter
+- complete frontmatter (title, description, category, slug, publishedAt, tldr, suitableFor, notSuitableFor, relatedSlugs)
 - explicit conclusion / clear takeaway
 - `TL;DR` where appropriate
 - `suitableFor / notSuitableFor`
-- next-step guidance
+- next-step guidance section at end of article body
+  - zh: `## 下一步建议` or `## 下一步行动`
+  - ja: `## 次のステップ` or `## 次の一歩` (both are recognized by `content-harness-check`)
 - at least 2 internal links in the article body
 - valid `relatedSlugs`
 - structure compatible with extractors for `faq`, `framework`, and `cluster`

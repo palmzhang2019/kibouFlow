@@ -239,12 +239,23 @@
 
 ### 反哺到 `scripts/content-harness-check.mjs`
 
-已完成的增强：
+已完成增强（2026-04-24）：
 - ✅ 增加 warning code（W001-W011）
 - ✅ 增加 category（template-level / article-level / translation-level）
 - ✅ 增加 severity（P1 / P2 / P3）
 - ✅ 增加 `--json` 输出选项
 - ✅ 增加 `--verbose` 显示全部警告
+- ✅ 每条 warning 包含结构化字段（code, severity, category, file, locale, categoryDir, slug, message）
+- ✅ 终端默认输出保持可读（显示 code + file + message + 聚合统计）
+
+### Warning 基线与 diff 机制
+
+已落地（2026-04-24）：
+- `scripts/content-warning-baseline.mjs`：生成 / 查看 content warning 基线
+- `scripts/baselines/content-warning-baseline.json`：机器可读 baseline 文件
+- `scripts/content-warning-diff.mjs`：对比当前与 baseline 的差异
+- `npm run audit:content:baseline`：生成新 baseline
+- `npm run audit:content:diff`：查看 warning 变化趋势
 
 ---
 
@@ -252,28 +263,39 @@
 
 ### Warning 基线文件
 
-建议在 `docs/content-warning-baseline.md` 中记录：
+已在 `scripts/baselines/content-warning-baseline.json` 记录：
 
-```markdown
-# Content Warning Baseline
-最后更新：2026-04-24
-
-## 当前已知债务
-- P1 internal links 问题：36 条
-- P1 next-step 问题：23 条（全部在 ja locale）
-- P2 frontmatter 问题：8 条
-
-## 暂不处理项
-- （暂无）
+```json
+{
+  "generatedAt": "2026-04-24",
+  "scanned": 48,
+  "blockingErrors": 0,
+  "totalWarnings": 69,
+  "byCode": { "W009": 36, "W010": 23, "W005": 6, "W006": 1, "W007": 1, "W001": 1, "W002": 1 }
+}
 ```
+
+**当前已知债务（Phase 1-A/1-B 后更新）**：
+- W009 internal links 问题：36 条（大量存在，短期内不会全部修复）
+- W010 next-step 问题：0 条（✅ 已在 Phase 1-A 解决）
+- W005 tldr 问题：5 条（从 6 降到 5，what-we-dont-handle-yet 已补齐）
+- W006/W007 suitableFor/notSuitableFor：0 条（✅ 已在 Phase 1-B 解决）
+
+当前 warning 总量从 69 降到 33。
 
 ### 治理周期
 
 | 周期 | 动作 |
 |------|------|
-| 发文章前 | 必须通过 `verify:content` |
-| 每周 | 运行 `verify:content` 并对比 baseline |
+| 发文章前 | 必须通过 `verify:content`（warning 总数允许存量内增长，但不能引入新的 warning type） |
+| 每周 | 运行 `audit:content:diff` 并审查趋势 |
 | 每月 | 审查 warning 趋势，关闭已解决的项 |
+
+### Warning 允许规则
+
+- **允许增加**：在已知债务存量范围内（当前 69 条），新增内容引入的 warning 在存量中属于可接受范围
+- **不允许增加**：新增的 warning code（W001-W011 以外的类型）或 P1 severity 数量明显上升
+- **必须回滚**：如果 `audit:content:diff` 显示 delta > 0 且来自新的 W001-W011 之外的 code，需要先修再合并
 
 ---
 

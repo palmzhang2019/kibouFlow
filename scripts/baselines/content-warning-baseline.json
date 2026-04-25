@@ -1,0 +1,22 @@
+{
+  "generatedAt": "2026-04-25T00:13:02.592Z",
+  "scanned": 48,
+  "blockingErrors": 0,
+  "totalWarnings": 0,
+  "byCode": {},
+  "bySeverity": {
+    "P1": 0,
+    "P2": 0,
+    "P3": 0
+  },
+  "byCategory": {
+    "template-level": 0,
+    "article-level": 0,
+    "translation-level": 0
+  },
+  "byLocale": {
+    "zh": 0,
+    "ja": 0
+  },
+  "warnings": []
+}

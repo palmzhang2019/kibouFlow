@@ -33,8 +33,37 @@ const NEXT_STEPS_PATTERNS = [
   /^##\s*次のステップ/m,
   /^##\s*次にやること/m,
   /^##\s*次の行動/m,
+  /^##\s*次の一歩/m,
 ];
 const RELATED_SLUG_PATTERN = /^(problems|paths|boundaries|cases)\/[a-z0-9-]+$/;
+
+const WARNING_CODES = {
+  NON_CANONICAL_CONTENT_TYPE: "W001",
+  NON_CANONICAL_CLUSTER: "W002",
+  NON_CANONICAL_CTA_TYPE: "W003",
+  NON_CANONICAL_RELATED_SLUG: "W004",
+  MISSING_TLDR: "W005",
+  MISSING_SUITABLE_FOR: "W006",
+  MISSING_NOT_SUITABLE_FOR: "W007",
+  MISSING_RELATED_SLUGS: "W008",
+  INSUFFICIENT_INTERNAL_LINKS: "W009",
+  MISSING_NEXT_STEP: "W010",
+  MISSING_PAIRED_LOCALE: "W011",
+};
+
+const WARNING_DEFINITIONS = {
+  W001: { severity: "P3", category: "article-level" },
+  W002: { severity: "P3", category: "article-level" },
+  W003: { severity: "P3", category: "article-level" },
+  W004: { severity: "P3", category: "article-level" },
+  W005: { severity: "P2", category: "article-level" },
+  W006: { severity: "P2", category: "article-level" },
+  W007: { severity: "P2", category: "article-level" },
+  W008: { severity: "P2", category: "article-level" },
+  W009: { severity: "P1", category: "article-level" },
+  W010: { severity: "P1", category: "template-level" },
+  W011: { severity: "P3", category: "translation-level" },
+};
 
 function normalizeString(value) {
   if (typeof value !== "string") return undefined;
@@ -90,13 +119,28 @@ function pairedLocaleExists(locale, category, slug) {
   return fs.existsSync(path.join(CONTENT_DIR, sibling, category, `${slug}.mdx`));
 }
 
+function makeWarning(code, filePath, message) {
+  const relative = path.relative(ROOT, filePath).replaceAll("\\", "/");
+  const parts = relative.split("/");
+  const locale = parts[1] || "";
+  const categoryDir = parts[2] || "";
+  const slug = path.basename(filePath, ".mdx");
+  const def = WARNING_DEFINITIONS[code] || { severity: "P3", category: "unknown" };
+  return {
+    code,
+    severity: def.severity,
+    category: def.category,
+    file: relative,
+    locale,
+    categoryDir,
+    slug,
+    message,
+  };
+}
+
 function validateFile(filePath) {
   const raw = fs.readFileSync(filePath, "utf-8");
   const { data, content } = matter(raw);
-  const relative = path.relative(ROOT, filePath).replaceAll("\\", "/");
-  const locale = path.basename(path.dirname(path.dirname(filePath)));
-  const categoryFromDir = path.basename(path.dirname(filePath));
-  const slugFromFile = path.basename(filePath, ".mdx");
   const errors = [];
   const warnings = [];
   const category = normalizeString(data.category);
@@ -109,9 +153,14 @@ function validateFile(filePath) {
   for (const field of requiredFields) {
     const value = normalizeString(data[field]);
     if (!value) {
-      errors.push(`${relative}: missing required frontmatter '${field}'`);
+      errors.push(`${filePath}: missing required frontmatter '${field}'`);
     }
   }
+
+  const relative = path.relative(ROOT, filePath).replaceAll("\\", "/");
+  const locale = path.basename(path.dirname(path.dirname(filePath)));
+  const categoryFromDir = path.basename(path.dirname(filePath));
+  const slugFromFile = path.basename(filePath, ".mdx");
 
   if (!LOCALES.includes(locale)) {
     errors.push(`${relative}: file is not under a supported locale directory`);
@@ -134,15 +183,15 @@ function validateFile(filePath) {
   }
 
   if (contentType && !CONTENT_TYPES.includes(contentType)) {
-    warnings.push(`${relative}: non-canonical contentType '${contentType}'`);
+    warnings.push(makeWarning(WARNING_CODES.NON_CANONICAL_CONTENT_TYPE, filePath, `non-canonical contentType '${contentType}'`));
   }
 
   if (cluster && !CLUSTERS.includes(cluster)) {
-    warnings.push(`${relative}: non-canonical cluster '${cluster}'`);
+    warnings.push(makeWarning(WARNING_CODES.NON_CANONICAL_CLUSTER, filePath, `non-canonical cluster '${cluster}'`));
   }
 
   if (ctaType && !CTA_TYPES.includes(ctaType)) {
-    warnings.push(`${relative}: non-canonical ctaType '${ctaType}'`);
+    warnings.push(makeWarning(WARNING_CODES.NON_CANONICAL_CTA_TYPE, filePath, `non-canonical ctaType '${ctaType}'`));
   }
 
   if (data.relatedSlugs != null && !Array.isArray(data.relatedSlugs)) {
@@ -152,37 +201,37 @@ function validateFile(filePath) {
   for (const related of toArray(data.relatedSlugs)) {
     const normalized = normalizeString(related);
     if (!normalized || !RELATED_SLUG_PATTERN.test(normalized)) {
-      warnings.push(`${relative}: relatedSlugs entry '${String(related)}' is non-canonical`);
+      warnings.push(makeWarning(WARNING_CODES.NON_CANONICAL_RELATED_SLUG, filePath, `relatedSlugs entry '${String(related)}' is non-canonical`));
     }
   }
 
   if (!Array.isArray(data.tldr) || data.tldr.length === 0) {
-    warnings.push(`${relative}: missing tldr frontmatter`);
+    warnings.push(makeWarning(WARNING_CODES.MISSING_TLDR, filePath, `missing tldr frontmatter`));
   }
 
   if (!Array.isArray(data.suitableFor) || data.suitableFor.length === 0) {
-    warnings.push(`${relative}: missing suitableFor frontmatter`);
+    warnings.push(makeWarning(WARNING_CODES.MISSING_SUITABLE_FOR, filePath, `missing suitableFor frontmatter`));
   }
 
   if (!Array.isArray(data.notSuitableFor) || data.notSuitableFor.length === 0) {
-    warnings.push(`${relative}: missing notSuitableFor frontmatter`);
+    warnings.push(makeWarning(WARNING_CODES.MISSING_NOT_SUITABLE_FOR, filePath, `missing notSuitableFor frontmatter`));
   }
 
   if (!Array.isArray(data.relatedSlugs) || data.relatedSlugs.length === 0) {
-    warnings.push(`${relative}: missing relatedSlugs`);
+    warnings.push(makeWarning(WARNING_CODES.MISSING_RELATED_SLUGS, filePath, `missing relatedSlugs`));
   }
 
   const internalLinks = countInternalLinks(content);
   if (internalLinks < 2) {
-    warnings.push(`${relative}: only ${internalLinks} internal links found in article body`);
+    warnings.push(makeWarning(WARNING_CODES.INSUFFICIENT_INTERNAL_LINKS, filePath, `only ${internalLinks} internal links found in article body`));
   }
 
   if (!hasNextSteps(content)) {
-    warnings.push(`${relative}: missing next-step section heading`);
+    warnings.push(makeWarning(WARNING_CODES.MISSING_NEXT_STEP, filePath, `missing next-step section heading`));
   }
 
   if (!pairedLocaleExists(locale, categoryFromDir, slugFromFile)) {
-    warnings.push(`${relative}: missing paired locale article`);
+    warnings.push(makeWarning(WARNING_CODES.MISSING_PAIRED_LOCALE, filePath, `missing paired locale article`));
   }
 
   return { errors, warnings };
@@ -204,6 +253,32 @@ for (const file of allFiles) {
   allWarnings.push(...warnings);
 }
 
+const jsonMode = process.argv.includes("--json");
+const verboseMode = process.argv.includes("--verbose");
+
+const summary = {
+  scanned: allFiles.length,
+  blockingErrors: allErrors.length,
+  warnings: allWarnings.length,
+  byCode: {},
+  bySeverity: { P1: 0, P2: 0, P3: 0 },
+  byCategory: { "template-level": 0, "article-level": 0, "translation-level": 0 },
+  byLocale: { zh: 0, ja: 0 },
+  details: allWarnings,
+};
+
+for (const w of allWarnings) {
+  summary.byCode[w.code] = (summary.byCode[w.code] || 0) + 1;
+  summary.bySeverity[w.severity]++;
+  summary.byCategory[w.category]++;
+  summary.byLocale[w.locale]++;
+}
+
+if (jsonMode) {
+  console.log(JSON.stringify({ errors: allErrors, warnings: allWarnings, summary }, null, 2));
+  process.exit(allErrors.length > 0 ? 1 : 0);
+}
+
 console.log(`content harness check scanned ${allFiles.length} MDX files`);
 
 if (allErrors.length > 0) {
@@ -221,12 +296,16 @@ console.log("content harness check found no blocking errors");
 
 if (allWarnings.length > 0) {
   console.warn(`content harness check found ${allWarnings.length} warning(s):`);
-  for (const warning of allWarnings.slice(0, 20)) {
-    console.warn(`- ${warning}`);
+  const displayWarnings = verboseMode ? allWarnings : allWarnings.slice(0, 20);
+  for (const w of displayWarnings) {
+    console.warn(`- [${w.code}] ${w.file}: ${w.message}`);
   }
-  if (allWarnings.length > 20) {
+  if (!verboseMode && allWarnings.length > 20) {
     console.warn(`- ... and ${allWarnings.length - 20} more warning(s)`);
   }
+  console.warn(`\n  severity: P1=${summary.bySeverity.P1} P2=${summary.bySeverity.P2} P3=${summary.bySeverity.P3}`);
+  console.warn(`  category: template-level=${summary.byCategory["template-level"]} article-level=${summary.byCategory["article-level"]} translation-level=${summary.byCategory["translation-level"]}`);
+  console.warn(`  by-code: ${Object.entries(summary.byCode).map(([k,v]) => `${k}=${v}`).join(" ")}`);
 } else {
   console.log("content harness check found no warnings");
 }
