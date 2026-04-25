@@ -48,6 +48,25 @@
 
 ---
 
+## 1.5 日常入口：`harness:select`
+
+不需要记命令。运行交互式 selector：
+
+```bash
+npm run harness:select
+```
+
+它会问你"这次主要改了什么"，然后建议并执行对应命令。
+
+支持参数：
+
+- `npm run harness:select -- --help` — 显示菜单和命令映射
+- `npm run harness:select -- --dry-run` — 选择后只打印命令，不执行
+
+所有映射关系见下方命令矩阵。`harness:select` 只是编排层，不替代原有 `verify:*` / `audit:*` 命令。
+
+---
+
 ## 2. 你每天应该怎么用
 
 ### Step 1：先判断任务类型
@@ -92,6 +111,7 @@ git status --short
 
 | 场景 | 首选命令 | 说明 |
 |------|----------|------|
+| **日常入口（推荐）** | **`npm run harness:select`** | **交互式选择，按改动类型运行对应命令** |
 | 日常代码回归 | `npm run verify:local` | 单元 + 集成 + build |
 | 内容 / MDX / frontmatter | `npm run verify:content` | 内容检查 + content/JSON-LD 相关单测 |
 | 内容 warning 防回归 | `npm run audit:content:diff:strict` | CI 级 strict diff |
@@ -331,6 +351,8 @@ npm run audit:content:diff:strict
 ---
 
 ## 8. 常见场景速查
+
+> 不想记命令？用 `npm run harness:select` 交互式选择。
 
 ### 我改了一篇文章
 

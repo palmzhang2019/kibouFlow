@@ -31,7 +31,8 @@
     "audit:geo:repo": "node scripts/run-python-script.mjs scripts/geo_principles_audit.py",
     "audit:geo:repo:json": "node scripts/run-python-script.mjs scripts/geo_principles_audit.py --json",
     "audit:seo-geo:local": "node scripts/run-python-script.mjs scripts/seo-geo-audit.py --skip-online --content-dir content --output scripts/seo-geo-audit-local.json",
-    "audit:admin:selenium": "node scripts/run-python-script.mjs scripts/selenium_geo_admin_flow.py"
+    "audit:admin:selenium": "node scripts/run-python-script.mjs scripts/selenium_geo_admin_flow.py",
+    "harness:select": "node scripts/harness-select.mjs"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",

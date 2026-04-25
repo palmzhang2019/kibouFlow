@@ -918,6 +918,14 @@ Flows workflow 当前实际触发范围：
 | 未来新增 E2E spec 的 tier review | 中 | 新增 Playwright spec 前必须先判断 Tier（已在 testing-strategy.md 明确） |
 | 其他发现 | — | 临时产物清理建议：test-results/、__pycache__/、.pyc 等，仅记录不擅自删除 |
 
+### 维护增强记录
+
+- **增强 #1**（2026-04-25）：`npm run harness:select` 交互式 CLI 落地
+  - 包装 `verify:*` / `audit:*` 命令为交互式入口
+  - 支持 `--help` 和 `--dry-run` 参数
+  - 多选自动合并、去重、按合理顺序执行
+  - 文档已同步至 `harness-operating-guide.md`
+
 ### 交接约束（不要默认做的事）
 
 - **不要默认扩 CI**：四条 workflow 职责边界已清晰，不要默认新增 workflow 或扩大触发范围
