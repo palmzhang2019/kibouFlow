@@ -81,4 +81,30 @@ describe("POST /api/partner", () => {
       }),
     );
   });
+
+  it("returns error status when database insert fails", async () => {
+    insertPartnerSubmissionMock.mockResolvedValue({ ok: false, reason: "insert_failed", detail: "connection refused" });
+    const req = new Request("http://localhost/api/partner", {
+      method: "POST",
+      body: JSON.stringify({ org_name: "Kibou", contact_person: "Bob", contact_method: "bob@example.com" }),
+      headers: { "content-type": "application/json" },
+    });
+    const res = await POST(req as never);
+    expect(res.status).not.toBe(200);
+  });
+
+  it("extracts IP from x-forwarded-for with multiple IPs", async () => {
+    insertPartnerSubmissionMock.mockResolvedValue({ ok: true });
+    const req = new Request("http://localhost/api/partner", {
+      method: "POST",
+      body: JSON.stringify({ org_name: "Kibou", contact_person: "Bob", contact_method: "bob@example.com" }),
+      headers: { "content-type": "application/json", "x-forwarded-for": "5.5.5.5, 6.6.6.6" },
+    });
+    const res = await POST(req as never);
+    expect(res.status).toBe(200);
+    expect(insertPartnerSubmissionMock).toHaveBeenCalledWith(
+      "5.5.5.5",
+      expect.any(Object),
+    );
+  });
 });

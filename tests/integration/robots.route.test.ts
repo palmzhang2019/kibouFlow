@@ -17,4 +17,23 @@ describe("robots.txt generator", () => {
     ) as { userAgent: string; allow?: string; disallow?: string } | undefined;
     expect(bytespider?.disallow).toBe("/");
   });
+
+  it("includes default allow rule for * user-agent", () => {
+    const r = robots();
+    const rules = r.rules ?? [];
+    const wildcard = rules.find(
+      (x) => "userAgent" in x && x.userAgent === "*",
+    ) as { userAgent: string; allow?: string; disallow?: string } | undefined;
+    expect(wildcard).toBeDefined();
+    expect(wildcard?.allow).toBe("/");
+  });
+
+  it("blocks known harmful bots", () => {
+    const r = robots();
+    const rules = r.rules ?? [];
+    const bytespider = rules.find(
+      (x) => "userAgent" in x && x.userAgent === "Bytespider",
+    ) as { userAgent: string; allow?: string; disallow?: string } | undefined;
+    expect(bytespider?.disallow).toBe("/");
+  });
 });

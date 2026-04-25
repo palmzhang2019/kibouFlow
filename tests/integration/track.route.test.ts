@@ -46,4 +46,26 @@ describe("POST /api/track", () => {
       }),
     );
   });
+
+  it("handles missing event_name gracefully", async () => {
+    const req = new Request("http://localhost/api/track", {
+      method: "POST",
+      body: JSON.stringify({ page_path: "/zh" }),
+      headers: { "content-type": "application/json" },
+    });
+    const res = await POST(req as never);
+    expect(res.status).toBe(200);
+    await expect(res.json()).resolves.toEqual({ ok: true });
+  });
+
+  it("handles empty request body gracefully", async () => {
+    const req = new Request("http://localhost/api/track", {
+      method: "POST",
+      body: JSON.stringify({}),
+      headers: { "content-type": "application/json" },
+    });
+    const res = await POST(req as never);
+    expect(res.status).toBe(200);
+    await expect(res.json()).resolves.toEqual({ ok: true });
+  });
 });

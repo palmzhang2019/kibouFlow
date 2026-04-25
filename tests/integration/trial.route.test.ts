@@ -78,4 +78,30 @@ describe("POST /api/trial", () => {
       }),
     );
   });
+
+  it("returns error status when database insert fails", async () => {
+    insertTrialSubmissionMock.mockResolvedValue({ ok: false, reason: "insert_failed", detail: "connection refused" });
+    const req = new Request("http://localhost/api/trial", {
+      method: "POST",
+      body: JSON.stringify({ name: "Alice", contact: "alice@example.com" }),
+      headers: { "content-type": "application/json" },
+    });
+    const res = await POST(req as never);
+    expect(res.status).not.toBe(200);
+  });
+
+  it("extracts IP from x-forwarded-for with multiple IPs", async () => {
+    insertTrialSubmissionMock.mockResolvedValue({ ok: true });
+    const req = new Request("http://localhost/api/trial", {
+      method: "POST",
+      body: JSON.stringify({ name: "Alice", contact: "alice@example.com" }),
+      headers: { "content-type": "application/json", "x-forwarded-for": "3.3.3.3, 4.4.4.4" },
+    });
+    const res = await POST(req as never);
+    expect(res.status).toBe(200);
+    expect(insertTrialSubmissionMock).toHaveBeenCalledWith(
+      "3.3.3.3",
+      expect.any(Object),
+    );
+  });
 });

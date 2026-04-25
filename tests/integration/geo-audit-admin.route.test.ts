@@ -106,4 +106,36 @@ describe("admin geo-audit API routes", () => {
     expect(body.issues).toEqual([]);
     expect(runScriptMock).toHaveBeenCalledTimes(1);
   });
+
+  it("POST run returns 401 without session", async () => {
+    const res = await runPost(
+      new NextRequest("http://localhost/api/admin/geo-audit/run", {
+        method: "POST",
+      }),
+    );
+    expect(res.status).toBe(401);
+  });
+
+  it("POST run handles script failure gracefully", async () => {
+    runScriptMock.mockResolvedValue({
+      ok: false,
+      exitCode: 1,
+      markdown: "script crashed: internal error",
+      json: null,
+      stderr: "Traceback (most recent call last):\n  File 'audit.py', line 42\n",
+      command: ["python", "geo_audit.py"],
+    });
+    const cookie = await sessionCookie();
+    const res = await runPost(
+      new NextRequest("http://localhost/api/admin/geo-audit/run", {
+        method: "POST",
+        headers: { cookie },
+      }),
+    );
+    // handler returns 500 when result.ok is false
+    expect(res.status).toBe(500);
+    const body = (await res.json()) as { ok: boolean; markdown: string };
+    expect(body.ok).toBe(false);
+    expect(body.markdown).toContain("script crashed");
+  });
 });

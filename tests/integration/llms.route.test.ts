@@ -13,6 +13,12 @@ describe("/llms.txt", () => {
     expect(body).toContain("/zh/guides/paths/job-prep-cluster-entry");
     expect(body).toContain("/ja/guides/paths/job-prep-cluster-entry");
   });
+
+  it("sets cache-control header", async () => {
+    const res = await getLlms();
+    const cacheControl = res.headers.get("cache-control") ?? "";
+    expect(cacheControl).toMatch(/s-maxage|max-age/);
+  });
 });
 
 describe("/llms-full.txt", () => {
@@ -28,5 +34,11 @@ describe("/llms-full.txt", () => {
     expect(body).toContain("日语学习路径 FAQ");
     expect(body).toContain("关键不是证书等级");
     expect(body).toContain("日本語学習パス FAQ");
+  });
+
+  it("sets cache-control header", async () => {
+    const res = await getLlmsFull();
+    const cacheControl = res.headers.get("cache-control") ?? "";
+    expect(cacheControl).toMatch(/s-maxage|max-age/);
   });
 });
