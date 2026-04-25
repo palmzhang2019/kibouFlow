@@ -111,7 +111,99 @@
 | 集成测试 | `tests/integration/**/*.test.ts` |
 | E2E 测试 | `tests/e2e/**/*.spec.ts` |
 | 手动探索测试 | `docs/manual-exploratory-checklist.md` |
-| GEO 阶段测试 | `docs/geo-phase-3-testing-path.md` |
+
+---
+
+## 7. E2E 测试分层（Playwright + Selenium + Manual）
+
+kibouFlow 的 E2E / 浏览器自动化分为五个层级，新增 E2E spec 时必须先判断应进入哪一层。
+
+### 分层总览
+
+| 分层 | 名称 | 触发方式 | 入口命令 | CI guardrail |
+|------|------|----------|----------|---------------|
+| **Tier 1** | CI E2E smoke | CI 自动 | `npm run verify:e2e:smoke` | ✅ 是 |
+| **Tier 2** | Focused flows check | 本地按需 | `npm run verify:flows` | ❌ |
+| **Tier 3** | Local/manual browser automation | 本地/人工 | `npm run audit:admin:selenium` | ❌ |
+| **Tier 4** | Environment-dependent manual checks | 人工 | `docs/geo-admin-hermes-manual-test.md` | ❌ |
+| **Tier 5** | Future full/nightly E2E | 暂不实现 | — | — |
+
+### Tier 1：CI E2E smoke
+
+**适合进入的条件**：低依赖、快速、稳定、不依赖真实 DB、不依赖完整 GEO 体检产物、可在 GitHub Actions Ubuntu + Chromium 中稳定运行。
+
+**当前包含**：
+
+- `tests/e2e/core-flows.spec.ts`（8 tests）
+- `tests/e2e/geo-phase3-health.spec.ts`（1 test）
+- `tests/e2e/geo-rules-preview.spec.ts`（1 test）
+
+**入口**：`npm run verify:e2e:smoke`
+
+**CI 守卫**：`flows-governance.yml` 在以下文件变更时自动触发：
+- `tests/e2e/core-flows.spec.ts`
+- `tests/e2e/geo-phase3-health.spec.ts`
+- `tests/e2e/geo-rules-preview.spec.ts`
+- `package.json`、`playwright.config.ts`、`scripts/run-harness-verify.mjs`
+- `src/app/[locale]/page.tsx`、`src/app/[locale]/trial/**`、`src/app/[locale]/partner/**`
+- `src/app/api/trial/**`、`src/app/api/partner/**`、`src/app/api/track/**`
+- `src/components/forms/**`、`src/components/tracking/**`、`src/lib/tracking-events.ts`
+
+### Tier 2：Focused flows check
+
+**适合进入的条件**：只想验证核心用户 flows（trial / partner / guides）时，不需要跑全量 smoke。
+
+**当前包含**：
+
+- `tests/e2e/core-flows.spec.ts`（8 tests）
+
+**入口**：`npm run verify:flows`
+
+**说明**：不进入 CI guardrail，作为本地开发快速反馈用。
+
+### Tier 3：Local/manual browser automation
+
+**适合进入的条件**：需要站点启动、需要 admin password/session secret、需要本机 Chrome/Selenium、不适合默认 CI。
+
+**当前包含**：
+
+- `scripts/selenium_geo_admin_flow.py`（Selenium 主流程，覆盖 TC-NAV-01、TC-AUTH-01、TC-DASH-01、TC-RUN-01、TC-HIST-01/02、TC-ISS-01、TC-HUB-01、TC-AUTH-02）
+
+**入口**：`npm run audit:admin:selenium`
+
+**说明**：不是 CI guardrail，是本地/人工后台浏览器自动化。依赖浏览器环境、站点启动和 admin 环境变量。
+
+### Tier 4：Environment-dependent manual checks
+
+**适合进入的条件**：需要真实 DB、需要真实历史记录、需要真实 issue、需要决策提交、需要完整体检产物、需要 Python 脚本和迁移状态。
+
+**当前包含**：
+
+- `docs/geo-admin-hermes-manual-test.md` 中尚未自动化的 TC：
+  - TC-ISS-02：问题详情与决策提交（需真实 issue + 007 migration）
+  - TC-API-02：带 Cookie 调 run（需 Python 环境和服务端脚本执行）
+
+**说明**：完全人工执行，不适合自动化。
+
+### Tier 5：Future full/nightly E2E
+
+**当前原则**：
+
+- 不提前创建空的重型 CI
+- 当 E2E spec 数量增长、运行时间增长或出现 flaky 风险后，再评估是否引入 nightly/full workflow
+- 新增 Playwright spec 不默认进入 Tier 1，必须先判断 tier
+
+### 新增 E2E spec 的判断流程
+
+1. 是否低依赖、稳定、快速、可在 GitHub Actions Ubuntu + Chromium 中运行？
+   - 是 → Tier 1（走 PR 讨论是否纳入 `verify:e2e:smoke`）
+   - 否 → 继续判断
+2. 是否核心 flows 且适合本地开发反馈？
+   - 是 → Tier 2（`verify:flows`）
+   - 否 → 继续判断
+3. 是否需要浏览器、admin secrets、站点启动但不适合 CI？
+   - 是 → Tier 3（`audit:admin:selenium`）
+   - 否 → Tier 4 或 5
 
 ---
 
@@ -120,3 +212,4 @@
 | 日期 | 变更 | 备注 |
 | --- | --- | --- |
 | 2026-04-24 | 整合自 test-doc.md | 文档治理 |
+| 2026-04-25 | 新增 Section 7 E2E Test Tiering（Tier 1~5）| Phase 11 完成 |

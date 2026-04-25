@@ -523,6 +523,15 @@ Phase 10（CI 首次运行稳定性观察）已完成：
 - ✅ `verify:seo-geo`: 16 tests passed + `next build` 成功
 - ✅ 文档同步完成（真实 CI 观察因 `gh` CLI 不可用，标记为未观察到）
 
+Phase 11（E2E 分层评估与维护策略）已完成：
+- ✅ `docs/testing-strategy.md` 新增 E2E Test Tiering 分层（Tier 1~5）
+- ✅ 明确 Tier 1（CI E2E smoke）包含三个 Playwright spec
+- ✅ 明确 Tier 2（Focused flows check）入口为 `verify:flows`
+- ✅ 明确 Tier 3（Local/manual browser automation）入口为 `audit:admin:selenium`
+- ✅ 明确 Tier 4 为 environment-dependent manual checks
+- ✅ 明确 Tier 5 为未来 full/nightly E2E（暂不实现）
+- ✅ 新增 Playwright spec 判断流程已写入文档
+
 职责边界：
 - `.github/workflows/content-governance.yml` 负责内容 warning 防回归：`content/**` 与 content harness 脚本变化时运行 `verify:content` 和 `audit:content:diff:strict`。
 - `.github/workflows/seo-geo-governance.yml` 负责 SEO/GEO 结构入口防回归：sitemap、robots、llms、JSON-LD/SEO 组件、site-url/content 解析相关库和对应测试变化时运行 `verify:seo-geo`。
@@ -561,7 +570,7 @@ Flows workflow 当前实际触发范围：
 - Tracking 库：`src/lib/tracking-events.ts`
 
 仍可继续：
-- Phase 11：E2E 分层评估与维护策略（推荐下一步）
+- Phase 12：Harness 维护交接与增强 Backlog 收口（推荐下一步）
 - TC-API-02 体检 API 自动化评估（按需，需 Python 环境）
 - flows workflow 首次 CI push 后观察真实运行（按需）
 
@@ -648,39 +657,24 @@ Flows workflow 当前实际触发范围：
     - `verify:admin-geo`: 10 tests passed
     - `verify:e2e:smoke`: 10 tests passed（core-flows 8 + geo-phase3-health 1 + geo-rules-preview 1）
     - `verify:seo-geo`: 16 tests passed + `next build` 成功
+25. 完成 Phase 12/Harness 维护交接与增强 Backlog 收口
+    - 文档状态更新：明确标记主线完成，进入维护与增强阶段
+    - 后续事项整理为 Backlog，不再作为推荐建设型 Phase 追加
+    - 保留真实 CI 未观察的事实
+    - 生成交接摘要供后续 agent 快速接手
 
 ### 已知结果
 
 - 所有 `verify:*` 命令已能执行
 - `verify:content` 当前为 `0` 条 warning
 - Phase 2（CI / 防回归）已完成
-  - content CI workflow 已落地
-  - strict diff 模式已落地
-  - 文档已同步
 - Phase 3（SEO/GEO CI）已完成
-  - SEO/GEO CI workflow 已落地
-  - `verify:seo-geo` 已接入自动触发
-  - 文档已同步
 - Phase 4（Admin GEO CI）已完成
-  - Admin GEO CI workflow 已落地
-  - `verify:admin-geo` 已接入自动触发
-  - 文档已同步
 - Phase 5（Baseline 历史留存）已完成
-  - baseline history / trend 命令已落地
-  - 历史快照自动保存到 `scripts/baselines/history/`
-  - 文档已同步
 - Phase 6（Core Flows Playwright CI）已完成
-  - flows CI workflow 已落地
-  - `verify:flows` 已接入自动触发
-  - 文档已同步
 - Phase 7（CI Path Filter Refinement）已完成
-  - content / admin-geo workflow path filter 已补齐 push 触发边界
-  - 四条 workflow path filter 已统一检查
-  - 文档已同步
-- 当前最值得继续处理的是：
-  - Phase 11：E2E 分层评估与维护策略（推荐下一步）
-  - TC-API-02 体检 API 自动化评估（按需，需 Python 环境）
-  - flows workflow 首次 CI push 后观察真实运行（按需）
+- Phase 12（维护交接与 Backlog 收口）已完成：Harness 主线已全部完成，进入维护与增强阶段
+- 当前无默认下一步；按需执行事项已整理为 Backlog
 
 ---
 
@@ -747,7 +741,7 @@ Flows workflow 当前实际触发范围：
 
 - ✅ 已完成
 
-## 阶段 4：内容 warning 消债（当前主线）
+## 阶段 4：内容 warning 消债（已完成）
 
 目标：
 
@@ -887,62 +881,160 @@ Flows workflow 当前实际触发范围：
 - 真实 GitHub Actions 首次运行仍需在下一次相关路径 push / PR 后观察。
 - 当前本地等价信号足以将 harness 主线推进到“维护与增强阶段”，但不能替代真实 CI 通过记录。
 
-## 阶段 11：E2E 分层评估与维护策略（推荐下一步）
+## 阶段 11：E2E 分层评估与维护策略（已完成）
 
 目标：
 
 - 在现有 E2E smoke 已全量覆盖当前三个 Playwright spec 的前提下，明确未来新增 E2E 时如何分层，避免后续把 CI 做重或把不稳定用例误塞进 smoke。
 
-建议动作：
+已完成动作：
 
-1. 盘点 `tests/e2e/**/*.spec.ts`、`scripts/selenium_geo_admin_flow.py` 与手动清单的当前覆盖边界
-2. 明确 E2E tier：CI smoke、local/manual browser automation、environment-dependent manual、future full/nightly（仅作为规则，不急于实现）
-3. 更新 `docs/testing-strategy.md`，写清 `verify:flows`、`verify:e2e:smoke`、`audit:admin:selenium` 与手动清单的关系
-4. 更新本计划文档，标记当前所有 Playwright E2E spec 均已纳入 smoke；未来新增 spec 需要先做分层判断
-5. 不新增 workflow、不扩大 CI、不新增测试，除非发现当前文档与事实不一致
+1. ✅ 盘点 `tests/e2e/**/*.spec.ts`、`scripts/selenium_geo_admin_flow.py` 与手动清单的当前覆盖边界
+2. ✅ 明确 E2E tier：CI smoke、focused flows、local/manual browser automation、environment-dependent manual、future full/nightly
+3. ✅ 更新 `docs/testing-strategy.md`，写清 `verify:flows`、`verify:e2e:smoke`、`audit:admin:selenium` 与手动清单的关系
+4. ✅ 更新本计划文档，标记当前所有 Playwright E2E spec 均已纳入 smoke；未来新增 spec 需要先做分层判断
+5. ✅ 未新增 workflow、未扩大 CI、未新增测试
 
----
+## 阶段 12：Harness 维护交接与增强 Backlog 收口（本次已完成）
 
-## 13. 当前最推荐的下一步
+> **状态**：Harness 主线已完成，进入维护与增强阶段。
+>
+> 本阶段不是继续新增 harness 能力，而是把 Phase 1~11 的建设成果收成可维护交接状态。真实 CI 首次运行仍待下一次 push / PR 后观察（Phase 10 本地等价检查已通过，但 `gh` CLI 不可用，真实 GitHub Actions 运行记录未观察到）。
 
-Phase 2（CI / 防回归收口）、Phase 3（SEO/GEO CI）、Phase 4（Admin GEO CI）、Phase 5（Baseline 历史留存）、Phase 6（Core Flows Playwright CI）、Phase 7（CI Path Filter Refinement）、Phase 8（Selective E2E Smoke Expansion）、Phase 8-A（E2E Smoke Trigger Refinement）、Phase 9（Admin GEO 手动测试清单自动化）和 Phase 10（CI 首次运行稳定性观察）均已完成。
+### 本次完成内容
 
-当前 harness CI / governance 体系已完整落地：
+1. ✅ 文档状态更新：明确标记 harness engineering 主线完成，进入维护与增强阶段
+2. ✅ 后续事项整理为 Backlog，不再作为推荐建设型 Phase 继续追加
+3. ✅ 保留真实 CI 未观察的事实，不改写为”已通过”
+4. ✅ 检查 `docs/docs-index.md` 无旧描述遗留
+5. ✅ 生成交接摘要供后续 agent 快速接手
 
-- `.github/workflows/content-governance.yml` 在 content 相关路径变更时自动触发
-- `.github/workflows/seo-geo-governance.yml` 在 SEO/GEO 相关路径变更时自动触发
-- `.github/workflows/admin-geo-governance.yml` 在 Admin GEO API 相关路径变更时自动触发
-- `.github/workflows/flows-governance.yml` 在核心用户 flows + E2E smoke spec 变更时自动触发（运行 `verify:e2e:smoke`）
-- 四条 workflow 均已将自身文件和 package.json 纳入 path filter
-- `audit:content:diff --strict` 在 warning 回归时 CI fail
-- `npm run audit:content:baseline` 生成时自动保存历史快照
-- `npm run audit:content:baseline:history` 可查看历史快照列表
-- `npm run audit:content:baseline:trend` 可查看 warnings 趋势
-- baseline=0 / warning=0 状态已被 content CI 守住
-- 核心用户 flows 已被 flows CI 守住
-- E2E smoke 覆盖（core-flows + geo-phase3-health + geo-rules-preview）已被 flows CI 执行
-- Phase 8-A 已完成：flows workflow path filter 显式包含全部三个 E2E smoke spec，job 名称更新为 `E2E Smoke Guard`
-- Phase 9 已完成：Selenium 主流程补齐 TC-NAV-01 和 TC-AUTH-02 加强版，Hermes 手动清单覆盖映射已建立
-- Phase 10 已完成：四条 workflow 本地等价检查均通过（`gh` CLI 不可用，真实 CI 观察标记为未观察到）
+### 维护 Backlog（按需执行，不默认推进）
 
-四条 CI 守卫职责边界已清晰：
-- content governance：内容 warning 防回归
-- SEO/GEO governance：站点结构与 SEO/GEO 入口防回归
-- admin GEO governance：Admin GEO API 防回归
-- flows governance：核心用户 flows + E2E smoke spec 防回归（运行 `verify:e2e:smoke`）
+| 事项 | 优先级 | 说明 |
+|------|--------|------|
+| 真实 GitHub Actions 首次 push 后观察 | 高 | 本地等价检查已通过；真实 CI 运行待下一次相关路径 push/PR 时观察 |
+| TC-API-02 体检 API 自动化评估 | 低 | 需 Python 环境，按需执行 |
+| 未来新增 E2E spec 的 tier review | 中 | 新增 Playwright spec 前必须先判断 Tier（已在 testing-strategy.md 明确） |
+| 其他发现 | — | 临时产物清理建议：test-results/、__pycache__/、.pyc 等，仅记录不擅自删除 |
 
-E2E smoke 命令入口：
-- `npm run verify:flows`：仅运行 core-flows spec（原有命令保留）
-- `npm run verify:e2e:smoke`：运行全部三个 E2E spec（core-flows + geo-phase3-health + geo-rules-preview）
+### 交接约束（不要默认做的事）
 
-后续可继续：
-- Phase 11：E2E 分层评估与维护策略（推荐下一步）
-- TC-API-02 体检 API 自动化评估（按需，需 Python 环境）
-- flows workflow 首次 CI push 后观察真实运行（按需）
+- **不要默认扩 CI**：四条 workflow 职责边界已清晰，不要默认新增 workflow 或扩大触发范围
+- **不要默认新增 E2E**：所有 Playwright E2E spec 当前均为 Tier 1 CI smoke；未来新增必须先做 tier 判断
+- **不要默认升级依赖**：不要因版本更新随意升级依赖或修改 package-lock.json
+- **不要把真实 CI 未观察改写为已通过**
 
 ---
 
-## 14. 使用方式
+## 13. 交接摘要（供新窗口快速接手）
+
+### 当前状态
+
+Harness Engineering **主线已完成**，进入 **维护与增强阶段**。
+
+### 四条 workflow
+
+| Workflow | 触发路径 | CI 入口 |
+|----------|----------|---------|
+| `content-governance.yml` | content/**、scripts/content-harness-check.mjs、package.json | `verify:content` + `audit:content:diff:strict` |
+| `seo-geo-governance.yml` | SEO/GEO 相关路径（见 Section 9 SEO/GEO workflow 触发范围） | `verify:seo-geo` |
+| `admin-geo-governance.yml` | admin API / session 相关路径 | `verify:admin-geo` |
+| `flows-governance.yml` | core-flows spec + E2E smoke spec + trial/partner 页面和 API | `verify:e2e:smoke` |
+
+### 关键命令
+
+```bash
+# 本地回归（默认）
+npm run verify:local
+
+# 内容验证
+npm run verify:content
+npm run audit:content:diff:strict
+
+# SEO/GEO 验证
+npm run verify:seo-geo
+
+# Admin GEO 验证
+npm run verify:admin-geo
+
+# E2E smoke（CI 用）
+npm run verify:e2e:smoke
+
+# E2E focused（本地开发用）
+npm run verify:flows
+
+# 发布前综合验证
+npm run verify:publish
+
+# Content baseline / history / trend
+npm run audit:content:baseline
+npm run audit:content:baseline:history
+npm run audit:content:baseline:trend
+
+# Selenium 后台自动化（本地）
+npm run audit:admin:selenium
+```
+
+### E2E 分层（Tier 1~5）
+
+| Tier | 名称 | 触发方式 | 入口命令 |
+|------|------|----------|----------|
+| Tier 1 | CI E2E smoke | CI 自动 | `verify:e2e:smoke` |
+| Tier 2 | Focused flows check | 本地按需 | `verify:flows` |
+| Tier 3 | Local/manual browser automation | 本地/人工 | `audit:admin:selenium` |
+| Tier 4 | Environment-dependent manual checks | 人工 | `docs/geo-admin-hermes-manual-test.md` |
+| Tier 5 | Future full/nightly E2E | 暂不实现 | — |
+
+**当前所有 Playwright E2E spec 均为 Tier 1（CI smoke）**。未来新增 spec 必须先做 tier 判断。
+
+### 维护 Backlog
+
+1. **真实 CI 首次 push 后观察**（高优先级）：本地等价检查已通过；`gh` CLI 不可用，真实 GitHub Actions 运行记录待下一次相关路径 push/PR 时观察
+2. **TC-API-02 体检 API 自动化评估**（低优先级）：需 Python 环境，按需执行
+3. **未来新增 E2E spec 的 tier review**（中优先级）：新增前必须先判断 Tier
+
+### 不要默认做的事
+
+- **不要默认扩 CI**：四条 workflow 职责边界已清晰，不要新增 workflow 或扩大触发范围
+- **不要默认新增 E2E**：新增 Playwright spec 前必须先做 tier 判断
+- **不要默认升级依赖**：不要因版本更新随意升级依赖或修改 package-lock.json
+- **不要把真实 CI 未观察改写为已通过**
+
+### 临时产物清理建议（只记录，不擅自删除）
+
+- `test-results/`：Playwright E2E 输出
+- `__pycache__/` / `.pyc`：Python 缓存
+- `.next/`：Next.js 构建产物
+
+---
+
+## 14. 当前状态与维护原则
+
+### 当前状态
+
+Harness Engineering **主线已完成**，进入 **维护与增强阶段**。Phase 1~11 全部完成，Phase 12 已完成。
+
+### 当前最推荐的下一步
+
+**没有默认下一步。** Harness 主线已完整，四条 CI guardrail 已落地，内容 warning 已清零，E2E 分层策略已明确。
+
+除非任务明确要求，否则：
+- 不要默认扩 CI（职责边界已清晰）
+- 不要默认新增 E2E（所有 spec 均为 Tier 1 CI smoke）
+- 不要默认升级依赖
+
+### 按需执行事项（不主动推进）
+
+| 事项 | 触发条件 |
+|------|----------|
+| 真实 CI 首次 push 后观察 | 下一次相关路径 push / PR 后，`gh run list` 可见时 |
+| TC-API-02 体检 API 自动化评估 | 需 Python 环境 + 真实 DB，Admin GEO 例行维护时评估 |
+| 未来新增 E2E spec tier review | 计划新增 Playwright spec 之前 |
+
+---
+
+## 15. 使用方式
 
 后续你完全可以把这份文档当成长期执行底稿。
 
