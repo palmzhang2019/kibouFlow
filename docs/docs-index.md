@@ -16,6 +16,7 @@
 |------|----------|----------------|
 | `docs/project-overview.md` | 项目总览：产品定位、技术栈、路由结构、目录结构、核心模块职责。 | 刚接手项目、需要快速建立全局认知时。 |
 | `docs/使用指南.md` | 面向日常开发的使用手册，覆盖启动、环境变量、开发与回归的常见操作。 | 平时开发、自测、跑本地环境时。 |
+| `docs/harness-operating-guide.md` | Harness 日常使用指南，说明开发、内容、SEO/GEO、Admin、E2E 等改动应该如何选择验证入口和维护方式。 | 今天要改项目、想按 harness 正确操作时。 |
 | `docs/testing-strategy.md` | 测试分类和执行框架，解释单元、集成、E2E、手动测试之间的关系。 | 想确定“这次改动该跑什么测试”时。 |
 | `docs/manual-exploratory-checklist.md` | 上线前手动探索测试清单，覆盖前台主要页面和关键交互。 | 发版前人工回归、手动冒烟时。 |
 | `docs/new-post-sop.md` | GEO 内容发布 SOP，包含发文前检查、发布当天冒烟、发布后轻量修正。 | 新增或修改 MDX 内容、准备发布内容时。 |
@@ -37,7 +38,7 @@
 | 任务场景 | 优先看这些文档 |
 |----------|----------------|
 | 刚接手项目 | `project-overview.md`、`使用指南.md` |
-| 日常开发 / 本地启动 | `使用指南.md`、`testing-strategy.md` |
+| 日常开发 / 本地启动 | `使用指南.md`、`harness-operating-guide.md`、`testing-strategy.md` |
 | 改页面、接口、SEO/GEO 逻辑后要回归 | `testing-strategy.md`、`manual-exploratory-checklist.md`、`seo-geo-audit.md` |
 | 新增或修改内容文章 | `new-post-sop.md`、`content-warning-remediation-plan.md` |
 | 调整 CI / harness 守卫 | `dev-test-seo-geo-loop-plan.md`、`testing-strategy.md` |
@@ -76,6 +77,7 @@
 
 - 想知道“这个项目是干什么的”：看 `project-overview.md`
 - 想知道“我现在该怎么跑起来”：看 `使用指南.md`
+- 想知道“今天改项目怎么按 harness 操作”：看 `harness-operating-guide.md`
 - 想知道“改完后要怎么验”：看 `testing-strategy.md`
 - 想知道“内容怎么发、怎么补质量”：看 `new-post-sop.md`
 - 想知道“GEO 为什么做、做什么、怎么分阶段做”：看 `geo-principles.md`、`geo-strategy.md`、`geo-implementation-phases.md`
