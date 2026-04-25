@@ -132,6 +132,7 @@ function printHumanReadable(diff) {
 }
 
 const jsonMode = process.argv.includes("--json");
+const strictMode = process.argv.includes("--strict");
 
 const baseline = loadBaseline();
 if (!baseline) {
@@ -146,4 +147,41 @@ if (jsonMode) {
   console.log(JSON.stringify(diff, null, 2));
 } else {
   printHumanReadable(diff);
+}
+
+if (strictMode) {
+  let hasRegression = false;
+  const regressedItems = [];
+
+  if (diff.delta > 0) {
+    hasRegression = true;
+    regressedItems.push(`total warnings increased by ${diff.delta}`);
+  }
+
+  if (diff.newCodes.length > 0) {
+    hasRegression = true;
+    regressedItems.push(`new warning types introduced: ${diff.newCodes.map(c => c.code).join(", ")}`);
+  }
+
+  if (diff.bySeverity.P1.delta > 0) {
+    hasRegression = true;
+    regressedItems.push(`P1 severity increased by ${diff.bySeverity.P1.delta}`);
+  }
+
+  if (baseline.totalWarnings === 0 && diff.currentTotalWarnings > 0) {
+    hasRegression = true;
+    regressedItems.push(`baseline=0 but now has ${diff.currentTotalWarnings} warning(s)`);
+  }
+
+  if (hasRegression) {
+    console.error("\n[STRICT MODE] REGRESSION DETECTED:");
+    for (const item of regressedItems) {
+      console.error(`  - ${item}`);
+    }
+    console.error(`\nFailing CI check. Run \`npm run audit:content:baseline\` to update baseline if this is an intentional improvement.`);
+    process.exit(1);
+  } else {
+    console.log("\n[STRICT MODE] No regression detected. CI check passed.");
+    process.exit(0);
+  }
 }

@@ -1,0 +1,44 @@
+name: Content Governance
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/content-governance.yml"
+      - "package.json"
+      - "content/**"
+      - "scripts/content-harness-check.mjs"
+      - "scripts/content-warning-diff.mjs"
+      - "scripts/content-warning-baseline.mjs"
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/content-governance.yml"
+      - "package.json"
+      - "content/**"
+      - "scripts/content-harness-check.mjs"
+      - "scripts/content-warning-diff.mjs"
+      - "scripts/content-warning-baseline.mjs"
+
+jobs:
+  content-guard:
+    name: Content Warning Guard
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run content harness check
+        run: npm run verify:content
+
+      - name: Run strict content diff (CI guard)
+        run: npm run audit:content:diff:strict

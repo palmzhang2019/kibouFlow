@@ -92,7 +92,13 @@ def main() -> int:
     wait = WebDriverWait(driver, wait_sec)
 
     try:
-        # TC-NAV / TC-AUTH: 登录
+        # TC-NAV-01: 未登录访问受保护页应重定向到登录页
+        protected_url = f"{base}/{locale}/admin/geo-audit"
+        driver.get(protected_url)
+        wait.until(EC.url_contains(f"/{locale}/admin/login"))
+        assert "login" in driver.current_url.lower(), "未登录访问受保护页未跳转到 login"
+
+        # TC-AUTH-01: 登录成功进入总览
         driver.get(login_url)
         wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'input[type="password"]')))
         driver.find_element(By.CSS_SELECTOR, 'input[type="password"]').send_keys(password)
@@ -171,6 +177,11 @@ def main() -> int:
         # TC-AUTH-02: 退出（避免点到站点其它区域的按钮）
         admin_logout_button(driver).click()
         wait.until(EC.url_contains(f"/{locale}/admin/login"))
+
+        # TC-AUTH-02 加强版：退出后访问受保护页仍应重定向到登录页
+        driver.get(protected_url)
+        wait.until(EC.url_contains(f"/{locale}/admin/login"))
+        assert "login" in driver.current_url.lower(), "退出后访问受保护页未跳转到 login"
 
         print("PASS: Selenium 主流程完成")
         return 0

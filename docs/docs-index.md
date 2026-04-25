@@ -25,7 +25,7 @@
 | `docs/geo-strategy.md` | GEO + SEO 策略方案，偏目标、现状差距、策略方向。 | 做方向规划、对齐优化思路时。 |
 | `docs/seo-geo-optimization-plan.md` | GEO + SEO 优化方案，内容和 `geo-strategy.md` 高度接近，偏完整方案版。 | 需要查看较完整的历史/平行方案时。 |
 | `docs/geo-implementation-phases.md` | GEO 落地的分阶段开发计划，说明每阶段做什么、如何拆分和验收。 | 准备排期、拆任务、做 roadmap 时。 |
-| `docs/dev-test-seo-geo-loop-plan.md` | Harness Engineering 落地计划，强调 agent/开发/验证/反馈闭环。 | 想完善仓库工作流、验证链路和 agent 使用规范时。 |
+| `docs/dev-test-seo-geo-loop-plan.md` | Harness Engineering 落地计划，强调 agent/开发/验证/反馈闭环，并记录 content、SEO/GEO、Admin GEO、flows/E2E smoke 四条 CI 守卫的职责边界。 | 想完善仓库工作流、验证链路和 agent 使用规范时。 |
 | `docs/geo-backend-operation-guide.md` | GEO 体检后台操作指南，说明后台入口、环境变量、运行与查看历史的流程。 | 使用 admin GEO audit 后台时。 |
 | `docs/geo-admin-hermes-manual-test.md` | GEO 治理后台的手动测试清单，给人工或 Hermes 执行探索/回归测试。 | 对后台做人工回归时。 |
 | `docs/geo-admin-selenium-e2e-flow.md` | GEO 治理后台 Selenium 自动化主流程说明，对应脚本和环境变量。 | 想跑后台浏览器自动化时。 |
@@ -40,6 +40,7 @@
 | 日常开发 / 本地启动 | `使用指南.md`、`testing-strategy.md` |
 | 改页面、接口、SEO/GEO 逻辑后要回归 | `testing-strategy.md`、`manual-exploratory-checklist.md`、`seo-geo-audit.md` |
 | 新增或修改内容文章 | `new-post-sop.md`、`content-warning-remediation-plan.md` |
+| 调整 CI / harness 守卫 | `dev-test-seo-geo-loop-plan.md`、`testing-strategy.md` |
 | 想理解 GEO 为什么这样设计 | `geo-principles.md`、`geo-strategy.md` |
 | 想做 GEO 方案规划或阶段拆分 | `geo-strategy.md`、`geo-implementation-phases.md`、`dev-test-seo-geo-loop-plan.md` |
 | 使用 GEO 后台 | `geo-backend-operation-guide.md` |

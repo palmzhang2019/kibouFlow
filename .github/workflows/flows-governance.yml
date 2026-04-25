@@ -1,0 +1,64 @@
+name: Flows Governance
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/flows-governance.yml"
+      - "package.json"
+      - "playwright.config.ts"
+      - "scripts/run-harness-verify.mjs"
+      - "tests/e2e/core-flows.spec.ts"
+      - "tests/e2e/geo-phase3-health.spec.ts"
+      - "tests/e2e/geo-rules-preview.spec.ts"
+      - "src/app/[locale]/page.tsx"
+      - "src/app/[locale]/trial/**"
+      - "src/app/[locale]/partner/**"
+      - "src/app/api/trial/**"
+      - "src/app/api/partner/**"
+      - "src/app/api/track/**"
+      - "src/components/forms/**"
+      - "src/components/tracking/**"
+      - "src/lib/tracking-events.ts"
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/flows-governance.yml"
+      - "package.json"
+      - "playwright.config.ts"
+      - "scripts/run-harness-verify.mjs"
+      - "tests/e2e/core-flows.spec.ts"
+      - "tests/e2e/geo-phase3-health.spec.ts"
+      - "tests/e2e/geo-rules-preview.spec.ts"
+      - "src/app/[locale]/page.tsx"
+      - "src/app/[locale]/trial/**"
+      - "src/app/[locale]/partner/**"
+      - "src/app/api/trial/**"
+      - "src/app/api/partner/**"
+      - "src/app/api/track/**"
+      - "src/components/forms/**"
+      - "src/components/tracking/**"
+      - "src/lib/tracking-events.ts"
+
+jobs:
+  flows-guard:
+    name: E2E Smoke Guard
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E smoke verification
+        run: npm run verify:e2e:smoke

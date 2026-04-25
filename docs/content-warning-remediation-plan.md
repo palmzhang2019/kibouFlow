@@ -1,18 +1,34 @@
 # Content Warning Remediation Plan
 
 > Generated: 2026-04-24
+> Updated: 2026-04-25 (Phase 2 CI sync)
 > Source: Phase 1 of Harness Engineering - Content Warning Structuring
 
 ---
 
-## 扫描概览
+## ⚠️ 历史状态说明
+
+本文档记录的是 **2026-04-24** 的治理结果（Phase 1-A/1-B/1-C）。
+
+**当前状态（2026-04-25）**：
 
 | 指标 | 数值 |
 |------|------|
 | 扫描文章总数 | 48 MDX files |
 | blocking errors | 0 |
-| warnings | 69 |
-| 受影响文件数 | 40 |
+| warnings | **0** |
+| 当前 baseline | `totalWarnings: 0` |
+
+---
+
+## 扫描概览（历史快照）
+
+| 指标 | 数值 |
+|------|------|
+| 扫描文章总数 | 48 MDX files |
+| blocking errors | 0 |
+| warnings（历史） | 69 |
+| 受影响文件数（历史） | 40 |
 | 双语配对完整率 | 100% (48/48 paired) |
 
 ---
@@ -263,7 +279,7 @@
 
 ### Warning 基线文件
 
-已在 `scripts/baselines/content-warning-baseline.json` 记录：
+**历史 baseline（仅供参考）**：
 
 ```json
 {
@@ -275,21 +291,31 @@
 }
 ```
 
-**当前已知债务（Phase 1-A/1-B 后更新）**：
-- W009 internal links 问题：36 条（大量存在，短期内不会全部修复）
-- W010 next-step 问题：0 条（✅ 已在 Phase 1-A 解决）
-- W005 tldr 问题：5 条（从 6 降到 5，what-we-dont-handle-yet 已补齐）
-- W006/W007 suitableFor/notSuitableFor：0 条（✅ 已在 Phase 1-B 解决）
+**当前 baseline（Phase 2 后）**：
 
-当前 warning 总量从 69 降到 33。
+```json
+{
+  "generatedAt": "2026-04-25T00:13:02.592Z",
+  "scanned": 48,
+  "blockingErrors": 0,
+  "totalWarnings": 0,
+  "byCode": {},
+  "bySeverity": { "P1": 0, "P2": 0, "P3": 0 }
+}
+```
+
+**当前已知债务**：
+- ✅ 所有历史 warning 已清零
+- ✅ Phase 1-A/1-B/1-C 已完成
+- ⚠️ 新增内容如引入 warning，将被 CI `--strict` 模式拦截
 
 ### 治理周期
 
 | 周期 | 动作 |
 |------|------|
-| 发文章前 | 必须通过 `verify:content`（warning 总数允许存量内增长，但不能引入新的 warning type） |
+| 发文章前 | 必须通过 `verify:content`（warning 必须为 0） |
+| PR 提交 | `audit:content:diff:strict` 自动检查，有回归则 CI fail |
 | 每周 | 运行 `audit:content:diff` 并审查趋势 |
-| 每月 | 审查 warning 趋势，关闭已解决的项 |
 
 ### Warning 允许规则
 

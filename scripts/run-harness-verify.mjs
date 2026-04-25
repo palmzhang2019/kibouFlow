@@ -43,6 +43,11 @@ const tasks = {
     { command: nextCommand, args: ["build"] },
   ],
   flows: [{ command: npmCommand, args: ["run", "test:e2e", "--", "tests/e2e/core-flows.spec.ts"] }],
+  "e2e:smoke": [
+    { command: npmCommand, args: ["run", "test:e2e", "--", "tests/e2e/core-flows.spec.ts"] },
+    { command: npmCommand, args: ["run", "test:e2e", "--", "tests/e2e/geo-phase3-health.spec.ts"] },
+    { command: npmCommand, args: ["run", "test:e2e", "--", "tests/e2e/geo-rules-preview.spec.ts"] },
+  ],
 };
 
 const selected = tasks[target];

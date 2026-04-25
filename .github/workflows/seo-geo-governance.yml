@@ -1,0 +1,59 @@
+name: SEO / GEO Governance
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/seo-geo-governance.yml"
+      - "package.json"
+      - "src/app/layout.tsx"
+      - "src/app/sitemap.ts"
+      - "src/app/robots.ts"
+      - "src/app/llms.txt/**"
+      - "src/app/llms-full.txt/**"
+      - "src/components/seo/**"
+      - "src/lib/seo/**"
+      - "src/lib/content.ts"
+      - "src/lib/geo-settings.ts"
+      - "tests/unit/seo-site-url.test.ts"
+      - "tests/unit/sitemap.test.ts"
+      - "tests/integration/llms.route.test.ts"
+      - "tests/integration/robots.route.test.ts"
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/seo-geo-governance.yml"
+      - "package.json"
+      - "src/app/layout.tsx"
+      - "src/app/sitemap.ts"
+      - "src/app/robots.ts"
+      - "src/app/llms.txt/**"
+      - "src/app/llms-full.txt/**"
+      - "src/components/seo/**"
+      - "src/lib/seo/**"
+      - "src/lib/content.ts"
+      - "src/lib/geo-settings.ts"
+      - "tests/unit/seo-site-url.test.ts"
+      - "tests/unit/sitemap.test.ts"
+      - "tests/integration/llms.route.test.ts"
+      - "tests/integration/robots.route.test.ts"
+
+jobs:
+  seo-geo-guard:
+    name: SEO / GEO Guard
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run SEO / GEO verification
+        run: npm run verify:seo-geo
