@@ -92,8 +92,15 @@ export function mergeGeoAuditRunMetaFromReportJson(row: GeoAuditRunRow): Pick<
   const j = resolveGeoAuditReportPayload(row);
   const jsonUsed = j && typeof j.used_llm === "boolean" ? j.used_llm : null;
   const str = (k: "llm_model" | "script_version" | "target_path"): string | null => {
-    const v = j?.[k];
-    return typeof v === "string" && v.length > 0 ? v : null;
+    const rowVal = row[k];
+    const jsonVal = j?.[k];
+    if (typeof rowVal === "string" && rowVal.length > 0) {
+      return rowVal;
+    }
+    if (typeof jsonVal === "string" && jsonVal.length > 0) {
+      return jsonVal;
+    }
+    return null;
   };
   return {
     used_llm: jsonUsed !== null ? jsonUsed : row.used_llm,

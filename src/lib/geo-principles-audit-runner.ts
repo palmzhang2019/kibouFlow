@@ -117,11 +117,9 @@ export function coalesceAuditJsonForPersist(
   if (!fromStdout) return fromMd;
   if (!fromMd) return fromStdout;
   const issues = mergeIssueListsForPersist(fromStdout.issues, fromMd.issues);
-  return {
-    ...fromMd,
-    ...fromStdout,
-    ...(issues !== undefined ? { issues } : {}),
-  };
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { issues: _i, ...rest } = { ...fromMd, ...fromStdout };
+  return issues !== undefined ? { ...rest, issues } : rest;
 }
 
 function splitStdout(stdout: string): { markdown: string; json: PrinciplesAuditResult["json"] } {
