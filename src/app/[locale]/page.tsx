@@ -1,8 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { HeroSection } from "@/components/home/HeroSection";
 import { ProblemSection } from "@/components/home/ProblemSection";
-import { ValueSection } from "@/components/home/ValueSection";
-import { FlowSection } from "@/components/home/FlowSection";
+import { PostSubmitSection } from "@/components/home/PostSubmitSection";
 import { AudienceSection } from "@/components/home/AudienceSection";
 import { GuidesPreview } from "@/components/home/GuidesPreview";
 import { Section } from "@/components/shared/Section";
@@ -57,8 +56,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <OrganizationJsonLd />
       <HeroSection />
       <ProblemSection />
-      <ValueSection />
-      <FlowSection />
+      <PostSubmitSection />
       <AudienceSection />
       <Section bg="muted">
         <GuidesPreview />
@@ -67,6 +65,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <h2 className="text-2xl sm:text-3xl font-bold">{t("title")}</h2>
         <p className="mt-3 text-muted">{t("subtitle")}</p>
         <CTAButtons size="lg" className="mt-8 justify-center" ctaId="bottom" />
+        <p className="text-sm text-slate-500 mt-3">{t("assistant")}</p>
       </Section>
     </>
   );

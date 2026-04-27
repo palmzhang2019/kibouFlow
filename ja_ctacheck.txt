@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "<string>", line 7, in <module>
+    print(c, t[:8])
+    ~~~~~^^^^^^^^^^
+UnicodeEncodeError: 'gbk' codec can't encode character '\u30fb' in position 6: illegal multibyte sequence
+3 

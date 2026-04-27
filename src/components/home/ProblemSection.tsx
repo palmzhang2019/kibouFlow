@@ -22,7 +22,7 @@ export function ProblemSection() {
       <h2 className="text-2xl sm:text-3xl font-bold text-center">{t("title")}</h2>
       <div className="mt-10 grid gap-6 sm:grid-cols-2">
         {items.map((item, i) => (
-          <Card key={i}>
+          <Card key={i} className="hover:-translate-y-0.5 hover:shadow-md transition-all duration-200">
             <div className="flex items-start gap-4">
               <div className="shrink-0">{icons[i]}</div>
               <div>

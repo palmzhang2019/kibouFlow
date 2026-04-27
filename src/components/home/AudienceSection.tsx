@@ -12,7 +12,7 @@ export function AudienceSection() {
       <h2 className="text-2xl sm:text-3xl font-bold text-center">{t("title")}</h2>
       <div className="mt-10 grid gap-6 md:grid-cols-2">
         {/* Suitable */}
-        <div className="rounded-xl border-2 border-primary/20 bg-primary-light/30 p-6">
+        <div className="rounded-xl border-2 border-primary/20 bg-primary-light/30 p-6 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200">
           <h3 className="text-lg font-semibold text-primary flex items-center gap-2">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
