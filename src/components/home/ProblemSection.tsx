@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { Section } from "@/components/shared/Section";
 import { Card } from "@/components/shared/Card";
 
@@ -15,6 +16,7 @@ export function ProblemSection() {
   const items = [0, 1, 2, 3].map((i) => ({
     title: t(`items.${i}.title`),
     desc: t(`items.${i}.desc`),
+    href: t(`items.${i}.href`),
   }));
 
   return (
@@ -22,15 +24,24 @@ export function ProblemSection() {
       <h2 className="text-2xl sm:text-3xl font-bold text-center">{t("title")}</h2>
       <div className="mt-10 grid gap-6 sm:grid-cols-2">
         {items.map((item, i) => (
-          <Card key={i} className="hover:-translate-y-0.5 hover:shadow-md transition-all duration-200">
-            <div className="flex items-start gap-4">
-              <div className="shrink-0">{icons[i]}</div>
-              <div>
-                <h3 className="font-semibold text-lg">{item.title}</h3>
-                <p className="mt-1 text-sm text-muted">{item.desc}</p>
+          <Link
+            key={i}
+            href={item.href}
+            className="group block rounded-xl border border-gray-100 bg-white shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all duration-200"
+          >
+            <Card className="!bg-transparent hover:!bg-white">
+              <div className="flex items-start gap-4">
+                <div className="shrink-0">{icons[i]}</div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg">{item.title}</h3>
+                  <p className="mt-1 text-sm text-muted">{item.desc}</p>
+                  <p className="mt-3 text-xs text-primary font-medium group-hover:underline">
+                    {t("relatedLink")} →
+                  </p>
+                </div>
               </div>
-            </div>
-          </Card>
+            </Card>
+          </Link>
         ))}
       </div>
     </Section>

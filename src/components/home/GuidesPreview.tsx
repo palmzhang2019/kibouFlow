@@ -9,7 +9,7 @@ export function GuidesPreview() {
   const guides = useTranslations("guides");
   const { trackCTAClick } = useTracking();
 
-  const items = [0, 1, 2].map((i) => ({
+  const items = [0, 1, 2, 3].map((i) => ({
     category: t(`items.${i}.category`),
     title: t(`items.${i}.title`),
     desc: t(`items.${i}.desc`),
@@ -22,7 +22,7 @@ export function GuidesPreview() {
         {t("title")}
       </h2>
       <p className="mt-2 text-muted text-center text-sm">{t("subtitle")}</p>
-      <div className="mt-8 grid gap-4 sm:grid-cols-3">
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {items.map((item, i) => (
           <Link
             key={i}

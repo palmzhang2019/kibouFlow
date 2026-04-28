@@ -43,43 +43,47 @@
       "ctaAssistant": "约 3 分钟填写，不需要注册"
     },
     "heroPathCard": {
-      "title": "你的整理路径",
-      "steps": [
-        {
-          "label": "01 梳理现状",
-          "desc": "日语水平 · 学历经历 · 当前目标"
-        },
-        {
-          "label": "02 判断优先项",
-          "desc": "补日语 / 准备求职 / 咨询机构"
-        },
-        {
-          "label": "03 明确下一步",
-          "desc": "整理问题 · 判断方向 · 决定是否咨询"
-        }
-      ],
-      "footer": "无需注册 · 中日双语支持"
+      "label": "示例",
+      "title": "整理结果预览",
+      "currentIssues": {
+        "title": "当前卡点",
+        "items": [
+          "・日语优先级不明",
+          "・简历材料不足",
+          "・求职方向不清"
+        ]
+      },
+      "nextStep": {
+        "title": "下一步建议",
+        "content": "先整理简历素材，再判断是否需要补日语或进入咨询。"
+      },
+      "footer": "示例预览 · 实际内容会根据提交情况整理"
     },
     "problems": {
       "title": "你是否也卡在这些地方？",
       "items": [
         {
           "title": "不知道先做什么",
-          "desc": "日语、简历、求职、咨询，好像都重要"
+          "desc": "日语、简历、求职、咨询，好像都重要",
+          "href": "/guides/paths/push-forward-or-sort-first"
         },
         {
           "title": "信息太多，反而更乱",
-          "desc": "网上说法很多，不知道哪些适合自己"
+          "desc": "网上说法很多，不知道哪些适合自己",
+          "href": "/guides/paths/four-preparation-paths"
         },
         {
           "title": "想问人，但不知道怎么问",
-          "desc": "问题太多，反而不知道从哪一句开始"
+          "desc": "问题太多，反而不知道从哪一句开始",
+          "href": "/guides/problems/goal-unclear-kills-consulting"
         },
         {
           "title": "不了解日本职场节奏",
-          "desc": "不清楚招聘时机、简历要求和准备顺序"
+          "desc": "不清楚招聘时机、简历要求和准备顺序",
+          "href": "/guides/paths/job-prep-cluster-entry"
         }
-      ]
+      ],
+      "relatedLink": "相关内容"
     },
     "postSubmit": {
       "title": "提交之后，会怎么整理？",
@@ -114,12 +118,17 @@
         {
           "title": "下一步建议示例",
           "content": "先整理简历素材，再判断是否需要补日语或进入咨询。"
-        },
-        {
-          "title": "继续方式",
-          "content": "・只看整理建议\n・进入免费整理\n・进一步咨询\n・机构合作沟通"
         }
-      ]
+      ],
+      "continueOptions": {
+        "title": "看完整理建议后，你可以选择",
+        "items": [
+          "只看整理结果",
+          "继续免费整理",
+          "需要时再咨询",
+          "了解机构合作"
+        ]
+      }
     },
     "audience": {
       "title": "适合谁来？",
@@ -143,26 +152,32 @@
       }
     },
     "guidesPreview": {
-      "title": "不知道从哪里开始？",
-      "subtitle": "先看这三个常见问题",
+      "title": "也可以从这些主题开始",
+      "subtitle": "根据现在最卡住的地方，先选一个方向继续看。",
       "items": [
         {
-          "category": "求职准备",
-          "title": "我想在日本找工作，应该先准备什么？",
-          "desc": "适合还没开始投递、但想提前准备的人",
-          "href": "/zh/guides/paths/job-prep-cluster-entry"
+          "category": "方向整理",
+          "title": "方向很乱时，怎么先把问题整理清楚？",
+          "desc": "适合问题很多、但不知道怎么开口整理的人",
+          "href": "/guides/paths/direction-sorting-cluster-entry"
         },
         {
           "category": "日语路径",
           "title": "日语不够好，还能开始求职准备吗？",
           "desc": "适合担心日语不够、但又不想一直等下去的人",
-          "href": "/zh/guides/paths/japanese-learning-path-cluster-entry"
+          "href": "/guides/paths/japanese-learning-path-cluster-entry"
         },
         {
-          "category": "方向整理",
-          "title": "方向很乱时，怎么先把问题整理清楚？",
-          "desc": "适合问题很多、但不知道怎么开口整理的人",
-          "href": "/zh/guides/paths/direction-sorting-cluster-entry"
+          "category": "求职准备",
+          "title": "我想在日本找工作，应该先准备什么？",
+          "desc": "适合还没开始投递、但想提前准备的人",
+          "href": "/guides/paths/job-prep-cluster-entry"
+        },
+        {
+          "category": "边界判断",
+          "title": "哪些问题适合先整理，哪些需要找专业人士？",
+          "desc": "适合不确定该继续整理，还是直接找中介、行政书士或其他专业人士的人",
+          "href": "/guides/boundaries/concept-path-judgment"
         }
       ]
     },

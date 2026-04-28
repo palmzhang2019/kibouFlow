@@ -1,21 +1,7 @@
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { Section } from "@/components/shared/Section";
 import { Card } from "@/components/shared/Card";
-
-const stepIcons = [
-  <svg key="0" className="h-7 w-7 text-primary" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-  </svg>,
-  <svg key="1" className="h-7 w-7 text-primary" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
-  </svg>,
-  <svg key="2" className="h-7 w-7 text-primary" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5m.75-9l3-3 2.148 2.148A12.021 12.021 0 0116.5 3.75" />
-  </svg>,
-  <svg key="3" className="h-7 w-7 text-primary" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-  </svg>,
-];
 
 export function PostSubmitSection() {
   const t = useTranslations("home.postSubmit");
@@ -25,13 +11,15 @@ export function PostSubmitSection() {
     desc: t(`steps.${i}.desc`),
   }));
 
-  const cards = [0, 1, 2, 3].map((i) => ({
+  const cards = [0, 1, 2].map((i) => ({
     title: t(`cards.${i}.title`),
     content: t(`cards.${i}.content`),
   }));
 
+  const continueOptions = t.raw("continueOptions.items") as string[];
+
   return (
-    <Section bg="muted">
+    <Section bg="muted" className="!py-12">
       <h2 className="text-2xl sm:text-3xl font-bold text-center">{t("title")}</h2>
       <p className="mt-4 text-muted text-center max-w-xl mx-auto leading-relaxed">{t("subtitle")}</p>
 
@@ -62,18 +50,44 @@ export function PostSubmitSection() {
       </div>
 
       {/* Example cards */}
-      <div className="mt-12 grid gap-5 sm:grid-cols-2">
+      <div className="mt-12 grid gap-5 sm:grid-cols-3">
         {cards.map((card, i) => (
-          <Card key={i} className="p-5 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200">
-            <div className="flex items-start gap-3">
-              <div className="shrink-0 mt-0.5">{stepIcons[i]}</div>
-              <div>
-                <h3 className="font-semibold text-sm">{card.title}</h3>
-                <p className="mt-2 text-xs text-muted whitespace-pre-line">{card.content}</p>
-              </div>
-            </div>
+          <Card
+            key={i}
+            className={`p-5 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 ${
+              i === 1 ? "bg-amber-50/50" : i === 2 ? "bg-blue-50/50" : ""
+            }`}
+          >
+            <h3 className="font-semibold text-sm mb-2">{card.title}</h3>
+            <p className="text-xs text-muted whitespace-pre-line">{card.content}</p>
           </Card>
         ))}
+      </div>
+
+      {/* Continue options */}
+      <div className="mt-8 text-center">
+        <p className="text-sm text-muted mb-4">{t("continueOptions.title")}</p>
+        <div className="flex flex-wrap justify-center gap-3">
+          {continueOptions.map((option, i) => {
+            const isLink = i === 1 || i === 3;
+            return isLink ? (
+              <Link
+                key={i}
+                href={i === 1 ? "/trial" : "/partner"}
+                className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-white border border-gray-200 text-foreground hover:bg-gray-50 hover:border-gray-300 transition-colors"
+              >
+                {option}
+              </Link>
+            ) : (
+              <span
+                key={i}
+                className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-muted"
+              >
+                {option}
+              </span>
+            );
+          })}
+        </div>
       </div>
     </Section>
   );
