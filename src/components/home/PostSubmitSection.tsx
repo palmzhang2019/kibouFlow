@@ -19,7 +19,7 @@ export function PostSubmitSection() {
   const continueOptions = t.raw("continueOptions.items") as string[];
 
   return (
-    <Section bg="muted" className="!py-8">
+    <Section bg="muted" className="!py-6">
       <h2 className="text-2xl sm:text-3xl font-bold text-center">{t("title")}</h2>
       <p className="mt-4 text-muted text-center max-w-xl mx-auto leading-relaxed">{t("subtitle")}</p>
 
@@ -33,9 +33,6 @@ export function PostSubmitSection() {
               </div>
               <p className="mt-3 text-sm font-semibold text-foreground leading-tight max-w-[140px]">
                 {step.label}
-              </p>
-              <p className="mt-1 text-[13px] text-foreground/60 leading-relaxed max-w-[150px] hidden sm:block">
-                {step.desc}
               </p>
             </div>
             {i < steps.length - 1 && (
@@ -58,7 +55,7 @@ export function PostSubmitSection() {
               i === 1 ? "bg-amber-50/50" : i === 2 ? "bg-blue-50/50" : ""
             }`}
           >
-            <h3 className="font-semibold text-sm mb-2">{card.title}</h3>
+            <h3 className="text-[15px] font-bold mb-2">{card.title}</h3>
             <p className="text-xs text-muted whitespace-pre-line">{card.content}</p>
           </Card>
         ))}
@@ -67,11 +64,11 @@ export function PostSubmitSection() {
       {/* Continue options */}
       <div className="mt-8">
         <div className="max-w-3xl mx-auto rounded-2xl border border-slate-200 bg-white/70 px-5 py-4 shadow-sm">
-          <p className="text-sm text-muted mb-4 text-center">{t("continueOptions.title")}</p>
+          <p className="text-sm text-slate-600 mb-4 text-center">{t("continueOptions.title")}</p>
           <div className="flex flex-wrap justify-center gap-3">
             {continueOptions.map((option, i) => {
               const isPrimary = i === 1;
-              const isSecondary = i === 3;
+              const isSecondary = i === 2;
               if (isPrimary) {
                 return (
                   <Link
@@ -89,6 +86,17 @@ export function PostSubmitSection() {
                     key={i}
                     href="/partner"
                     className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-white border border-gray-200 text-foreground hover:bg-gray-50 hover:border-gray-300 transition-colors"
+                  >
+                    {option}
+                  </Link>
+                );
+              }
+              if (i === 3) {
+                return (
+                  <Link
+                    key={i}
+                    href="/partner"
+                    className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gray-50 border border-gray-100 text-slate-500 hover:bg-gray-100 hover:border-gray-200 transition-colors"
                   >
                     {option}
                   </Link>
