@@ -112,6 +112,8 @@ test.describe("Core locale and conversion flows", () => {
 
   test("partner page form fields and success page are reachable", async ({ page }) => {
     await page.goto("/ja/partner");
+    await expect(page.locator('form select[name="org_type"]')).toBeVisible();
+    await expect(page.locator('form textarea[name="cooperation_interest"]')).toBeVisible();
     await expect(page.locator('form input[name="org_name"]')).toBeVisible();
     await expect(page.locator('form input[name="contact_person"]')).toBeVisible();
     await expect(page.locator('form input[name="contact_method"]')).toBeVisible();

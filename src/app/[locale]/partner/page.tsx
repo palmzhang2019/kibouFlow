@@ -51,7 +51,7 @@ export default async function PartnerPage({ params }: { params: Promise<{ locale
     desc: t(`types.items.${i}.desc`),
   }));
 
-  const benefitItems = [0, 1, 2, 3].map((i) => ({
+  const benefitItems = [0, 1, 2].map((i) => ({
     title: t(`benefits.items.${i}.title`),
     desc: t(`benefits.items.${i}.desc`),
   }));
@@ -63,6 +63,11 @@ export default async function PartnerPage({ params }: { params: Promise<{ locale
 
   const boundaryItems = [0, 1, 2, 3].map((i) => t(`boundary.items.${i}`));
 
+  const processSteps = [0, 1, 2, 3].map((i) => ({
+    title: t(`process.steps.${i}.title`),
+    desc: t(`process.steps.${i}.desc`),
+  }));
+
   return (
     <>
       <BreadcrumbJsonLd items={crumbs} id="jsonld-breadcrumb-partner" />
@@ -71,6 +76,20 @@ export default async function PartnerPage({ params }: { params: Promise<{ locale
         <div className="max-w-2xl mx-auto text-center">
           <h1 className="text-3xl sm:text-4xl font-bold">{t("title")}</h1>
           <p className="mt-3 text-muted">{t("subtitle")}</p>
+          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+            <a
+              href="#partner-form"
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-white px-6 py-3 text-sm font-medium hover:bg-primary-dark transition-colors"
+            >
+              {t("ctaPrimary")}
+            </a>
+            <a
+              href="#partner-methods"
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white text-gray-700 px-6 py-3 text-sm font-medium hover:bg-gray-50 transition-colors"
+            >
+              {t("ctaSecondary")}
+            </a>
+          </div>
         </div>
       </Section>
 
@@ -90,7 +109,10 @@ export default async function PartnerPage({ params }: { params: Promise<{ locale
       {/* What we reduce */}
       <Section>
         <h2 className="text-2xl font-bold">{t("benefits.title")}</h2>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        {t("benefits.subtitle") && (
+          <p className="mt-2 text-muted">{t("benefits.subtitle")}</p>
+        )}
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
           {benefitItems.map((item, i) => (
             <Card key={i}>
               <h3 className="font-semibold">{item.title}</h3>
@@ -100,8 +122,24 @@ export default async function PartnerPage({ params }: { params: Promise<{ locale
         </div>
       </Section>
 
+      {/* Process */}
+      <Section>
+        <h2 className="text-2xl font-bold">{t("process.title")}</h2>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+          {processSteps.map((step, i) => (
+            <Card key={i}>
+              <div className="text-xs font-medium text-muted mb-2">
+                {String(i + 1).padStart(2, "0")}
+              </div>
+              <h3 className="font-semibold">{step.title}</h3>
+              <p className="mt-1 text-sm text-muted">{step.desc}</p>
+            </Card>
+          ))}
+        </div>
+      </Section>
+
       {/* Cooperation models */}
-      <Section bg="muted">
+      <Section bg="muted" id="partner-methods">
         <h2 className="text-2xl font-bold">{t("cooperation.title")}</h2>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           {coopItems.map((item, i) => (
@@ -129,9 +167,13 @@ export default async function PartnerPage({ params }: { params: Promise<{ locale
       </Section>
 
       {/* Form */}
-      <Section bg="muted">
+      <Section bg="muted" id="partner-form">
         <div className="max-w-lg mx-auto">
-          <PartnerForm />
+          <h2 className="text-2xl font-bold">{t("form.introTitle")}</h2>
+          <p className="mt-2 text-sm text-muted whitespace-pre-line">{t("form.introDesc")}</p>
+          <div className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-6">
+            <PartnerForm />
+          </div>
         </div>
       </Section>
     </>

@@ -69,6 +69,39 @@ export function PartnerForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6" onFocus={handleFocus}>
+      {/* Org type */}
+      <div>
+        <label htmlFor="org_type" className="block text-sm font-medium mb-1.5">
+          {t("form.orgType")}
+        </label>
+        <select
+          id="org_type"
+          name="org_type"
+          className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition bg-white"
+        >
+          <option value="">{t("form.orgTypeOptions.placeholder")}</option>
+          <option value="langSchool">{t("form.orgTypeOptions.langSchool")}</option>
+          <option value="jobSupport">{t("form.orgTypeOptions.jobSupport")}</option>
+          <option value="foreignSupport">{t("form.orgTypeOptions.foreignSupport")}</option>
+          <option value="consultant">{t("form.orgTypeOptions.consultant")}</option>
+          <option value="other">{t("form.orgTypeOptions.other")}</option>
+        </select>
+      </div>
+
+      {/* Cooperation interest */}
+      <div>
+        <label htmlFor="cooperation_interest" className="block text-sm font-medium mb-1.5">
+          {t("form.cooperationInterest")}
+        </label>
+        <textarea
+          id="cooperation_interest"
+          name="cooperation_interest"
+          rows={4}
+          placeholder={t("form.cooperationInterestPlaceholder")}
+          className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition resize-none"
+        />
+      </div>
+
       {/* Org name */}
       <div>
         <label htmlFor="org_name" className="block text-sm font-medium mb-1.5">
@@ -111,39 +144,6 @@ export function PartnerForm() {
           required
           placeholder={t("form.contactMethodPlaceholder")}
           className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition"
-        />
-      </div>
-
-      {/* Org type */}
-      <div>
-        <label htmlFor="org_type" className="block text-sm font-medium mb-1.5">
-          {t("form.orgType")}
-        </label>
-        <select
-          id="org_type"
-          name="org_type"
-          className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition bg-white"
-        >
-          <option value="">{t("form.orgTypeOptions.placeholder")}</option>
-          <option value="langSchool">{t("form.orgTypeOptions.langSchool")}</option>
-          <option value="jobSupport">{t("form.orgTypeOptions.jobSupport")}</option>
-          <option value="foreignSupport">{t("form.orgTypeOptions.foreignSupport")}</option>
-          <option value="consultant">{t("form.orgTypeOptions.consultant")}</option>
-          <option value="other">{t("form.orgTypeOptions.other")}</option>
-        </select>
-      </div>
-
-      {/* Cooperation interest */}
-      <div>
-        <label htmlFor="cooperation_interest" className="block text-sm font-medium mb-1.5">
-          {t("form.cooperationInterest")}
-        </label>
-        <textarea
-          id="cooperation_interest"
-          name="cooperation_interest"
-          rows={4}
-          placeholder={t("form.cooperationInterestPlaceholder")}
-          className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition resize-none"
         />
       </div>
 
