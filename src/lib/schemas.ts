@@ -4,6 +4,7 @@ export const trialFormSchema = z.object({
   name: z.string().min(1),
   contact: z.string().min(1),
   current_status: z.string().optional(),
+  japanese_level: z.enum(["n5", "n4", "n3", "n2", "n1", "none", "unsure"]),
   main_concern: z.string().optional(),
   goal: z.string().optional(),
   willing_followup: z.boolean().default(true),

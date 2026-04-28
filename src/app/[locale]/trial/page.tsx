@@ -75,7 +75,7 @@ export default async function TrialPage({ params }: { params: Promise<{ locale: 
 
           {/* Right: form */}
           <div className="lg:col-span-7 xl:col-span-8">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 sm:p-6">
               <p className="text-lg font-semibold text-foreground">{t("form.formTitle")}</p>
               <p className="text-sm text-muted mt-1">{t("form.hint")}</p>
               <TrialForm />

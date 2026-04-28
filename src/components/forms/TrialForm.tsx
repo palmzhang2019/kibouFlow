@@ -35,6 +35,7 @@ export function TrialForm() {
       name: formData.get("name") as string,
       contact: formData.get("contact") as string,
       current_status: formData.get("current_status") as string,
+      japanese_level: formData.get("japanese_level") as string,
       main_concern: formData.get("main_concern") as string,
       goal: formData.get("goal") as string,
       willing_followup: formData.get("willing_followup") === "yes",
@@ -70,7 +71,76 @@ export function TrialForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6" onFocus={handleFocus}>
+    <form onSubmit={handleSubmit} className="space-y-5" onFocus={handleFocus}>
+      {/* Current status */}
+      <div>
+        <label htmlFor="current_status" className="block text-sm font-medium mb-1.5">
+          {t("form.currentStatus")}
+        </label>
+        <select
+          id="current_status"
+          name="current_status"
+          className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition bg-white"
+        >
+          <option value="">{t("form.statusOptions.placeholder")}</option>
+          <option value="student">{t("form.statusOptions.student")}</option>
+          <option value="jobSeeking">{t("form.statusOptions.jobSeeking")}</option>
+          <option value="working">{t("form.statusOptions.working")}</option>
+          <option value="other">{t("form.statusOptions.other")}</option>
+        </select>
+      </div>
+
+      {/* Japanese level */}
+      <div>
+        <label htmlFor="japanese_level" className="block text-sm font-medium mb-1.5">
+          {t("form.japaneseLevel")} <span className="text-error">*</span>
+        </label>
+        <select
+          id="japanese_level"
+          name="japanese_level"
+          required
+          className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition bg-white"
+        >
+          <option value="">{t("form.japaneseLevelOptions.placeholder")}</option>
+          <option value="n5">{t("form.japaneseLevelOptions.n5")}</option>
+          <option value="n4">{t("form.japaneseLevelOptions.n4")}</option>
+          <option value="n3">{t("form.japaneseLevelOptions.n3")}</option>
+          <option value="n2">{t("form.japaneseLevelOptions.n2")}</option>
+          <option value="n1">{t("form.japaneseLevelOptions.n1")}</option>
+          <option value="none">{t("form.japaneseLevelOptions.none")}</option>
+          <option value="unsure">{t("form.japaneseLevelOptions.unsure")}</option>
+        </select>
+      </div>
+
+      {/* Main concern */}
+      <div>
+        <label htmlFor="main_concern" className="block text-sm font-medium mb-1.5">
+          {t("form.mainConcern")}
+        </label>
+        <textarea
+          id="main_concern"
+          name="main_concern"
+          rows={2}
+          placeholder={t("form.mainConcernPlaceholder")}
+          spellCheck={false}
+          className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition resize-none"
+        />
+      </div>
+
+      {/* Goal */}
+      <div>
+        <label htmlFor="goal" className="block text-sm font-medium mb-1.5">
+          {t("form.goal")}
+        </label>
+        <textarea
+          id="goal"
+          name="goal"
+          rows={2}
+          placeholder={t("form.goalPlaceholder")}
+          className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition resize-none"
+        />
+      </div>
+
       {/* Name */}
       <div>
         <label htmlFor="name" className="block text-sm font-medium mb-1.5">
@@ -98,52 +168,6 @@ export function TrialForm() {
           required
           placeholder={t("form.contactPlaceholder")}
           className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition"
-        />
-      </div>
-
-      {/* Current status */}
-      <div>
-        <label htmlFor="current_status" className="block text-sm font-medium mb-1.5">
-          {t("form.currentStatus")}
-        </label>
-        <select
-          id="current_status"
-          name="current_status"
-          className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition bg-white"
-        >
-          <option value="">{t("form.statusOptions.placeholder")}</option>
-          <option value="student">{t("form.statusOptions.student")}</option>
-          <option value="jobSeeking">{t("form.statusOptions.jobSeeking")}</option>
-          <option value="working">{t("form.statusOptions.working")}</option>
-          <option value="other">{t("form.statusOptions.other")}</option>
-        </select>
-      </div>
-
-      {/* Main concern */}
-      <div>
-        <label htmlFor="main_concern" className="block text-sm font-medium mb-1.5">
-          {t("form.mainConcern")}
-        </label>
-        <textarea
-          id="main_concern"
-          name="main_concern"
-          rows={3}
-          placeholder={t("form.mainConcernPlaceholder")}
-          className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition resize-none"
-        />
-      </div>
-
-      {/* Goal */}
-      <div>
-        <label htmlFor="goal" className="block text-sm font-medium mb-1.5">
-          {t("form.goal")}
-        </label>
-        <textarea
-          id="goal"
-          name="goal"
-          rows={3}
-          placeholder={t("form.goalPlaceholder")}
-          className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition resize-none"
         />
       </div>
 

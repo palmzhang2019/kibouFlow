@@ -5,6 +5,7 @@ describe("trialFormSchema", () => {
     const parsed = trialFormSchema.safeParse({
       name: "Alice",
       contact: "alice@example.com",
+      japanese_level: "n3",
     });
 
     expect(parsed.success).toBe(true);

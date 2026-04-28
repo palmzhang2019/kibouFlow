@@ -39,6 +39,20 @@ describe("POST /api/trial", () => {
     expect(res.status).toBe(400);
   });
 
+  it("returns 400 when japanese_level is missing", async () => {
+    const req = new Request("http://localhost/api/trial", {
+      method: "POST",
+      body: JSON.stringify({
+        name: "Alice",
+        contact: "alice@example.com",
+      }),
+      headers: { "content-type": "application/json" },
+    });
+
+    const res = await POST(req as never);
+    expect(res.status).toBe(400);
+  });
+
   it("returns 503 when database is not configured", async () => {
     insertTrialSubmissionMock.mockResolvedValue({ ok: false, reason: "not_configured" });
 
@@ -47,6 +61,7 @@ describe("POST /api/trial", () => {
       body: JSON.stringify({
         name: "Alice",
         contact: "alice@example.com",
+        japanese_level: "n3",
       }),
       headers: { "content-type": "application/json", "x-forwarded-for": "1.1.1.1" },
     });
@@ -63,6 +78,7 @@ describe("POST /api/trial", () => {
       body: JSON.stringify({
         name: "Alice",
         contact: "alice@example.com",
+        japanese_level: "n3",
       }),
       headers: { "content-type": "application/json", "x-real-ip": "2.2.2.2" },
     });
@@ -75,6 +91,7 @@ describe("POST /api/trial", () => {
       expect.objectContaining({
         name: "Alice",
         contact: "alice@example.com",
+        japanese_level: "n3",
       }),
     );
   });
@@ -83,7 +100,7 @@ describe("POST /api/trial", () => {
     insertTrialSubmissionMock.mockResolvedValue({ ok: false, reason: "insert_failed", detail: "connection refused" });
     const req = new Request("http://localhost/api/trial", {
       method: "POST",
-      body: JSON.stringify({ name: "Alice", contact: "alice@example.com" }),
+      body: JSON.stringify({ name: "Alice", contact: "alice@example.com", japanese_level: "n3" }),
       headers: { "content-type": "application/json" },
     });
     const res = await POST(req as never);
@@ -94,7 +111,7 @@ describe("POST /api/trial", () => {
     insertTrialSubmissionMock.mockResolvedValue({ ok: true });
     const req = new Request("http://localhost/api/trial", {
       method: "POST",
-      body: JSON.stringify({ name: "Alice", contact: "alice@example.com" }),
+      body: JSON.stringify({ name: "Alice", contact: "alice@example.com", japanese_level: "n3" }),
       headers: { "content-type": "application/json", "x-forwarded-for": "3.3.3.3, 4.4.4.4" },
     });
     const res = await POST(req as never);
