@@ -14,6 +14,22 @@ import type { Category } from "@/lib/content";
 import { resolveGeoMetadata } from "@/lib/geo-settings";
 import { getGeoSchemaToggles } from "@/lib/geo-rules";
 
+const CATEGORY_SECTION_IDS: Record<Category, string> = {
+  problems: "section-problems",
+  paths: "section-paths",
+  boundaries: "section-boundaries",
+  cases: "section-cases",
+};
+
+function renderSectionTitle(title: string) {
+  return (
+    <h2 className="mb-6 flex items-center gap-3 text-2xl font-bold text-foreground">
+      <span className="h-6 w-1 rounded-full bg-primary" aria-hidden="true" />
+      {title}
+    </h2>
+  );
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -74,6 +90,25 @@ export default async function GuidesIndexPage({
         !["cluster", "faq", "framework", "concept"].includes(a.contentType || ""),
     ),
   })).filter((g) => g.articles.length > 0);
+  const sectionNavItems = [
+    ...(clusterEntries.length > 0
+      ? [{ id: "section-clusters", label: t("sections.clusters") }]
+      : []),
+    ...(caseLibrary
+      ? [{ id: "section-case-library", label: t("sections.caseLibrary") }]
+      : []),
+    ...(faqEntries.length > 0 ? [{ id: "section-faqs", label: t("sections.faqs") }] : []),
+    ...(frameworkEntries.length > 0
+      ? [{ id: "section-frameworks", label: t("sections.frameworks") }]
+      : []),
+    ...(conceptEntries.length > 0
+      ? [{ id: "section-concepts", label: t("sections.concepts") }]
+      : []),
+    ...grouped.map(({ category }) => ({
+      id: CATEGORY_SECTION_IDS[category],
+      label: t(`categories.${category}`),
+    })),
+  ];
 
   return (
     <>
@@ -81,93 +116,105 @@ export default async function GuidesIndexPage({
         <BreadcrumbJsonLd items={crumbs} id="jsonld-breadcrumb-guides" />
       ) : null}
       <Section>
-      <div className="max-w-3xl mx-auto text-center">
-        <h1 className="text-3xl sm:text-4xl font-bold">{t("title")}</h1>
-        <p className="mt-3 text-muted">{t("subtitle")}</p>
-      </div>
+        <div className="max-w-3xl mx-auto text-center">
+          <h1 className="text-3xl sm:text-4xl font-bold">{t("title")}</h1>
+          <p className="mt-3 text-muted">{t("subtitle")}</p>
+        </div>
 
-      <div className="mt-14 space-y-14">
-        {clusterEntries.length > 0 && (
-          <div>
-            <h2 className="text-xl font-bold mb-6">{t("sections.clusters")}</h2>
-            <p className="mb-6 max-w-2xl text-sm leading-6 text-muted">
-              {t("sectionLeads.clusters")}
-            </p>
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {clusterEntries.map((article) => (
-                <ArticleCard key={article.href} article={article} />
-              ))}
-            </div>
+        <nav className="mt-8 overflow-x-auto" aria-label={t("title")}>
+          <div className="flex gap-2 whitespace-nowrap pb-1">
+            {sectionNavItems.map((item) => (
+              <a
+                key={item.id}
+                href={`#${item.id}`}
+                className="rounded-full border border-slate-200 px-4 py-2 text-sm text-slate-600 transition-colors hover:border-primary hover:text-primary"
+              >
+                {item.label}
+              </a>
+            ))}
           </div>
-        )}
+        </nav>
 
-        {caseLibrary && (
-          <div>
-            <h2 className="text-xl font-bold mb-6">{t("sections.caseLibrary")}</h2>
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              <ArticleCard article={caseLibrary} />
-              {CLUSTERS.map((cluster) => {
-                const sample = getArticlesByCluster(locale, cluster).find(
-                  (entry) =>
-                    entry.contentType === "case" && entry.slug !== "case-library",
-                );
-                if (!sample) return null;
-                return <ArticleCard key={`${cluster}-${sample.href}`} article={sample} />;
-              })}
+        <div className="mt-14 space-y-16">
+          {clusterEntries.length > 0 && (
+            <div id="section-clusters" className="scroll-mt-24">
+              {renderSectionTitle(t("sections.clusters"))}
+              <p className="mb-6 max-w-2xl text-sm leading-6 text-muted">
+                {t("sectionLeads.clusters")}
+              </p>
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {clusterEntries.map((article) => (
+                  <ArticleCard key={article.href} article={article} />
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {faqEntries.length > 0 && (
-          <div>
-            <h2 className="text-xl font-bold mb-6">{t("sections.faqs")}</h2>
-            <p className="mb-6 max-w-2xl text-sm leading-6 text-muted">
-              {t("sectionLeads.faqs")}
-            </p>
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {faqEntries.map((article) => (
-                <ArticleCard key={article.href} article={article} />
-              ))}
+          {caseLibrary && (
+            <div id="section-case-library" className="scroll-mt-24">
+              {renderSectionTitle(t("sections.caseLibrary"))}
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                <ArticleCard article={caseLibrary} />
+                {CLUSTERS.map((cluster) => {
+                  const sample = getArticlesByCluster(locale, cluster).find(
+                    (entry) =>
+                      entry.contentType === "case" && entry.slug !== "case-library",
+                  );
+                  if (!sample) return null;
+                  return <ArticleCard key={`${cluster}-${sample.href}`} article={sample} />;
+                })}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {frameworkEntries.length > 0 && (
-          <div>
-            <h2 className="text-xl font-bold mb-6">{t("sections.frameworks")}</h2>
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {frameworkEntries.map((article) => (
-                <ArticleCard key={article.href} article={article} />
-              ))}
+          {faqEntries.length > 0 && (
+            <div id="section-faqs" className="scroll-mt-24">
+              {renderSectionTitle(t("sections.faqs"))}
+              <p className="mb-6 max-w-2xl text-sm leading-6 text-muted">
+                {t("sectionLeads.faqs")}
+              </p>
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {faqEntries.map((article) => (
+                  <ArticleCard key={article.href} article={article} />
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {conceptEntries.length > 0 && (
-          <div>
-            <h2 className="text-xl font-bold mb-6">{t("sections.concepts")}</h2>
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {conceptEntries.map((article) => (
-                <ArticleCard key={article.href} article={article} />
-              ))}
+          {frameworkEntries.length > 0 && (
+            <div id="section-frameworks" className="scroll-mt-24">
+              {renderSectionTitle(t("sections.frameworks"))}
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {frameworkEntries.map((article) => (
+                  <ArticleCard key={article.href} article={article} />
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {grouped.map(({ category, articles }) => (
-          <div key={category}>
-            <h2 className="text-xl font-bold mb-6">
-              {t(`categories.${category}`)}
-            </h2>
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {articles.map((article) => (
-                <ArticleCard key={article.href} article={article} />
-              ))}
+          {conceptEntries.length > 0 && (
+            <div id="section-concepts" className="scroll-mt-24">
+              {renderSectionTitle(t("sections.concepts"))}
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {conceptEntries.map((article) => (
+                  <ArticleCard key={article.href} article={article} />
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-    </Section>
+          )}
+
+          {grouped.map(({ category, articles }) => (
+            <div key={category} id={CATEGORY_SECTION_IDS[category]} className="scroll-mt-24">
+              {renderSectionTitle(t(`categories.${category}`))}
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {articles.map((article) => (
+                  <ArticleCard key={article.href} article={article} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </Section>
     </>
   );
 }

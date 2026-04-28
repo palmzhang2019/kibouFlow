@@ -454,7 +454,7 @@
   },
   "guides": {
     "title": "路径判断与问题解答",
-    "subtitle": "帮你整理方向、理解判断逻辑、找到合理的下一步",
+    "subtitle": "先选一个最接近你现状的主题，再进入对应的框架、案例或 FAQ。",
     "sections": {
       "clusters": "热门主题",
       "caseLibrary": "案例库",
