@@ -30,7 +30,7 @@ export function GuidesPreview() {
             onClick={() => trackCTAClick(`home-guides-preview-${i}`, "home")}
             className="group block rounded-xl border border-gray-100 bg-white p-5 shadow-sm hover:border-primary/30 hover:shadow-md transition-all"
           >
-            <span className="text-xs font-medium text-primary/70 uppercase tracking-wide">
+            <span className="text-xs font-medium text-blue-600">
               {item.category}
             </span>
             <h3 className="mt-2 text-sm font-semibold group-hover:text-primary transition-colors leading-snug">

@@ -27,7 +27,7 @@ export function HeroPathCard() {
           <p className="text-xs font-medium text-muted mb-2">
             {t("currentIssues.title")}
           </p>
-          <ul className="space-y-1.5">
+          <ul className="space-y-1.5 bg-gray-50 rounded-lg border border-gray-100 px-4 py-3">
             {currentIssues.map((item, i) => (
               <li key={i} className="text-sm text-foreground">
                 {item}

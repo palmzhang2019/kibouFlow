@@ -19,7 +19,7 @@ export function PostSubmitSection() {
   const continueOptions = t.raw("continueOptions.items") as string[];
 
   return (
-    <Section bg="muted" className="!py-12">
+    <Section bg="muted" className="!py-8">
       <h2 className="text-2xl sm:text-3xl font-bold text-center">{t("title")}</h2>
       <p className="mt-4 text-muted text-center max-w-xl mx-auto leading-relaxed">{t("subtitle")}</p>
 
@@ -31,15 +31,15 @@ export function PostSubmitSection() {
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white font-bold text-lg">
                 {i + 1}
               </div>
-              <p className="mt-3 text-sm font-semibold leading-tight max-w-[140px]">
+              <p className="mt-3 text-sm font-semibold text-foreground leading-tight max-w-[140px]">
                 {step.label}
               </p>
-              <p className="mt-1 text-xs text-muted leading-tight max-w-[140px] hidden sm:block">
+              <p className="mt-1 text-sm text-foreground/60 leading-tight max-w-[140px] hidden sm:block">
                 {step.desc}
               </p>
             </div>
             {i < steps.length - 1 && (
-              <div className="hidden md:block text-gray-300 mx-3">
+              <div className="hidden md:block text-slate-300 mx-2 text-lg">
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                 </svg>
@@ -50,7 +50,7 @@ export function PostSubmitSection() {
       </div>
 
       {/* Example cards */}
-      <div className="mt-12 grid gap-5 sm:grid-cols-3">
+      <div className="mt-10 grid gap-5 sm:grid-cols-3">
         {cards.map((card, i) => (
           <Card
             key={i}
@@ -65,28 +65,45 @@ export function PostSubmitSection() {
       </div>
 
       {/* Continue options */}
-      <div className="mt-8 text-center">
-        <p className="text-sm text-muted mb-4">{t("continueOptions.title")}</p>
-        <div className="flex flex-wrap justify-center gap-3">
-          {continueOptions.map((option, i) => {
-            const isLink = i === 1 || i === 3;
-            return isLink ? (
-              <Link
-                key={i}
-                href={i === 1 ? "/trial" : "/partner"}
-                className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-white border border-gray-200 text-foreground hover:bg-gray-50 hover:border-gray-300 transition-colors"
-              >
-                {option}
-              </Link>
-            ) : (
-              <span
-                key={i}
-                className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-muted"
-              >
-                {option}
-              </span>
-            );
-          })}
+      <div className="mt-8">
+        <div className="max-w-3xl mx-auto rounded-2xl border border-slate-200 bg-white/70 px-5 py-4 shadow-sm">
+          <p className="text-sm text-muted mb-4 text-center">{t("continueOptions.title")}</p>
+          <div className="flex flex-wrap justify-center gap-3">
+            {continueOptions.map((option, i) => {
+              const isPrimary = i === 1;
+              const isSecondary = i === 3;
+              if (isPrimary) {
+                return (
+                  <Link
+                    key={i}
+                    href="/trial"
+                    className="inline-flex items-center px-5 py-2 rounded-full text-sm font-medium bg-primary text-white hover:bg-primary/90 transition-colors shadow-sm"
+                  >
+                    {option}
+                  </Link>
+                );
+              }
+              if (isSecondary) {
+                return (
+                  <Link
+                    key={i}
+                    href="/partner"
+                    className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-white border border-gray-200 text-foreground hover:bg-gray-50 hover:border-gray-300 transition-colors"
+                  >
+                    {option}
+                  </Link>
+                );
+              }
+              return (
+                <span
+                  key={i}
+                  className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-muted"
+                >
+                  {option}
+                </span>
+              );
+            })}
+          </div>
         </div>
       </div>
     </Section>
