@@ -17,11 +17,15 @@ export function ProblemSection() {
     title: t(`items.${i}.title`),
     desc: t(`items.${i}.desc`),
     href: t(`items.${i}.href`),
+    ctaLabel: t.raw(`items.${i}.ctaLabel`) ?? t("relatedLink"),
   }));
 
   return (
     <Section bg="muted">
       <h2 className="text-2xl sm:text-3xl font-bold text-center">{t("title")}</h2>
+      {t.raw("subtitle") && (
+        <p className="mt-2 text-sm text-slate-500 text-center">{t("subtitle")}</p>
+      )}
       <div className="mt-10 grid gap-6 sm:grid-cols-2">
         {items.map((item, i) => (
           <Link
@@ -36,7 +40,7 @@ export function ProblemSection() {
                   <h3 className="font-semibold text-lg">{item.title}</h3>
                   <p className="mt-1 text-sm text-muted">{item.desc}</p>
                   <p className="mt-3 text-xs text-primary font-medium group-hover:underline">
-                    {t("relatedLink")} →
+                    {item.ctaLabel}
                   </p>
                 </div>
               </div>

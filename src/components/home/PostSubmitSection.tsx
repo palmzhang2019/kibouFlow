@@ -34,12 +34,12 @@ export function PostSubmitSection() {
               <p className="mt-3 text-sm font-semibold text-foreground leading-tight max-w-[140px]">
                 {step.label}
               </p>
-              <p className="mt-1 text-sm text-foreground/60 leading-tight max-w-[140px] hidden sm:block">
+              <p className="mt-1 text-[13px] text-foreground/60 leading-relaxed max-w-[150px] hidden sm:block">
                 {step.desc}
               </p>
             </div>
             {i < steps.length - 1 && (
-              <div className="hidden md:block text-slate-300 mx-2 text-lg">
+              <div className="hidden md:block text-slate-400 mx-2 text-lg">
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                 </svg>

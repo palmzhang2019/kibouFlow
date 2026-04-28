@@ -37,7 +37,7 @@
   "home": {
     "hero": {
       "title": "在日本发展，\n先把方向整理清楚",
-      "subtitle": "不确定该先补日语、准备简历、求职转职，还是找人咨询？\nkibouFlow 先帮你整理现状和目标，再判断下一步应该从哪里开始。",
+      "subtitle": "不确定该先补日语、准备简历、求职转职，还是找人咨询？kibouFlow 先帮你整理现状和目标，再判断下一步应该从哪里开始。",
       "ctaPrimary": "免费开始整理 →",
       "ctaSecondary": "了解机构合作",
       "ctaAssistant": "约 3 分钟填写，不需要注册"
@@ -65,25 +65,30 @@
         {
           "title": "不知道先做什么",
           "desc": "日语、简历、求职、咨询，好像都重要",
-          "href": "/guides/paths/push-forward-or-sort-first"
+          "href": "/guides/paths/push-forward-or-sort-first",
+          "ctaLabel": "看准备顺序 →"
         },
         {
           "title": "信息太多，反而更乱",
           "desc": "网上说法很多，不知道哪些适合自己",
-          "href": "/guides/paths/four-preparation-paths"
+          "href": "/guides/paths/four-preparation-paths",
+          "ctaLabel": "看判断方法 →"
         },
         {
           "title": "想问人，但不知道怎么问",
           "desc": "问题太多，反而不知道从哪一句开始",
-          "href": "/guides/problems/goal-unclear-kills-consulting"
+          "href": "/guides/problems/goal-unclear-kills-consulting",
+          "ctaLabel": "看如何整理问题 →"
         },
         {
           "title": "不了解日本职场节奏",
           "desc": "不清楚招聘时机、简历要求和准备顺序",
-          "href": "/guides/paths/job-prep-cluster-entry"
+          "href": "/guides/paths/job-prep-cluster-entry",
+          "ctaLabel": "看求职准备节奏 →"
         }
       ],
-      "relatedLink": "相关内容"
+      "relatedLink": "相关内容",
+      "subtitle": "以下是来到 kibouFlow 的用户最常提到的困惑"
     },
     "postSubmit": {
       "title": "提交之后，会怎么整理？",

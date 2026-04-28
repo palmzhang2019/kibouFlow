@@ -37,7 +37,7 @@
   "home": {
     "hero": {
       "title": "日本での発展、まず方向を整理しよう",
-      "subtitle": "日本語を先に伸ばすべきか、履歴書を準備すべきか、転職活動を始めるべきか、誰かに相談すべきか迷っていませんか。\nkibouFlow は、まず今の状況と目標を整理し、次に何から始めるべきかを一緒に考えます。",
+      "subtitle": "日本語を先に伸ばすべきか、履歴書を準備すべきか、転職活動を始めるべきか、誰かに相談すべきか迷っていませんか。kibouFlow は、まず今の状況と目標を整理し、次に何から始めるべきかを一緒に考えます。",
       "ctaPrimary": "無料で整理を始める →",
       "ctaSecondary": "法人・機関向け連携を見る",
       "ctaAssistant": "約3分で入力・登録不要"
@@ -61,26 +61,31 @@
     },
     "problems": {
       "title": "こんなところで止まっていませんか？",
+      "subtitle": "kibouFlow に来る人がよく感じている悩みです",
       "items": [
         {
           "title": "何から始めればいいか分からない",
           "desc": "日本語、履歴書、転職活動、相談、どれも大事に見える",
-          "href": "/guides/paths/push-forward-or-sort-first"
+          "href": "/guides/paths/push-forward-or-sort-first",
+          "ctaLabel": "準備の順番を見る →"
         },
         {
           "title": "情報が多すぎて、かえって迷う",
           "desc": "ネットの情報は多いけれど、自分に合うものが分からない",
-          "href": "/guides/paths/four-preparation-paths"
+          "href": "/guides/paths/four-preparation-paths",
+          "ctaLabel": "判断のしかたを見る →"
         },
         {
           "title": "誰かに聞きたいが、どう聞けばいいか分からない",
           "desc": "悩みが多くて、最初の一言が出てこない",
-          "href": "/guides/problems/goal-unclear-kills-consulting"
+          "href": "/guides/problems/goal-unclear-kills-consulting",
+          "ctaLabel": "悩みを整理する方法を見る →"
         },
         {
           "title": "日本の就職・転職の流れが分からない",
           "desc": "募集時期、履歴書、準備順序が見えにくい",
-          "href": "/guides/paths/job-prep-cluster-entry"
+          "href": "/guides/paths/job-prep-cluster-entry",
+          "ctaLabel": "転職準備の流れを見る →"
         }
       ],
       "relatedLink": "関連ガイド"

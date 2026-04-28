@@ -22,15 +22,15 @@ export function CTAButtons({
 
   const sizeClasses =
     size === "lg"
-      ? "px-8 py-3.5 text-base"
-      : "px-6 py-2.5 text-sm";
+      ? "px-8 py-3.5 text-base min-h-[48px]"
+      : "px-6 py-2.5 text-sm min-h-[40px]";
 
   return (
     <div className={`flex flex-col sm:flex-row gap-3 ${className}`}>
       <Link
         href="/trial"
         onClick={() => trackCTAClick(`${ctaId}-primary`, "trial")}
-        className={`inline-flex items-center justify-center font-medium rounded-lg bg-primary text-white hover:bg-primary-dark transition-colors ${sizeClasses}`}
+        className={`inline-flex items-center justify-center font-medium rounded-lg bg-[#1D4ED8] text-white hover:bg-[#1e3a8a] transition-colors ${sizeClasses}`}
       >
         {t("trial")}
       </Link>
