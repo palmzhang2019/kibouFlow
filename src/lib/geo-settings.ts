@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getPg } from "@/lib/db";
-import { getSiteUrl, getDefaultOgImage } from "@/lib/seo/site-url";
+import { getSiteUrl, getDefaultOgImage, buildOgImageUrl } from "@/lib/seo/site-url";
 
 export interface GeoSiteSettingsRow {
   site_name: string;
@@ -35,6 +35,7 @@ export interface GeoMetadataInput {
   existingDescription?: string;
   existingCanonical?: string;
   existingOpenGraph?: Metadata["openGraph"];
+  existingTwitter?: Metadata["twitter"];
 }
 
 interface GeoMetadataResolved {
@@ -42,6 +43,7 @@ interface GeoMetadataResolved {
   description: string;
   canonical?: string;
   openGraph: Metadata["openGraph"];
+  twitter: Metadata["twitter"];
   robots?: Metadata["robots"];
 }
 
@@ -157,6 +159,23 @@ export async function resolveGeoMetadata(
     site?.default_description ||
     DEFAULT_SITE_SETTINGS.default_description;
   const canonical = page?.canonical_url || input.existingCanonical;
+
+  // Resolve OG image: DB page override > existing input > default
+  const resolvedOgImageUrl =
+    page?.og_image && page.og_image.length > 0
+      ? buildOgImageUrl(page.og_image)
+      : input.existingOpenGraph?.images &&
+          Array.isArray(input.existingOpenGraph.images) &&
+          input.existingOpenGraph.images.length > 0
+        ? buildOgImageUrl(
+            typeof input.existingOpenGraph.images[0] === "string"
+              ? input.existingOpenGraph.images[0]
+              : (input.existingOpenGraph.images[0] as { url: string }).url,
+          )
+        : getDefaultOgImage();
+
+  const ogImageEntry = { url: resolvedOgImageUrl, width: 1200, height: 1200, alt: title };
+
   const openGraph = {
     ...(input.existingOpenGraph ?? {}),
     title: page?.og_title || page?.meta_title || input.existingTitle || title,
@@ -165,11 +184,22 @@ export async function resolveGeoMetadata(
       page?.meta_description ||
       input.existingDescription ||
       description,
-    images:
-      page?.og_image && page.og_image.length > 0
-        ? [{ url: page.og_image }]
-        : (input.existingOpenGraph?.images ?? [{ url: getDefaultOgImage() }]),
+    images: [ogImageEntry],
   };
+
+  // Build twitter card metadata: prefer existing input, fallback to resolved OG image
+  const twitter: Metadata["twitter"] = {
+    card: "summary",
+    title: page?.og_title || page?.meta_title || input.existingTitle || title,
+    description:
+      page?.og_description ||
+      page?.meta_description ||
+      input.existingDescription ||
+      description,
+    images: [resolvedOgImageUrl],
+    ...(input.existingTwitter ?? {}),
+  };
+
   const robots = page?.noindex ? { index: false, follow: false } : undefined;
 
   return {
@@ -177,6 +207,7 @@ export async function resolveGeoMetadata(
     description,
     canonical,
     openGraph,
+    twitter,
     robots,
   };
 }

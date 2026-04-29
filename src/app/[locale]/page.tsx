@@ -35,6 +35,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     title: resolved.title,
     description: resolved.description,
     openGraph: resolved.openGraph,
+    twitter: resolved.twitter,
     alternates: {
       canonical: resolved.canonical,
       languages: {

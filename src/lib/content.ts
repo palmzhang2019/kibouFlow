@@ -71,6 +71,8 @@ export interface ArticleFrontmatter {
   keyTakeaways?: string[];
   relatedSlugs?: string[]; // e.g. "paths/four-preparation-paths"
   ctaType?: "trial" | "partner" | "both";
+  /** Optional per-article OG image path, e.g. "/og/articles/xxx.png" */
+  ogImage?: string;
 }
 
 export interface ArticleMeta extends ArticleFrontmatter {
@@ -260,6 +262,7 @@ function normalizeFrontmatter(
     mentions: normalizeStringArray(frontmatter.mentions),
     keyTakeaways: normalizeStringArray(frontmatter.keyTakeaways),
     relatedSlugs: normalizeStringArray(frontmatter.relatedSlugs),
+    ogImage: normalizeFrontmatterString(frontmatter.ogImage),
   };
 }
 

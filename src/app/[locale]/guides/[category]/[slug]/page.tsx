@@ -23,6 +23,7 @@ import { extractFaqPairsFromMarkdown } from "@/lib/faq-extractor";
 import { extractHowToFromMarkdown } from "@/lib/howto-extractor";
 import { getGeoConfigBundle, resolveGeoMetadata } from "@/lib/geo-settings";
 import { compilePatterns, getGeoRules, getGeoSchemaToggles } from "@/lib/geo-rules";
+import { buildOgImageUrl } from "@/lib/seo/site-url";
 
 interface PageParams {
   locale: string;
@@ -48,6 +49,7 @@ export async function generateMetadata({
   if (!article) return {};
 
   const url = `/${locale}/guides/${category}/${slug}`;
+  const articleOgImageUrl = buildOgImageUrl(article.ogImage);
   const resolved = await resolveGeoMetadata({
     locale: locale as "zh" | "ja",
     path: url,
@@ -61,6 +63,7 @@ export async function generateMetadata({
       type: "article",
       publishedTime: article.publishedAt,
       modifiedTime: article.updatedAt || article.publishedAt,
+      images: [{ url: articleOgImageUrl }],
     },
   });
 
@@ -68,6 +71,7 @@ export async function generateMetadata({
     title: resolved.title,
     description: resolved.description,
     openGraph: resolved.openGraph,
+    twitter: resolved.twitter,
     alternates: {
       canonical: resolved.canonical,
       languages: {

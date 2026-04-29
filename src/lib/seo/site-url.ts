@@ -66,5 +66,20 @@ export function absoluteUrl(path: string, siteUrl?: string): string {
 }
 
 export function getDefaultOgImage(): string {
-  return `${getSiteUrl()}/og-image.svg`;
+  return `${getSiteUrl()}/og/default-og.png`;
+}
+
+/**
+ * Build an absolute OG image URL from a possibly-relative image path.
+ * If the path is already absolute (starts with http), return as-is.
+ * Otherwise, prefix with the site URL.
+ */
+export function buildOgImageUrl(imagePath?: string): string {
+  if (!imagePath) return getDefaultOgImage();
+  if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+    return imagePath;
+  }
+  const base = getSiteUrl().replace(/\/$/, "");
+  const p = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
+  return `${base}${p}`;
 }
