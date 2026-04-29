@@ -39,6 +39,7 @@ RELEASE_FINGERPRINT_FILE=""
 APP_DOMAIN="${APP_DOMAIN:-}"
 APP_EMAIL="${APP_EMAIL:-}"
 NEXT_PUBLIC_SITE_URL="${NEXT_PUBLIC_SITE_URL:-}"
+WWW_DOMAIN="${WWW_DOMAIN:-}"
 DATABASE_URL="${DATABASE_URL:-}"
 DB_PASSWORD="${DB_PASSWORD:-}"
 ADMIN_GEO_PASSWORD="${ADMIN_GEO_PASSWORD:-}"
@@ -250,6 +251,9 @@ apply_config_defaults() {
   BUILD_FINGERPRINT_FILE="${SHARED_DIR}/.build-fingerprint"
   RELEASE_FINGERPRINT_FILE="${SHARED_DIR}/.release-fingerprint"
   SERVICE_NAME="${SERVICE_NAME:-$APP_NAME}"
+  if [[ -z "$WWW_DOMAIN" && -n "$APP_DOMAIN" ]]; then
+    WWW_DOMAIN="www.${APP_DOMAIN}"
+  fi
 
   BUILD_ON_SERVER="${BUILD_ON_SERVER:-1}"
   INSTALL_NGINX="${INSTALL_NGINX:-1}"
@@ -293,6 +297,24 @@ load_existing_deploy_env() {
 normalize_env_aliases() {
   if [[ -z "$ADMIN_GEO_PASSWORD" && -n "${GEO_ADMIN_PASSWORD:-}" ]]; then
     ADMIN_GEO_PASSWORD="$GEO_ADMIN_PASSWORD"
+  fi
+}
+
+normalize_domains() {
+  if [[ -n "$APP_DOMAIN" ]]; then
+    APP_DOMAIN="${APP_DOMAIN#http://}"
+    APP_DOMAIN="${APP_DOMAIN#https://}"
+    APP_DOMAIN="${APP_DOMAIN%/}"
+  fi
+
+  if [[ -z "$WWW_DOMAIN" && -n "$APP_DOMAIN" ]]; then
+    WWW_DOMAIN="www.${APP_DOMAIN}"
+  fi
+
+  if [[ -n "$WWW_DOMAIN" ]]; then
+    WWW_DOMAIN="${WWW_DOMAIN#http://}"
+    WWW_DOMAIN="${WWW_DOMAIN#https://}"
+    WWW_DOMAIN="${WWW_DOMAIN%/}"
   fi
 }
 
@@ -838,8 +860,81 @@ write_nginx_config() {
 
   local conf_file="/etc/nginx/sites-available/${APP_NAME}"
   local server_name="${APP_DOMAIN:-_}"
+  local www_server_name="${WWW_DOMAIN:-}"
 
-  cat > "$conf_file" <<EOF
+  if [[ "$ENABLE_SSL" == "1" || "$ENABLE_SSL" == "true" ]]; then
+    cat > "$conf_file" <<EOF
+map \$http_upgrade \$connection_upgrade {
+  default upgrade;
+  '' close;
+}
+
+server {
+  listen 80;
+  listen [::]:80;
+  server_name ${server_name} ${www_server_name};
+
+  if (\$host = ${www_server_name}) {
+    return 301 https://${server_name}\$request_uri;
+  }
+
+  if (\$host = ${server_name}) {
+    return 301 https://${server_name}\$request_uri;
+  }
+
+  return 404;
+}
+
+server {
+  listen 443 ssl;
+  listen [::]:443 ssl;
+  server_name ${www_server_name};
+
+  ssl_certificate /etc/letsencrypt/live/${server_name}/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/${server_name}/privkey.pem;
+  include /etc/letsencrypt/options-ssl-nginx.conf;
+  ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+  return 301 https://${server_name}\$request_uri;
+}
+
+server {
+  listen 443 ssl;
+  listen [::]:443 ssl;
+  server_name ${server_name};
+
+  ssl_certificate /etc/letsencrypt/live/${server_name}/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/${server_name}/privkey.pem;
+  include /etc/letsencrypt/options-ssl-nginx.conf;
+  ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+  client_max_body_size 2m;
+  server_tokens off;
+
+  location /_next/static/ {
+    alias ${CURRENT_LINK}/.next/static/;
+    access_log off;
+    expires 365d;
+    add_header Cache-Control "public, max-age=31536000, immutable";
+  }
+
+  location / {
+    proxy_pass http://127.0.0.1:${APP_PORT};
+    proxy_http_version 1.1;
+    proxy_set_header Host \$host;
+    proxy_set_header X-Real-IP \$remote_addr;
+    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto \$scheme;
+    proxy_set_header Upgrade \$http_upgrade;
+    proxy_set_header Connection \$connection_upgrade;
+    proxy_read_timeout 90s;
+    proxy_send_timeout 90s;
+    proxy_buffering off;
+  }
+}
+EOF
+  else
+    cat > "$conf_file" <<EOF
 map \$http_upgrade \$connection_upgrade {
   default upgrade;
   '' close;
@@ -875,6 +970,7 @@ server {
   }
 }
 EOF
+  fi
 
   ln -sfn "$conf_file" "/etc/nginx/sites-enabled/${APP_NAME}"
   rm -f /etc/nginx/sites-enabled/default
@@ -900,10 +996,21 @@ configure_ssl_if_needed() {
   fi
 
   info "Requesting or renewing Let's Encrypt certificate."
-  certbot --nginx -d "$APP_DOMAIN" --email "$APP_EMAIL" --agree-tos --non-interactive --redirect || {
-    warn "Certbot failed. Check DNS and rerun later."
-    return
-  }
+
+  certbot certonly --nginx \
+    -d "$APP_DOMAIN" \
+    -d "$WWW_DOMAIN" \
+    --email "$APP_EMAIL" \
+    --agree-tos \
+    --non-interactive \
+    --keep-until-expiring || {
+      warn "Certbot failed. Check DNS and rerun later."
+      return
+    }
+
+  nginx -t
+  systemctl reload nginx
+
   ok "SSL configured."
 }
 
@@ -977,6 +1084,7 @@ main() {
   apply_config_defaults
   load_existing_deploy_env
   normalize_env_aliases
+  normalize_domains
 
   echo ""
   echo "============================================================"
@@ -994,6 +1102,7 @@ main() {
   install_node_if_needed
   install_and_tune_postgres
   ensure_required_inputs
+  normalize_domains
   ensure_app_user_dirs
   write_managed_env
   run_migrations
