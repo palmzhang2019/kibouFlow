@@ -31,9 +31,24 @@ export function TrialForm() {
     const formData = new FormData(e.currentTarget);
     const utm = getStoredUTMParams();
 
+    const contact = (formData.get("contact") as string).trim();
+
+    // Frontend email validation
+    if (!contact) {
+      setError(t("error.contactRequired"));
+      setSubmitting(false);
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(contact)) {
+      setError(t("error.invalidEmail"));
+      setSubmitting(false);
+      return;
+    }
+
     const data = {
       name: formData.get("name") as string,
-      contact: formData.get("contact") as string,
+      contact,
       current_status: formData.get("current_status") as string,
       japanese_level: formData.get("japanese_level") as string,
       main_concern: formData.get("main_concern") as string,
@@ -51,13 +66,15 @@ export function TrialForm() {
         body: JSON.stringify(data),
       });
 
-      if (res.status === 429) {
-        setError(t("error.tooManyRequests"));
-        return;
-      }
-
       if (!res.ok) {
-        setError(t("error.submitFailed"));
+        const resBody = await res.json().catch(() => null);
+        if (res.status === 429 && resBody?.error === "duplicate_email") {
+          setError(t("error.duplicateEmail"));
+        } else if (res.status === 429) {
+          setError(t("error.tooManyRequests"));
+        } else {
+          setError(t("error.submitFailed"));
+        }
         return;
       }
 
@@ -156,7 +173,7 @@ export function TrialForm() {
         />
       </div>
 
-      {/* Contact */}
+      {/* Contact (email) */}
       <div>
         <label htmlFor="contact" className="block text-sm font-medium mb-1.5">
           {t("form.contact")} <span className="text-error">*</span>
@@ -164,7 +181,7 @@ export function TrialForm() {
         <input
           id="contact"
           name="contact"
-          type="text"
+          type="email"
           required
           placeholder={t("form.contactPlaceholder")}
           className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition"

@@ -7,6 +7,28 @@ export type InsertFailed = { ok: false; reason: "insert_failed"; detail?: string
 
 export type TrialInsertResult = InsertOk | InsertNotConfigured | InsertFailed;
 
+/**
+ * Check whether the given email has submitted a trial within the last `minutes` minutes.
+ * Returns `false` when DATABASE_URL is missing or on query error (fail-open).
+ */
+export async function hasRecentTrialSubmissionByEmail(email: string, minutes = 10): Promise<boolean> {
+  const sql = getPg();
+  if (!sql) return false;
+  try {
+    const normalized = email.trim().toLowerCase();
+    const rows = await sql`
+      SELECT 1 FROM trial_submissions
+      WHERE contact = ${normalized}
+        AND created_at > now() - ${minutes} * interval '1 minute'
+      LIMIT 1
+    `;
+    return rows.length > 0;
+  } catch (e) {
+    console.error("hasRecentTrialSubmissionByEmail", e);
+    return false;
+  }
+}
+
 export async function insertTrialSubmission(ip: string, data: TrialFormData): Promise<TrialInsertResult> {
   const sql = getPg();
   if (!sql) return { ok: false, reason: "not_configured" };

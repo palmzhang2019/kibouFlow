@@ -209,8 +209,8 @@
       "hint": "まずは分かる範囲で入力してください。",
       "name": "お名前・呼び方",
       "namePlaceholder": "お名前またはニックネームを入力",
-      "contact": "連絡先",
-      "contactPlaceholder": "WeChat / LINE / メール",
+      "contact": "メールアドレス",
+      "contactPlaceholder": "name@example.com",
       "currentStatus": "今の状況",
       "statusOptions": {
         "placeholder": "選択してください",
@@ -265,8 +265,10 @@
       "submitFailed": "送信に失敗しました。後ほどお試しください",
       "tooManyRequests": "送信が頻繁すぎます。10分後にお試しください",
       "required": "必須項目です",
-      "contactRequired": "連絡先を入力してください",
-      "nameRequired": "お名前を入力してください"
+      "contactRequired": "メールアドレスを入力してください",
+      "nameRequired": "お名前を入力してください",
+      "invalidEmail": "正しいメールアドレスを入力してください",
+      "duplicateEmail": "このメールアドレスでは先ほどすでに送信されています。10分後に再度お試しください。"
     }
   },
   "partner": {

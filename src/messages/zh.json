@@ -209,8 +209,8 @@
       "hint": "先简单写，不需要一次说完。",
       "name": "怎么称呼你",
       "namePlaceholder": "请输入你的姓名或昵称",
-      "contact": "联系方式",
-      "contactPlaceholder": "微信 / LINE / 邮箱",
+      "contact": "邮箱地址",
+      "contactPlaceholder": "name@example.com",
       "currentStatus": "现在的情况",
       "statusOptions": {
         "placeholder": "请选择",
@@ -265,8 +265,10 @@
       "submitFailed": "提交失败，请稍后重试",
       "tooManyRequests": "提交过于频繁，请 10 分钟后再试",
       "required": "此项为必填",
-      "contactRequired": "请提供联系方式",
-      "nameRequired": "请提供姓名或昵称"
+      "contactRequired": "请提供邮箱地址",
+      "nameRequired": "请提供姓名或昵称",
+      "invalidEmail": "请输入正确的邮箱地址",
+      "duplicateEmail": "这个邮箱刚刚已经提交过整理申请，请 10 分钟后再试。"
     }
   },
   "partner": {

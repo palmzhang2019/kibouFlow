@@ -63,4 +63,27 @@ describe("sitemap", () => {
     expect(entry).toBeDefined();
     expect(entry!.priority).toBe(0.8);
   });
+
+  it("no bare (non-locale) user-facing URLs exist in sitemap", () => {
+    const barePaths = ["/guides", "/partner", "/trial", "/faq"];
+    for (const entry of entries) {
+      const path = entry.url.replace(BASE_URL, "");
+      for (const bare of barePaths) {
+        // Allow /zh/guides, /ja/guides, etc. but reject /guides, /partner, etc.
+        if (path === bare || path.startsWith(`${bare}/`)) {
+          expect(
+            path.startsWith("/zh/") || path.startsWith("/ja/"),
+            `Sitemap URL ${entry.url} is a bare non-locale URL`,
+          ).toBe(true);
+        }
+      }
+    }
+  });
+
+  it("no http:// or www.kibouflow.com URLs in sitemap", () => {
+    for (const entry of entries) {
+      expect(entry.url.startsWith("https://")).toBe(true);
+      expect(entry.url).not.toContain("www.kibouflow.com");
+    }
+  });
 });

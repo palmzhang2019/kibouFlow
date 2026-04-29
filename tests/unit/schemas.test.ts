@@ -20,6 +20,36 @@ describe("trialFormSchema", () => {
     });
     expect(parsed.success).toBe(false);
   });
+
+  it("rejects non-email contact", () => {
+    const parsed = trialFormSchema.safeParse({
+      name: "Alice",
+      contact: "wechat_id_123",
+      japanese_level: "n3",
+    });
+    expect(parsed.success).toBe(false);
+  });
+
+  it("rejects empty contact", () => {
+    const parsed = trialFormSchema.safeParse({
+      name: "Alice",
+      contact: "",
+      japanese_level: "n3",
+    });
+    expect(parsed.success).toBe(false);
+  });
+
+  it("normalizes email to lowercase", () => {
+    const parsed = trialFormSchema.safeParse({
+      name: "Alice",
+      contact: "Alice@Example.COM",
+      japanese_level: "n3",
+    });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.contact).toBe("alice@example.com");
+    }
+  });
 });
 
 describe("partnerFormSchema", () => {
