@@ -5,13 +5,14 @@ import { PartnerForm } from "@/components/forms/PartnerForm";
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 import { buildBreadcrumbItems } from "@/lib/seo/breadcrumbs";
 import { resolveGeoMetadata } from "@/lib/geo-settings";
+import { type SupportedLocale, LOCALE_TO_BCP47 } from "@/i18n/routing";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "metadata.partner" });
   const path = `/${locale}/partner`;
   const resolved = await resolveGeoMetadata({
-    locale: locale as "zh" | "ja",
+    locale: locale as SupportedLocale,
     path,
     existingTitle: t("title"),
     existingDescription: t("description"),
@@ -19,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     existingOpenGraph: {
       title: t("title"),
       description: t("description"),
-      locale: locale === "zh" ? "zh_CN" : "ja_JP",
+      locale: LOCALE_TO_BCP47[locale as SupportedLocale],
       type: "website",
       url: path,
     },
@@ -32,7 +33,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     twitter: resolved.twitter,
     alternates: {
       canonical: resolved.canonical,
-      languages: { "x-default": "/zh/partner", zh: "/zh/partner", ja: "/ja/partner" },
+      languages: { "x-default": "/zh/partner", zh: "/zh/partner", ja: "/ja/partner", en: "/en/partner" },
     },
     robots: resolved.robots,
   };

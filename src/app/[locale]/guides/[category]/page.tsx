@@ -11,6 +11,7 @@ import {
 } from "@/lib/content";
 import { resolveGeoMetadata } from "@/lib/geo-settings";
 import { getGeoSchemaToggles } from "@/lib/geo-rules";
+import { type SupportedLocale, LOCALE_TO_BCP47, SUPPORTED_LOCALES } from "@/i18n/routing";
 
 interface PageParams {
   locale: string;
@@ -18,8 +19,7 @@ interface PageParams {
 }
 
 export function generateStaticParams() {
-  const locales = ["zh", "ja"];
-  return locales.flatMap((locale) =>
+  return SUPPORTED_LOCALES.flatMap((locale) =>
     CATEGORIES.map((category) => ({ locale, category })),
   );
 }
@@ -40,7 +40,7 @@ export async function generateMetadata({
   const url = `/${locale}/guides/${category}`;
 
   const resolved = await resolveGeoMetadata({
-    locale: locale as "zh" | "ja",
+    locale: locale as SupportedLocale,
     path: url,
     existingTitle: title,
     existingDescription: categoryDesc,
@@ -48,7 +48,7 @@ export async function generateMetadata({
     existingOpenGraph: {
       title: categoryLabel,
       description: categoryDesc,
-      locale: locale === "zh" ? "zh_CN" : "ja_JP",
+      locale: LOCALE_TO_BCP47[locale as SupportedLocale],
     },
   });
 
@@ -63,6 +63,7 @@ export async function generateMetadata({
         "x-default": `/zh/guides/${category}`,
         zh: `/zh/guides/${category}`,
         ja: `/ja/guides/${category}`,
+        en: `/en/guides/${category}`,
       },
     },
     robots: resolved.robots,
@@ -84,7 +85,7 @@ export default async function CategoryPage({
   const t = await getTranslations({ locale, namespace: "guides" });
   const tNav = await getTranslations({ locale, namespace: "common.nav" });
   const toggles = await getGeoSchemaToggles(
-    locale as "zh" | "ja",
+    locale as SupportedLocale,
     `/${locale}/guides/${category}`,
   );
 
@@ -117,9 +118,7 @@ export default async function CategoryPage({
             </div>
           ) : (
             <p className="text-center text-muted">
-              {locale === "ja"
-                ? "この分類にはまだ記事がありません。"
-                : "该分类下暂无文章。"}
+              {t("emptyCategory")}
             </p>
           )}
         </div>

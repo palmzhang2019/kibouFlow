@@ -189,7 +189,7 @@ export default async function GeoAuditDashboardPage() {
               </div>
             </dl>
             <p className="text-xs text-muted-foreground">
-              完成于 {new Date(latest.finished_at ?? latest.started_at).toLocaleString("zh-CN")}，脚本版本{" "}
+              完成于 {new Date(latest.finished_at ?? latest.started_at).toLocaleString("zh-CN", { timeZone: "Asia/Tokyo" })}，脚本版本{" "}
               {latest.script_version ?? "—"}
             </p>
           </section>

@@ -1,4 +1,5 @@
 import sitemap from "@/app/sitemap";
+import { buildArticleAlternateLanguages } from "@/lib/article-alternates";
 import { getSiteUrl } from "@/lib/seo/site-url";
 
 const BASE_URL = getSiteUrl();
@@ -85,5 +86,17 @@ describe("sitemap", () => {
       expect(entry.url.startsWith("https://")).toBe(true);
       expect(entry.url).not.toContain("www.kibouflow.com");
     }
+  });
+
+  it("article metadata omits en alternate when no English article exists", () => {
+    const languages = buildArticleAlternateLanguages("boundaries", "faq-japanese-path");
+
+    expect(languages).not.toHaveProperty("en");
+  });
+
+  it("article metadata includes en alternate when an English article exists", () => {
+    const languages = buildArticleAlternateLanguages("paths", "job-prep-cluster-entry");
+
+    expect(languages.en).toBe("/en/guides/paths/job-prep-cluster-entry");
   });
 });

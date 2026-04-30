@@ -13,6 +13,7 @@ import {
 import type { Category } from "@/lib/content";
 import { resolveGeoMetadata } from "@/lib/geo-settings";
 import { getGeoSchemaToggles } from "@/lib/geo-rules";
+import { type SupportedLocale, LOCALE_TO_BCP47 } from "@/i18n/routing";
 
 const CATEGORY_SECTION_IDS: Record<Category, string> = {
   problems: "section-problems",
@@ -38,7 +39,7 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "metadata.guides" });
   const resolved = await resolveGeoMetadata({
-    locale: locale as "zh" | "ja",
+    locale: locale as SupportedLocale,
     path: `/${locale}/guides`,
     existingTitle: t("title"),
     existingDescription: t("description"),
@@ -46,7 +47,7 @@ export async function generateMetadata({
     existingOpenGraph: {
       title: t("title"),
       description: t("description"),
-      locale: locale === "zh" ? "zh_CN" : "ja_JP",
+      locale: LOCALE_TO_BCP47[locale as SupportedLocale],
     },
   });
 
@@ -57,7 +58,7 @@ export async function generateMetadata({
     twitter: resolved.twitter,
     alternates: {
       canonical: resolved.canonical,
-      languages: { "x-default": "/zh/guides", zh: "/zh/guides", ja: "/ja/guides" },
+      languages: { "x-default": "/zh/guides", zh: "/zh/guides", ja: "/ja/guides", en: "/en/guides" },
     },
     robots: resolved.robots,
   };
@@ -71,7 +72,7 @@ export default async function GuidesIndexPage({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "guides" });
   const tNav = await getTranslations({ locale, namespace: "common.nav" });
-  const toggles = await getGeoSchemaToggles(locale as "zh" | "ja", `/${locale}/guides`);
+  const toggles = await getGeoSchemaToggles(locale as SupportedLocale, `/${locale}/guides`);
   const allArticles = getAllArticles(locale);
   const crumbs = buildBreadcrumbItems([
     { path: `/${locale}`, name: tNav("home") },

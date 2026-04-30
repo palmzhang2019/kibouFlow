@@ -15,6 +15,7 @@ const SITE_URL = getSiteUrl();
 const LOCALES = [
   { code: "zh", label: "Chinese" },
   { code: "ja", label: "Japanese" },
+  { code: "en", label: "English" },
 ] as const;
 
 const SECTIONS: { heading: string; contentType: ContentType }[] = [
@@ -65,7 +66,7 @@ export async function GET() {
     "",
     "> kibouFlow is a support platform for people whose direction is unclear when considering development in Japan.",
     "> It helps users sort out their current situation, then evaluate their options, and finally take action.",
-    "> Content is available in both Chinese and Japanese.",
+    "> Content is available in Chinese, Japanese, and English.",
     "",
     `- Site: ${SITE_URL}`,
     `- Full text: ${SITE_URL}/llms-full.txt`,

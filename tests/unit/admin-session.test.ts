@@ -3,6 +3,7 @@ import {
   signAdminSession,
   verifyAdminSession,
 } from "@/lib/admin-session";
+import { isAdminUiLocale } from "@/lib/admin-locale";
 
 describe("admin-session", () => {
   const secret = "test-secret-key-at-least-16";
@@ -26,5 +27,16 @@ describe("admin-session", () => {
   it("rejects expired token", () => {
     const token = signAdminSession(secret, -1);
     expect(verifyAdminSession(secret, token)).toBe(false);
+  });
+});
+
+describe("admin locale guard", () => {
+  it("allows admin UI for zh and ja", () => {
+    expect(isAdminUiLocale("zh")).toBe(true);
+    expect(isAdminUiLocale("ja")).toBe(true);
+  });
+
+  it("rejects en for admin UI", () => {
+    expect(isAdminUiLocale("en")).toBe(false);
   });
 });

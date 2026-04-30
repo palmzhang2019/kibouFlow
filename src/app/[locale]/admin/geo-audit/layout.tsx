@@ -1,11 +1,12 @@
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { GeoAuditHeader } from "@/components/admin/GeoAuditHeader";
 import {
   GEO_ADMIN_SESSION_COOKIE,
   getAdminSecrets,
   verifyAdminSession,
 } from "@/lib/admin-session";
+import { isAdminUiLocale } from "@/lib/admin-locale";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +18,10 @@ export default async function GeoAuditLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  if (!isAdminUiLocale(locale)) {
+    notFound();
+  }
+
   const secrets = getAdminSecrets();
   if (!secrets) {
     return (

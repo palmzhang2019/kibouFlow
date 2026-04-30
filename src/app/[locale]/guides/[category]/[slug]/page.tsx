@@ -19,11 +19,13 @@ import { DefinedTermJsonLd } from "@/components/seo/DefinedTermJsonLd";
 import { FAQPageJsonLd } from "@/components/seo/FAQPageJsonLd";
 import { HowToJsonLd } from "@/components/seo/HowToJsonLd";
 import { buildBreadcrumbItems } from "@/lib/seo/breadcrumbs";
+import { buildArticleAlternateLanguages } from "@/lib/article-alternates";
 import { extractFaqPairsFromMarkdown } from "@/lib/faq-extractor";
 import { extractHowToFromMarkdown } from "@/lib/howto-extractor";
 import { getGeoConfigBundle, resolveGeoMetadata } from "@/lib/geo-settings";
 import { compilePatterns, getGeoRules, getGeoSchemaToggles } from "@/lib/geo-rules";
 import { buildOgImageUrl } from "@/lib/seo/site-url";
+import { type SupportedLocale, LOCALE_TO_BCP47 } from "@/i18n/routing";
 
 interface PageParams {
   locale: string;
@@ -51,7 +53,7 @@ export async function generateMetadata({
   const url = `/${locale}/guides/${category}/${slug}`;
   const articleOgImageUrl = buildOgImageUrl(article.ogImage);
   const resolved = await resolveGeoMetadata({
-    locale: locale as "zh" | "ja",
+    locale: locale as SupportedLocale,
     path: url,
     existingTitle: `${article.title} | kibouFlow`,
     existingDescription: article.description,
@@ -59,7 +61,7 @@ export async function generateMetadata({
     existingOpenGraph: {
       title: article.title,
       description: article.description,
-      locale: locale === "zh" ? "zh_CN" : "ja_JP",
+      locale: LOCALE_TO_BCP47[locale as SupportedLocale],
       type: "article",
       publishedTime: article.publishedAt,
       modifiedTime: article.updatedAt || article.publishedAt,
@@ -74,11 +76,7 @@ export async function generateMetadata({
     twitter: resolved.twitter,
     alternates: {
       canonical: resolved.canonical,
-      languages: {
-        "x-default": `/zh/guides/${category}/${slug}`,
-        zh: `/zh/guides/${category}/${slug}`,
-        ja: `/ja/guides/${category}/${slug}`,
-      },
+      languages: buildArticleAlternateLanguages(category, slug),
     },
     robots: resolved.robots,
   };
@@ -98,13 +96,13 @@ export default async function ArticlePage({
   const article = getArticleBySlug(locale, category, slug);
   if (!article) notFound();
   const geoBundle = await getGeoConfigBundle(
-    locale as "zh" | "ja",
+    locale as SupportedLocale,
     `/${locale}/guides/${category}/${slug}`,
   );
   const [rulesResult, togglesResult] = await Promise.all([
-    getGeoRules(locale as "zh" | "ja"),
+    getGeoRules(locale as SupportedLocale),
     getGeoSchemaToggles(
-      locale as "zh" | "ja",
+      locale as SupportedLocale,
       `/${locale}/guides/${category}/${slug}`,
     ),
   ]);

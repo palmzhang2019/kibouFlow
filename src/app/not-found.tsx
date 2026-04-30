@@ -2,8 +2,8 @@ import Link from "next/link";
 
 /**
  * Global 404 page — sits at the root layout level (outside [locale]),
- * so next-intl is not available. We render bilingual (zh + ja) content
- * to cover both audiences with minimal complexity.
+ * so next-intl is not available. We render trilingual (zh + ja + en) content
+ * to cover all audiences with minimal complexity.
  */
 export default function NotFound() {
   return (
@@ -23,7 +23,7 @@ export default function NotFound() {
           <div className="text-center max-w-md">
             <p className="text-6xl font-bold text-gray-200">404</p>
             <h1 className="mt-4 text-xl font-semibold text-gray-900">
-              页面未找到 / ページが見つかりません
+              页面未找到 / ページが見つかりません / Page Not Found
             </h1>
             <p className="mt-2 text-sm text-gray-500">
               你访问的页面不存在，可能已被移动或删除。
@@ -31,19 +31,22 @@ export default function NotFound() {
             <p className="mt-1 text-sm text-gray-500">
               お探しのページは存在しないか、移動・削除された可能性があります。
             </p>
+            <p className="mt-1 text-sm text-gray-500">
+              {"The page you\u2019re looking for doesn\u2019t exist or may have been moved."}
+            </p>
 
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
                 href="/zh"
                 className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-primary text-white hover:bg-primary/90 transition-colors"
               >
-                返回首页 / トップへ
+                返回首页 / トップへ / Home
               </Link>
               <Link
                 href="/zh/guides"
                 className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors"
               >
-                浏览内容 / 記事一覧
+                浏览内容 / 記事一覧 / Guides
               </Link>
             </div>
 
@@ -54,6 +57,14 @@ export default function NotFound() {
               <span>·</span>
               <Link href="/ja/guides" className="hover:text-gray-600 transition-colors">
                 日本語記事
+              </Link>
+              <span>·</span>
+              <Link href="/en" className="hover:text-gray-600 transition-colors">
+                English Home
+              </Link>
+              <span>·</span>
+              <Link href="/en/guides" className="hover:text-gray-600 transition-colors">
+                English Guides
               </Link>
             </div>
           </div>

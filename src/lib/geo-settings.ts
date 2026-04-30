@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { getPg } from "@/lib/db";
 import { getSiteUrl, getDefaultOgImage, buildOgImageUrl } from "@/lib/seo/site-url";
+import type { SupportedLocale } from "@/i18n/routing";
 
 export interface GeoSiteSettingsRow {
   site_name: string;
   default_title_template: string;
   default_description: string;
-  default_locale: "zh" | "ja";
+  default_locale: SupportedLocale;
   site_url: string;
   robots_policy: string | null;
   updated_by: string | null;
@@ -14,7 +15,7 @@ export interface GeoSiteSettingsRow {
 }
 
 export interface GeoPageSettingsRow {
-  locale: "zh" | "ja";
+  locale: SupportedLocale;
   path: string;
   meta_title: string | null;
   meta_description: string | null;
@@ -29,7 +30,7 @@ export interface GeoPageSettingsRow {
 }
 
 export interface GeoMetadataInput {
-  locale: "zh" | "ja";
+  locale: SupportedLocale;
   path: string;
   existingTitle?: string;
   existingDescription?: string;
@@ -128,7 +129,7 @@ async function readPageSettings(
 }
 
 export async function getGeoConfigBundle(
-  locale: "zh" | "ja",
+  locale: SupportedLocale,
   path: string,
 ): Promise<GeoConfigBundle> {
   const normalizedPath = normalizeGeoPath(path);

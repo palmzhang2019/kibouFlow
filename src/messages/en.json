@@ -1,0 +1,581 @@
+{
+  "common": {
+    "nav": {
+      "home": "Home",
+      "trial": "Free Assessment",
+      "partner": "Partner With Us",
+      "faq": "FAQ",
+      "guides": "Guides"
+    },
+    "cta": {
+      "trial": "Start Free Assessment →",
+      "hopeSort": "Start Sorting",
+      "partner": "Learn About Partnerships",
+      "contact": "Contact Us",
+      "leaveRequest": "Leave a Request",
+      "applyPartner": "Apply for Partnership",
+      "bookPilot": "Book a Pilot Consultation",
+      "backHome": "Back to Home"
+    },
+    "footer": {
+      "tagline": "Helping people in Japan sort out their situation and find the next step forward.",
+      "contact": "Contact",
+      "privacy": "Privacy Policy",
+      "copyright": "© 2026 kibouFlow. All rights reserved.",
+      "xLink": "Follow us on X",
+      "clusterDirectionSorting": "Direction Sorting",
+      "clusterJapanesePath": "Japanese Learning",
+      "clusterJobPrep": "Job Prep",
+      "clusters": "Popular Topics"
+    },
+    "lang": {
+      "zh": "中文",
+      "ja": "日本語",
+      "en": "English",
+      "switch": "Switch Language"
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "Building your career in Japan?\nStart by sorting out your direction.",
+      "subtitle": "Not sure whether to improve your Japanese first, prepare your resume, start job hunting, or seek professional advice? kibouFlow helps you sort out your current situation and goals, then figure out where to begin.",
+      "ctaPrimary": "Start Free Assessment →",
+      "ctaSecondary": "Learn About Partnerships",
+      "ctaAssistant": "Takes about 3 minutes · No registration required"
+    },
+    "heroPathCard": {
+      "label": "Example",
+      "title": "Assessment Preview",
+      "currentIssues": {
+        "title": "Current Blockers",
+        "items": [
+          "・Unclear Japanese priority",
+          "・Resume materials insufficient",
+          "・Job search direction unclear"
+        ]
+      },
+      "nextStep": {
+        "title": "Suggested Next Step",
+        "content": "Start by organizing resume materials, then decide whether to improve Japanese or move to consultation."
+      },
+      "footer": "Preview example · Actual content will be based on your submission"
+    },
+    "problems": {
+      "title": "Are you stuck on any of these?",
+      "subtitle": "The most common concerns from people who come to kibouFlow",
+      "items": [
+        {
+          "title": "Don't know where to start",
+          "desc": "Japanese, resume, job hunting, consultation — they all seem important",
+          "href": "/guides/paths/push-forward-or-sort-first",
+          "ctaLabel": "See preparation order →"
+        },
+        {
+          "title": "Too much information, more confused than ever",
+          "desc": "There's a lot online, but you don't know what applies to you",
+          "href": "/guides/paths/four-preparation-paths",
+          "ctaLabel": "See how to decide →"
+        },
+        {
+          "title": "Want to ask for help, but don't know how",
+          "desc": "You have so many questions that you don't know where to begin",
+          "href": "/guides/problems/goal-unclear-kills-consulting",
+          "ctaLabel": "See how to organize →"
+        },
+        {
+          "title": "Unfamiliar with Japan's job market rhythm",
+          "desc": "Not sure about hiring cycles, resume requirements, or preparation order",
+          "href": "/guides/paths/job-prep-cluster-entry",
+          "ctaLabel": "See job prep timeline →"
+        }
+      ],
+      "relatedLink": "Related Content"
+    },
+    "postSubmit": {
+      "title": "What happens after you submit?",
+      "subtitle": "You don't need to decide whether to consult right away. First, write down your current situation, goals, and concerns — we'll help organize them and determine where to begin.",
+      "steps": [
+        {
+          "label": "Share your situation",
+          "desc": "Describe your Japanese level, experience, goals, and concerns"
+        },
+        {
+          "label": "Organize the issues",
+          "desc": "We break your input into actionable directions"
+        },
+        {
+          "label": "Prioritize",
+          "desc": "Determine what to tackle first"
+        },
+        {
+          "label": "Decide next steps",
+          "desc": "Move into deeper sorting or consultation when ready"
+        }
+      ],
+      "cards": [
+        {
+          "title": "Sample Input",
+          "content": "Japanese level: Studying for N2\nCurrent goal: Want to change jobs in Japan\nMain concern: Not sure whether to improve Japanese or prepare resume first"
+        },
+        {
+          "title": "Organized Blockers",
+          "content": "・Unclear Japanese priority\n・Resume materials insufficient\n・Job search direction unclear"
+        },
+        {
+          "title": "Sample Next Step",
+          "content": "Start by organizing resume materials, then decide whether to improve Japanese or move to consultation."
+        }
+      ],
+      "continueOptions": {
+        "title": "After reviewing your assessment, you can choose to",
+        "items": [
+          "Just review the suggestions",
+          "Continue with free assessment",
+          "Consult when ready",
+          "Learn about partnerships"
+        ]
+      }
+    },
+    "audience": {
+      "title": "Who is this for?",
+      "suitable": {
+        "title": "This is for you if",
+        "items": [
+          "You're building a career in Japan but unsure what to do next",
+          "You're not sure whether to improve Japanese, prepare your resume, or start job hunting",
+          "You have many questions but don't know how to express them or who to ask",
+          "You want to sort out your situation first before deciding whether to consult"
+        ]
+      },
+      "notSuitable": {
+        "title": "This may not be for you if",
+        "items": [
+          "You already have a clear direction and just need to execute — you can directly use our guides or relevant services",
+          "You have urgent visa, legal, or tax issues — please consult the appropriate professionals first",
+          "You're only looking for specific job listings — job platforms or recruitment sites may be more direct",
+          "You want someone else to decide for you — kibouFlow is better at helping you sort out your situation and evaluate options"
+        ]
+      }
+    },
+    "guidesPreview": {
+      "title": "Or start with these topics",
+      "subtitle": "Pick the topic closest to where you're stuck right now.",
+      "items": [
+        {
+          "category": "Direction Sorting",
+          "title": "When your direction is unclear, how do you sort things out first?",
+          "desc": "For people with many concerns who don't know how to start organizing them",
+          "href": "/guides/paths/direction-sorting-cluster-entry"
+        },
+        {
+          "category": "Japanese Path",
+          "title": "Can you start job preparation even if your Japanese isn't great?",
+          "desc": "For people worried about Japanese ability but don't want to keep waiting",
+          "href": "/guides/paths/japanese-learning-path-cluster-entry"
+        },
+        {
+          "category": "Job Prep",
+          "title": "What should you prepare before job hunting in Japan?",
+          "desc": "For people who haven't started applying yet but want to prepare early",
+          "href": "/guides/paths/job-prep-cluster-entry"
+        },
+        {
+          "category": "Boundaries",
+          "title": "Which issues should you take to a professional?",
+          "desc": "For people unsure whether to keep sorting or go directly to an agency or specialist",
+          "href": "/guides/boundaries/concept-path-judgment"
+        }
+      ]
+    },
+    "bottomCta": {
+      "title": "Start by sorting out your current situation",
+      "subtitle": "You don't need to decide everything at once. Submit your current situation first, then we'll help determine where to begin.",
+      "assistant": "No registration · Free submission · Chinese, Japanese & English support"
+    }
+  },
+  "trial": {
+    "title": "Start by sorting out your current situation",
+    "subtitle": "Takes about 3 minutes, no registration required. Write down your Japanese level, experience, goals, and current concerns — we'll help organize your issues and determine where to begin.",
+    "assistant": "Free submission · Multilingual support · Consultation optional",
+    "hintCard": {
+      "title": "Tips for filling out",
+      "items": [
+        "No need to prepare materials in advance",
+        "It's okay if you're not sure how to write it",
+        "You decide whether to continue after submitting"
+      ]
+    },
+    "form": {
+      "formTitle": "Share Your Situation",
+      "hint": "Start simple — you don't need to cover everything at once.",
+      "name": "Your Name",
+      "namePlaceholder": "Enter your name or nickname",
+      "contact": "Email Address",
+      "contactPlaceholder": "name@example.com",
+      "currentStatus": "Current Situation",
+      "statusOptions": {
+        "placeholder": "Please select",
+        "student": "Student",
+        "jobSeeking": "Job seeking",
+        "working": "Currently employed",
+        "other": "Other"
+      },
+      "japaneseLevel": "Japanese Level",
+      "japaneseLevelOptions": {
+        "placeholder": "Please select",
+        "n5": "N5",
+        "n4": "N4",
+        "n3": "N3",
+        "n2": "N2",
+        "n1": "N1",
+        "none": "No prior study",
+        "unsure": "Not sure"
+      },
+      "mainConcern": "Your Biggest Blocker Right Now",
+      "mainConcernPlaceholder": "Briefly describe the problem you most want to solve",
+      "goal": "What You Want to Achieve",
+      "goalPlaceholder": "What would you like to accomplish next?",
+      "willingFollowup": "Open to follow-up contact?",
+      "yes": "Yes",
+      "no": "No",
+      "sourceNote": "How did you hear about us? (Optional)",
+      "sourceNotePlaceholder": "e.g., Found on X, friend recommended...",
+      "submit": "Submit Assessment",
+      "submitting": "Submitting...",
+      "afterSubmit": {
+        "title": "What happens after submission?",
+        "items": [
+          "We'll respond within 1–3 business days",
+          "You'll receive an initial assessment tailored to your situation",
+          "This is a free initial assessment — it doesn't guarantee further consultation or services",
+          "If you'd like to continue, we'll explain the next steps"
+        ]
+      }
+    },
+    "success": {
+      "title": "Submission Successful!",
+      "message": "Thank you for your trust. We've received your information and will contact you within 1–3 business days.",
+      "nextSteps": "Next steps:",
+      "steps": [
+        "Watch for our reply at the contact method you provided",
+        "If you have new thoughts, feel free to submit again anytime",
+        "Follow our X for the latest updates"
+      ]
+    },
+    "error": {
+      "submitFailed": "Submission failed. Please try again later.",
+      "tooManyRequests": "Too many submissions. Please try again in 10 minutes.",
+      "required": "This field is required",
+      "contactRequired": "Please provide an email address",
+      "nameRequired": "Please provide your name or nickname",
+      "invalidEmail": "Please enter a valid email address",
+      "duplicateEmail": "This email was just used to submit an assessment. Please try again in 10 minutes."
+    }
+  },
+  "partner": {
+    "title": "Connect with users who come prepared",
+    "subtitle": "We're not here to take your clients — we help reduce upfront communication costs. Let users with clearer questions enter your service process.",
+    "ctaPrimary": "Submit Partnership Interest →",
+    "ctaSecondary": "See Partnership Models",
+    "types": {
+      "title": "Ideal Partner Types",
+      "items": [
+        {
+          "title": "Japanese Language Schools",
+          "desc": "Students aren't just learning Japanese — we help them figure out what comes after."
+        },
+        {
+          "title": "Career Support Organizations",
+          "desc": "Users arrive knowing where they're stuck, so you can move into formal services faster."
+        },
+        {
+          "title": "Foreign Resident Support Teams",
+          "desc": "Turn the vague 'want a better life in Japan' into concrete next steps."
+        },
+        {
+          "title": "Consultants & Advisors",
+          "desc": "User issues are pre-sorted, so your time goes toward real judgment calls."
+        }
+      ]
+    },
+    "benefits": {
+      "title": "Spend your time where it matters most",
+      "subtitle": "Before users come to you, their basic situation and real blockers are already organized.",
+      "items": [
+        {
+          "title": "Basic info pre-sorted",
+          "desc": "Japanese level, current status, goals, and concerns are organized before the conversation starts."
+        },
+        {
+          "title": "Real blockers are clearer",
+          "desc": "Instead of listening to a long, confused explanation, you can quickly see where the user is actually stuck."
+        },
+        {
+          "title": "Unsuitable users filtered early",
+          "desc": "People clearly outside your service scope are redirected at the previous step, reducing wasted communication."
+        }
+      ]
+    },
+    "process": {
+      "title": "How does partnership begin?",
+      "steps": [
+        {
+          "title": "Submit interest",
+          "desc": "Briefly describe your organization type and desired collaboration direction"
+        },
+        {
+          "title": "Confirm fit",
+          "desc": "We first assess whether a small-scale conversation makes sense"
+        },
+        {
+          "title": "Pilot program",
+          "desc": "Start with one specific scenario to validate value"
+        },
+        {
+          "title": "Review and decide",
+          "desc": "If both sides see value, we discuss deeper collaboration"
+        }
+      ]
+    },
+    "cooperation": {
+      "title": "Partnership Models",
+      "items": [
+        {
+          "title": "Free Pilot",
+          "desc": "Start small to validate value"
+        },
+        {
+          "title": "Small-scale Referrals",
+          "desc": "Refer suitable users to you"
+        },
+        {
+          "title": "Custom Assessment",
+          "desc": "Adjust assessment content and filtering criteria to fit your service scenarios."
+        },
+        {
+          "title": "Deeper Collaboration",
+          "desc": "Explore further partnership based on pilot results"
+        }
+      ]
+    },
+    "boundary": {
+      "title": "Current Partnership Scope",
+      "items": [
+        "We currently start with small-scale partnerships, not large-scale open integrations",
+        "Best suited for validating one specific scenario before deeper collaboration",
+        "Works well for job preparation, Japanese learning path, and needs assessment scenarios",
+        "User assessment process remains handled by kibouFlow — we don't hand off the entire user flow"
+      ]
+    },
+    "form": {
+      "introTitle": "Submit Partnership Interest",
+      "introDesc": "Briefly describe your organization type and desired collaboration direction.\nThis is not a formal application — we'll first assess whether a small-scale conversation makes sense.",
+      "orgName": "Organization Name",
+      "orgNamePlaceholder": "Enter organization name",
+      "contactPerson": "Contact Person",
+      "contactPersonPlaceholder": "Enter contact person's name",
+      "contactMethod": "Contact Method",
+      "contactMethodPlaceholder": "WeChat / LINE / Email / Phone",
+      "orgType": "Organization Type",
+      "orgTypeOptions": {
+        "placeholder": "Select organization type",
+        "langSchool": "Japanese Language School",
+        "jobSupport": "Career Support Organization",
+        "foreignSupport": "Foreign Resident Support Team",
+        "consultant": "Consultant / Advisor",
+        "other": "Other"
+      },
+      "cooperationInterest": "Partnership Description",
+      "cooperationInterestPlaceholder": "Briefly describe how you'd like to collaborate, or the communication challenges you currently face",
+      "submit": "Submit Partnership Application",
+      "submitting": "Submitting..."
+    },
+    "success": {
+      "title": "Application Submitted!",
+      "message": "Thank you for your interest in partnering with us. We'll contact you within 1–3 business days to discuss pilot collaboration possibilities.",
+      "nextSteps": "Next steps:",
+      "steps": [
+        "We'll learn more about your organization and needs",
+        "If there's a fit, we'll schedule a brief conversation",
+        "Start with a small pilot to validate collaboration value"
+      ]
+    },
+    "error": {
+      "submitFailed": "Submission failed. Please try again later.",
+      "tooManyRequests": "Too many submissions. Please try again later.",
+      "required": "This field is required",
+      "orgNameRequired": "Please provide the organization name",
+      "contactPersonRequired": "Please provide a contact person",
+      "contactMethodRequired": "Please provide a contact method"
+    }
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "What you might want to know about kibouFlow",
+    "items": [
+      {
+        "q": "What kind of problems does this site mainly help with?",
+        "a": "It mainly helps people who want to develop their career in Japan but lack clear direction — through hope sorting and path judgment. We don't give direct answers; instead, we help you organize your problems and suggest next steps."
+      },
+      {
+        "q": "Is this a tool, a service, or a platform?",
+        "a": "Right now, it's more like an entry point that helps you sort out your needs and direction first. After sorting, we help you figure out what to do next. You don't need to understand everything upfront — just give it a try."
+      },
+      {
+        "q": "Who is this suitable for?",
+        "a": "Anyone whose career direction in Japan is unclear, who doesn't know what to prioritize, or who has vague concerns they can't articulate well. As long as you're willing to sort things out, it's worth trying."
+      },
+      {
+        "q": "What problems aren't handled yet?",
+        "a": "Issues requiring formal legal or financial opinions, highly complex disputes, and matters clearly outside our current scope. We'll be upfront about these."
+      },
+      {
+        "q": "Will you directly recommend organizations?",
+        "a": "Not right away. We first help you sort out your situation and needs. Only if it's genuinely appropriate will we suggest possible directions, including whether connecting with an organization makes sense."
+      },
+      {
+        "q": "Can I use this if my Japanese isn't great?",
+        "a": "Yes. We support Chinese, Japanese, and English — use whichever language you're comfortable with. The initial sorting stage doesn't require strong Japanese skills."
+      },
+      {
+        "q": "Is there a cost right now?",
+        "a": "The current sorting stage is free. If deeper services are needed later, we'll explain in advance. There are no hidden fees."
+      },
+      {
+        "q": "How is my submitted information handled?",
+        "a": "Your information is used only for hope sorting and path judgment. It is not shared with third parties. We take your privacy seriously."
+      },
+      {
+        "q": "What happens after sorting?",
+        "a": "You'll receive feedback within 1–3 business days, including an initial assessment of your situation and suggested next steps. Whether to continue is entirely up to you."
+      },
+      {
+        "q": "How do I start a partnership?",
+        "a": "Currently focused on small-scale pilots. Submit your interest through the partnership page, and we'll arrange a brief conversation to validate value starting from a pilot."
+      }
+    ]
+  },
+  "guides": {
+    "title": "Guides & Problem Solving",
+    "subtitle": "Start with the topic closest to your current situation, then explore related frameworks, cases, or FAQs.",
+    "sections": {
+      "clusters": "Popular Topics",
+      "caseLibrary": "Case Library",
+      "faqs": "Topic FAQs",
+      "frameworks": "Decision Frameworks",
+      "concepts": "Concepts & Terms"
+    },
+    "sectionLeads": {
+      "clusters": "Start from popular topic clusters first — find your topic, then navigate to the corresponding framework, concept, and FAQ pages.",
+      "faqs": "FAQs keep one page per group of high-frequency questions, helping you navigate to specific issues before deciding which ones deserve standalone URLs."
+    },
+    "contentTypes": {
+      "problem": "Problem Solving",
+      "path": "Path Guidance",
+      "boundary": "Scope & Boundaries",
+      "case": "Case Study",
+      "faq": "FAQ",
+      "framework": "Decision Framework",
+      "concept": "Concept Page",
+      "cluster": "Popular Topic"
+    },
+    "categories": {
+      "problems": "Problem Solving",
+      "paths": "Path Guidance",
+      "boundaries": "Scope & Boundaries",
+      "cases": "Real Cases"
+    },
+    "categoryDescriptions": {
+      "problems": "Common issues you might face — resumes, Japanese, direction choices, job hunting pace, and more.",
+      "paths": "Judgment and advice on what to do next based on different situations.",
+      "boundaries": "What we can and cannot help with — stated upfront.",
+      "cases": "Real consultation scenarios to see how others made their decisions."
+    },
+    "categoryPageTitle": "{category} | kibouFlow",
+    "emptyCategory": "No articles in this category yet.",
+    "readMore": "Read More",
+    "relatedArticles": "Related Articles",
+    "publishedAt": "Published",
+    "updatedAt": "Updated",
+    "backToGuides": "Back to Guides",
+    "nextSteps": {
+      "title": "Next Steps",
+      "subtitle": "If you're still unsure, start with these pages.",
+      "caseLibrary": "Check the Case Library for a sample closest to your situation",
+      "clusterFaq": "Check this topic's FAQ to quickly rule out common misjudgments"
+    },
+    "template": {
+      "clusterHub": {
+        "title": "Parent Topic Cluster",
+        "subtitle": "Returning to the cluster entry page helps you understand where this content sits in the knowledge network."
+      },
+      "cluster": {
+        "themeFocus": "Theme Overview",
+        "readingOrder": "Recommended Reading Order"
+      },
+      "framework": {
+        "useWhen": "When to Use",
+        "outcome": "What You'll Get After Judging",
+        "mistakes": "Common Mistakes"
+      },
+      "concept": {
+        "definition": "One-line Definition",
+        "useWhen": "When It Applies",
+        "notFor": "When It Doesn't Apply"
+      },
+      "faq": {
+        "mainQuestion": "FAQ Topic",
+        "questionNav": "Question Navigation",
+        "futureArticlePrep": "Questions that could become standalone articles",
+        "futureArticlePrepHint": "This page keeps the FAQ aggregation format while consolidating the most splittable questions into a focused set."
+      },
+      "case": {
+        "background": "Background & Context",
+        "reusableConclusion": "Reusable Conclusion"
+      },
+      "tldr": {
+        "title": "TL;DR"
+      },
+      "conclusion": {
+        "title": "Conclusion"
+      },
+      "decisionBlock": {
+        "defaultHeading": "Decision Criteria",
+        "conditions": "Conditions",
+        "judgmentTable": "Decision Branches",
+        "actionLabel": "Recommended Action",
+        "fallbackNote": "If none of the above conditions apply"
+      }
+    },
+    "articleCta": {
+      "title": "Want to sort out your situation?",
+      "subtitle": "You don't need to have it all figured out — just start by sharing where you are"
+    }
+  },
+  "metadata": {
+    "home": {
+      "title": "Building your career in Japan? Start by sorting your direction | kibouFlow",
+      "description": "Helping people in Japan sort out their direction through hope sorting and path judgment. Sort first, then decide next steps."
+    },
+    "trial": {
+      "title": "Free Assessment | kibouFlow",
+      "description": "Free hope sorting and path judgment service. Submit your situation and get direction for your next steps."
+    },
+    "partner": {
+      "title": "Partner With Us | kibouFlow",
+      "description": "Partner with kibouFlow to reduce upfront communication costs. Ideal for language schools, career support organizations, and foreign resident support teams."
+    },
+    "faq": {
+      "title": "FAQ | kibouFlow",
+      "description": "Frequently asked questions about kibouFlow: services, target audience, pricing, privacy, and more."
+    },
+    "guides": {
+      "title": "Guides & Problem Solving | kibouFlow",
+      "description": "Categorized guides for career development in Japan — covering direction sorting, job preparation, Japanese learning, and case studies."
+    },
+    "breadcrumbs": {
+      "trialSuccess": "Submission Successful",
+      "partnerSuccess": "Application Submitted"
+    }
+  }
+}

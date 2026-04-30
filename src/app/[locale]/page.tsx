@@ -8,6 +8,7 @@ import { Section } from "@/components/shared/Section";
 import { CTAButtons } from "@/components/layout/CTAButtons";
 import { OrganizationJsonLd } from "@/components/seo/OrganizationJsonLd";
 import { resolveGeoMetadata } from "@/lib/geo-settings";
+import { type SupportedLocale, LOCALE_TO_BCP47 } from "@/i18n/routing";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -17,7 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       ? "帮助在日本发展但方向不清的人做希望整理、路径判断与下一步选择。先整理，再决定该先做什么。"
       : t("description");
   const resolved = await resolveGeoMetadata({
-    locale: locale as "zh" | "ja",
+    locale: locale as SupportedLocale,
     path: `/${locale}`,
     existingTitle: t("title"),
     existingDescription: description,
@@ -25,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     existingOpenGraph: {
       title: t("title"),
       description,
-      locale: locale === "zh" ? "zh_CN" : "ja_JP",
+      locale: LOCALE_TO_BCP47[locale as SupportedLocale],
       type: "website",
       url: `/${locale}`,
     },
@@ -42,6 +43,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
         "x-default": "/zh",
         zh: "/zh",
         ja: "/ja",
+        en: "/en",
       },
     },
     robots: resolved.robots,

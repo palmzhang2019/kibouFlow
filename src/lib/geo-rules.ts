@@ -1,9 +1,10 @@
 import { getPg } from "@/lib/db";
 import { normalizeGeoPath } from "@/lib/geo-settings";
+import type { SupportedLocale } from "@/i18n/routing";
 
 export interface GeoRulesRow {
   id?: string;
-  locale: "zh" | "ja";
+  locale: SupportedLocale;
   faq_exclude_heading_patterns: string[];
   faq_min_items: number;
   howto_section_patterns: string[];
@@ -14,7 +15,7 @@ export interface GeoRulesRow {
 }
 
 export interface GeoSchemaTogglesRow {
-  locale: "zh" | "ja";
+  locale: SupportedLocale;
   path: string;
   enable_article: boolean;
   enable_faqpage: boolean;
@@ -45,19 +46,19 @@ export const DEFAULT_SCHEMA_TOGGLES: Omit<
   enable_website: true,
 };
 
-const PROTECTED_TOGGLE_PATHS = new Set(["/zh", "/ja"]);
+const PROTECTED_TOGGLE_PATHS = new Set(["/zh", "/ja", "/en"]);
 
 export function isProtectedTogglePath(path: string): boolean {
   const normalized = normalizeGeoPath(path);
   if (PROTECTED_TOGGLE_PATHS.has(normalized)) return true;
-  return /\/(zh|ja)\/guides\/[^/]+\/[^/]+$/.test(normalized);
+  return /\/(zh|ja|en)\/guides\/[^/]+\/[^/]+$/.test(normalized);
 }
 
 export function compilePatterns(patterns: string[]): RegExp[] {
   return patterns.map((item) => new RegExp(item, "i"));
 }
 
-function mapGeoRulesRow(row: Record<string, unknown>, locale: "zh" | "ja"): GeoRulesRow {
+function mapGeoRulesRow(row: Record<string, unknown>, locale: SupportedLocale): GeoRulesRow {
   const faq = row.faq_exclude_heading_patterns;
   const howto = row.howto_section_patterns;
   return {
@@ -73,7 +74,7 @@ function mapGeoRulesRow(row: Record<string, unknown>, locale: "zh" | "ja"): GeoR
   };
 }
 
-function mapSchemaTogglesRow(row: Record<string, unknown>, locale: "zh" | "ja", path: string): GeoSchemaTogglesRow {
+function mapSchemaTogglesRow(row: Record<string, unknown>, locale: SupportedLocale, path: string): GeoSchemaTogglesRow {
   return {
     locale,
     path,
@@ -87,7 +88,7 @@ function mapSchemaTogglesRow(row: Record<string, unknown>, locale: "zh" | "ja", 
   };
 }
 
-export async function getGeoRules(locale: "zh" | "ja"): Promise<{
+export async function getGeoRules(locale: SupportedLocale): Promise<{
   data: GeoRulesRow;
   source: "db" | "none";
 }> {
@@ -106,7 +107,7 @@ export async function getGeoRules(locale: "zh" | "ja"): Promise<{
 }
 
 export async function getGeoSchemaToggles(
-  locale: "zh" | "ja",
+  locale: SupportedLocale,
   path: string,
 ): Promise<{ data: GeoSchemaTogglesRow; source: "db" | "none" }> {
   const sql = getPg();

@@ -31,6 +31,7 @@
     "lang": {
       "zh": "中文",
       "ja": "日本語",
+      "en": "English",
       "switch": "切换语言"
     }
   },
@@ -491,6 +492,7 @@
       "cases": "真实的咨询场景，帮你看看别人是怎么判断和决定的。"
     },
     "categoryPageTitle": "{category} | kibouFlow",
+    "emptyCategory": "该分类下暂无文章。",
     "readMore": "阅读详情",
     "relatedArticles": "相关文章",
     "publishedAt": "发布于",

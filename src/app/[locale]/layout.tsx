@@ -1,7 +1,7 @@
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { routing } from "@/i18n/routing";
+import { routing, type SupportedLocale } from "@/i18n/routing";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { TrackingProvider } from "@/components/tracking/TrackingProvider";
@@ -22,7 +22,7 @@ export default async function LocaleLayout({
   }
 
   const messages = await getMessages();
-  const toggles = await getGeoSchemaToggles(locale as "zh" | "ja", `/${locale}`);
+  const toggles = await getGeoSchemaToggles(locale as SupportedLocale, `/${locale}`);
 
   return (
     <html lang={locale} className="h-full antialiased" suppressHydrationWarning>

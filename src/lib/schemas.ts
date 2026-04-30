@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SUPPORTED_LOCALES } from "@/i18n/routing";
 
 export const trialFormSchema = z.object({
   name: z.string().min(1),
@@ -35,7 +36,7 @@ export const partnerFormSchema = z.object({
 
 export type PartnerFormData = z.infer<typeof partnerFormSchema>;
 
-const localeSchema = z.enum(["zh", "ja"]);
+const localeSchema = z.enum(SUPPORTED_LOCALES);
 
 export const geoSiteSettingsSchema = z.object({
   site_name: z.string().trim().min(1).max(120),

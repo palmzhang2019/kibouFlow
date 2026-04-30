@@ -5,6 +5,7 @@ import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { buildBreadcrumbItems } from "@/lib/seo/breadcrumbs";
 import { resolveGeoMetadata } from "@/lib/geo-settings";
+import { type SupportedLocale, LOCALE_TO_BCP47 } from "@/i18n/routing";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -23,7 +24,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
         : t("description");
   const path = `/${locale}/faq`;
   const resolved = await resolveGeoMetadata({
-    locale: locale as "zh" | "ja",
+    locale: locale as SupportedLocale,
     path,
     existingTitle: title,
     existingDescription: description,
@@ -31,7 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     existingOpenGraph: {
       title,
       description,
-      locale: locale === "zh" ? "zh_CN" : "ja_JP",
+      locale: LOCALE_TO_BCP47[locale as SupportedLocale],
       type: "website",
       url: path,
     },
@@ -44,7 +45,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     twitter: resolved.twitter,
     alternates: {
       canonical: resolved.canonical,
-      languages: { "x-default": "/zh/faq", zh: "/zh/faq", ja: "/ja/faq" },
+      languages: { "x-default": "/zh/faq", zh: "/zh/faq", ja: "/ja/faq", en: "/en/faq" },
     },
     robots: resolved.robots,
   };
@@ -68,6 +69,19 @@ const FAQ_GROUPS_JA: FAQGroup[] = [
   { heading: "サービス与合作", indices: [4, 9] },
   { heading: "料金とデータ", indices: [5, 6, 7, 8] },
 ];
+
+const FAQ_GROUPS_EN: FAQGroup[] = [
+  { heading: "About kibouFlow", indices: [0, 1] },
+  { heading: "Who It's For", indices: [2, 3] },
+  { heading: "Services & Cooperation", indices: [4, 9] },
+  { heading: "Fees & Data", indices: [5, 6, 7, 8] },
+];
+
+const FAQ_GROUPS: Record<SupportedLocale, FAQGroup[]> = {
+  zh: FAQ_GROUPS_ZH,
+  ja: FAQ_GROUPS_JA,
+  en: FAQ_GROUPS_EN,
+};
 
 function getGroupedItems(items: { q: string; a: string }[], groups: FAQGroup[]) {
   return groups.map((group) => ({
@@ -98,7 +112,7 @@ export default async function FAQPage({ params }: { params: Promise<{ locale: st
     a: t(`items.${i}.a`),
   }));
 
-  const groups = locale === "ja" ? FAQ_GROUPS_JA : FAQ_GROUPS_ZH;
+  const groups = FAQ_GROUPS[locale as SupportedLocale] ?? FAQ_GROUPS_ZH;
   const groupedItems = getGroupedItems(items, groups);
 
   const jsonLd = {

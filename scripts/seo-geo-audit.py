@@ -47,7 +47,7 @@ except ImportError:
 # ---------------------------------------------------------------------------
 # 常量
 # ---------------------------------------------------------------------------
-LOCALES = ["zh", "ja"]
+LOCALES = ["zh", "ja", "en"]
 CATEGORIES = ["problems", "paths", "boundaries", "cases"]
 HIGH_VALUE_CONTENT_TYPES = ["cluster", "framework", "concept", "faq", "case"]
 
@@ -523,13 +523,13 @@ def check_content_files(content_dir: Path, locale: str, issues: list[Issue]):
 # 第四层：交叉语言对齐检查
 # ---------------------------------------------------------------------------
 def check_locale_alignment(content_dir: Path, issues: list[Issue]):
-    """检查 zh 和 ja 内容是否一一对应"""
+    """检查 zh 和 ja 内容是否一一对应（en 为可选语言，不参与对齐检查）"""
     print("\n[3.5/4] 检查中日内容对齐...")
 
     zh_slugs = set()
     ja_slugs = set()
 
-    for locale in LOCALES:
+    for locale in ["zh", "ja"]:
         locale_dir = content_dir / locale
         if not locale_dir.exists():
             continue
@@ -559,6 +559,14 @@ def check_locale_alignment(content_dir: Path, issues: list[Issue]):
         print("  [ok] 中日内容完全对齐")
     else:
         print(f"  [!] 仅中文: {len(only_zh)} 篇，仅日文: {len(only_ja)} 篇")
+
+    # Report en content availability (informational only)
+    en_dir = content_dir / "en"
+    if en_dir.exists():
+        en_count = sum(1 for _ in en_dir.rglob("*.mdx"))
+        print(f"  [info] 英文内容: {en_count} 篇")
+    else:
+        print("  [info] 英文内容目录不存在")
 
 
 # ---------------------------------------------------------------------------

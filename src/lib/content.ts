@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import { slugifyHeading } from "@/lib/article-anchors";
+import { type SupportedLocale, SUPPORTED_LOCALES } from "@/i18n/routing";
 
 export const CATEGORIES = ["problems", "paths", "boundaries", "cases"] as const;
 export type Category = (typeof CATEGORIES)[number];
@@ -35,7 +36,7 @@ const CLUSTER_ENTRY_SLUGS: Record<Exclude<ClusterType, "partner-needs">, string>
   "japanese-path": "japanese-learning-path-cluster-entry",
   "direction-sorting": "direction-sorting-cluster-entry",
 };
-const CLUSTER_LABELS: Record<"zh" | "ja", Record<ClusterType, string>> = {
+const CLUSTER_LABELS: Record<SupportedLocale, Record<ClusterType, string>> = {
   zh: {
     "job-prep": "求职准备",
     "japanese-path": "日语学习路径",
@@ -47,6 +48,12 @@ const CLUSTER_LABELS: Record<"zh" | "ja", Record<ClusterType, string>> = {
     "japanese-path": "日本語学習ルート",
     "direction-sorting": "方向整理",
     "partner-needs": "連携前の受け入れ判断",
+  },
+  en: {
+    "job-prep": "Job Preparation",
+    "japanese-path": "Japanese Learning Path",
+    "direction-sorting": "Direction Sorting",
+    "partner-needs": "Partner Needs Assessment",
   },
 };
 
@@ -178,7 +185,7 @@ function uniqueStrings(values: (string | undefined)[]): string[] | undefined {
 }
 
 export function getClusterLabel(locale: string, cluster: ClusterType): string {
-  const localized = locale === "ja" ? CLUSTER_LABELS.ja : CLUSTER_LABELS.zh;
+  const localized = CLUSTER_LABELS[locale as SupportedLocale] ?? CLUSTER_LABELS.zh;
   return localized[cluster];
 }
 
@@ -534,7 +541,7 @@ export function getAllArticleSlugs(): {
   category: string;
   slug: string;
 }[] {
-  const locales = ["zh", "ja"];
+  const locales = SUPPORTED_LOCALES;
   const results: { locale: string; category: string; slug: string }[] = [];
 
   for (const locale of locales) {

@@ -6,7 +6,7 @@ import matter from "gray-matter";
 
 const ROOT = process.cwd();
 const CONTENT_DIR = path.join(ROOT, "content");
-const LOCALES = ["zh", "ja"];
+const LOCALES = ["zh", "ja", "en"];
 const CATEGORIES = ["problems", "paths", "boundaries", "cases"];
 const CONTENT_TYPES = [
   "problem",
@@ -34,6 +34,9 @@ const NEXT_STEPS_PATTERNS = [
   /^##\s*次にやること/m,
   /^##\s*次の行動/m,
   /^##\s*次の一歩/m,
+  /^##\s*Next Steps/mi,
+  /^##\s*Next Actions/mi,
+  /^##\s*What to Do Next/mi,
 ];
 const RELATED_SLUG_PATTERN = /^(problems|paths|boundaries|cases)\/[a-z0-9-]+$/;
 
@@ -115,6 +118,8 @@ function hasNextSteps(body) {
 }
 
 function pairedLocaleExists(locale, category, slug) {
+  // en is optional; only check zh↔ja pairing
+  if (locale === "en") return true;
   const sibling = locale === "zh" ? "ja" : "zh";
   return fs.existsSync(path.join(CONTENT_DIR, sibling, category, `${slug}.mdx`));
 }
@@ -263,7 +268,7 @@ const summary = {
   byCode: {},
   bySeverity: { P1: 0, P2: 0, P3: 0 },
   byCategory: { "template-level": 0, "article-level": 0, "translation-level": 0 },
-  byLocale: { zh: 0, ja: 0 },
+  byLocale: { zh: 0, ja: 0, en: 0 },
   details: allWarnings,
 };
 

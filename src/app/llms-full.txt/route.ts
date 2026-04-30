@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAllArticles, getArticleMarkdown } from "@/lib/content";
 import { getSiteUrl } from "@/lib/seo/site-url";
+import { SUPPORTED_LOCALES } from "@/i18n/routing";
 
 export const dynamic = "force-static";
 export const revalidate = 3600;
@@ -8,8 +9,6 @@ export const revalidate = 3600;
 const SITE_URL = getSiteUrl();
 const BUILD_VERSION = process.env.NEXT_PUBLIC_SITE_VERSION ?? "1.0.0";
 const LAST_UPDATED = new Date().toISOString().split("T")[0];
-
-const LOCALES = ["zh", "ja"] as const;
 
 export async function GET() {
   const chunks: string[] = [];
@@ -27,7 +26,7 @@ export async function GET() {
     ].join("\n"),
   );
 
-  for (const locale of LOCALES) {
+  for (const locale of SUPPORTED_LOCALES) {
     chunks.push(`\n\n## Locale: ${locale}\n`);
     const articles = getAllArticles(locale);
     for (const a of articles) {

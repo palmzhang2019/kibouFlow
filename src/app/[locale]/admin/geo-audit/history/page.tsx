@@ -80,7 +80,7 @@ export default async function GeoAuditHistoryPage() {
                     href={`/admin/geo-audit/history/${row.id}`}
                     className="text-primary underline decoration-primary/40 underline-offset-2"
                   >
-                    {new Date(row.started_at).toLocaleString("zh-CN")}
+                    {new Date(row.started_at).toLocaleString("zh-CN", { timeZone: "Asia/Tokyo" })}
                   </Link>
                 </td>
                 <td className="px-3 py-2 align-top">{row.status}</td>

@@ -104,11 +104,11 @@ export default async function GeoAuditHistoryDetailPage({
       <dl className="grid gap-2 rounded-lg border border-border bg-muted/20 p-4 text-sm sm:grid-cols-2">
         <div>
           <dt className="text-muted-foreground">开始时间</dt>
-          <dd>{new Date(row.started_at).toLocaleString("zh-CN")}</dd>
+          <dd>{new Date(row.started_at).toLocaleString("zh-CN", { timeZone: "Asia/Tokyo" })}</dd>
         </div>
         <div>
           <dt className="text-muted-foreground">结束时间</dt>
-          <dd>{row.finished_at ? new Date(row.finished_at).toLocaleString("zh-CN") : "—"}</dd>
+          <dd>{row.finished_at ? new Date(row.finished_at).toLocaleString("zh-CN", { timeZone: "Asia/Tokyo" }) : "—"}</dd>
         </div>
         <div>
           <dt className="text-muted-foreground">状态</dt>

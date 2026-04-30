@@ -31,6 +31,7 @@
     "lang": {
       "zh": "中文",
       "ja": "日本語",
+      "en": "English",
       "switch": "言語を切り替える"
     }
   },
@@ -491,6 +492,7 @@
       "cases": "実際の相談シーンを通じて、判断と決定のプロセスを紹介します。"
     },
     "categoryPageTitle": "{category} | kibouFlow",
+    "emptyCategory": "この分類にはまだ記事がありません。",
     "readMore": "詳しく読む",
     "relatedArticles": "関連記事",
     "publishedAt": "公開日",
