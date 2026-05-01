@@ -26,6 +26,7 @@ const candidates =
         { command: "python3", prefixArgs: [] },
       ]
     : [
+        { command: path.resolve(ROOT, ".venv/bin/python3"), prefixArgs: [] },
         { command: "python3", prefixArgs: [] },
         { command: "python", prefixArgs: [] },
       ];

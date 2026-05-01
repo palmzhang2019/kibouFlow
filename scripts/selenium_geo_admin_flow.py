@@ -46,17 +46,17 @@ def load_repo_env() -> None:
 
 
 def admin_nav_link(driver, text: str):
-    """后台顶栏链接。页面最外层还有站点 Header（同为 <header>），必须限定在「GEO 治理后台」那一块。"""
+    """后台顶栏链接。页面最外层还有站点 Header（同为 <header>），必须限定在后台导航那一块。"""
     return driver.find_element(
         By.XPATH,
-        f"//header[.//h1[contains(.,'GEO 治理后台')]]//a[contains(., '{text}')]",
+        f"//header[.//h1[contains(.,'kibouFlow 后台')]]//a[contains(., '{text}')]",
     )
 
 
 def admin_logout_button(driver):
     return driver.find_element(
         By.XPATH,
-        "//header[.//h1[contains(.,'GEO 治理后台')]]//button[contains(., '退出登录')]",
+        "//header[.//h1[contains(.,'kibouFlow 后台')]]//button[contains(., '退出登录')]",
     )
 
 
@@ -107,23 +107,23 @@ def main() -> int:
         assert "login" not in driver.current_url.lower(), "登录后仍停留在 login"
 
         # TC-DASH: 总览（客户端顶栏可能略晚于 h2，显式等待后台导航）
-        wait.until(EC.presence_of_element_located((By.XPATH, "//h2[contains(., '总览台')]")))
-        wait.until(EC.element_to_be_clickable((By.XPATH, "//header[.//h1[contains(.,'GEO 治理后台')]]//a[contains(., '运行体检')]")))
+        wait.until(EC.presence_of_element_located((By.XPATH, "//h2[contains(., '总览')]")))
+        wait.until(EC.element_to_be_clickable((By.XPATH, "//header[.//h1[contains(.,'kibouFlow 后台')]]//a[contains(., '运行体检')]")))
 
         # 运行体检（可选；SKIP 时只打开运行页再回总览，不触发长耗时脚本）
         if skip_run:
             admin_nav_link(driver, "运行体检").click()
-            wait.until(EC.presence_of_element_located((By.XPATH, "//h2[contains(., '运行 GEO 体检')]")))
+            wait.until(EC.presence_of_element_located((By.XPATH, "//h2[contains(., '运行站点体检')]")))
             admin_nav_link(driver, "总览").click()
-            wait.until(EC.presence_of_element_located((By.XPATH, "//h2[contains(., '总览台')]")))
+            wait.until(EC.presence_of_element_located((By.XPATH, "//h2[contains(., '总览')]")))
         else:
             admin_nav_link(driver, "运行体检").click()
-            wait.until(EC.presence_of_element_located((By.XPATH, "//h2[contains(., '运行 GEO 体检')]")))
-            run_btn = driver.find_element(By.XPATH, "//button[contains(., '运行 GEO 体检')]")
+            wait.until(EC.presence_of_element_located((By.XPATH, "//h2[contains(., '运行站点体检')]")))
+            run_btn = driver.find_element(By.XPATH, "//button[contains(., '运行站点体检')]")
             run_btn.click()
-            # 运行中按钮文案为「运行中…」，结束后恢复为「运行 GEO 体检」且可点
+            # 运行中按钮文案为「运行中…」，结束后恢复为「运行站点体检」且可点
             WebDriverWait(driver, audit_wait_sec).until(
-                EC.element_to_be_clickable((By.XPATH, "//button[contains(., '运行 GEO 体检')]"))
+                EC.element_to_be_clickable((By.XPATH, "//button[contains(., '运行站点体检')]"))
             )
             # 确认状态区出现成功或失败
             body = driver.find_element(By.TAG_NAME, "body").text
@@ -143,7 +143,7 @@ def main() -> int:
                 # 未入库时无按钮，改走历史列表
                 pass
 
-        # TC-HIST: 历史列表
+        # TC-HIST: 历史列表（通过顶栏导航）
         admin_nav_link(driver, "历史").click()
         wait.until(EC.presence_of_element_located((By.XPATH, "//h2[contains(., '历史记录')]")))
         # 点击第一条时间链接（若存在）
@@ -153,26 +153,26 @@ def main() -> int:
             wait.until(EC.presence_of_element_located((By.XPATH, "//h2[contains(., '报告详情')]")))
             assert "分数摘要" in driver.page_source
 
-        # TC-ISS: 问题中心
-        admin_nav_link(driver, "问题").click()
-        wait.until(EC.url_contains("geo-audit/issues"))
-        wait.until(EC.presence_of_element_located((By.XPATH, "//h2[contains(., '问题中心')]")))
-        issue_links = driver.find_elements(By.XPATH, "//tbody//a[contains(@href,'/geo-audit/issues/')]")
-        if issue_links:
-            issue_links[0].click()
-            wait.until(EC.presence_of_element_located((By.XPATH, "//h2[contains(., '问题详情')]")))
+        # TC-ISS: /issues 重定向到 /history
+        driver.get(f"{base}/{locale}/admin/geo-audit/issues")
+        wait.until(EC.url_contains("/admin/geo-audit/history"))
+        wait.until(EC.presence_of_element_located((By.XPATH, "//h2[contains(., '历史记录')]")))
 
-        # TC-HUB: 决策 / 验证 / 标准
+        # TC-HUB: 决策 / 验证 / 标准（均通过 redirect() 跳转到 /history、/run 或总览）
         driver.get(f"{base}/{locale}/admin/geo-audit/decisions")
-        wait.until(EC.presence_of_element_located((By.XPATH, "//h2[contains(., '修复决策中心')]")))
+        wait.until(EC.url_contains("/admin/geo-audit/history"))
+        wait.until(EC.presence_of_element_located((By.XPATH, "//h2[contains(., '历史记录')]")))
         driver.get(f"{base}/{locale}/admin/geo-audit/validation")
-        wait.until(EC.presence_of_element_located((By.XPATH, "//h2[contains(., '验证与复检中心')]")))
+        wait.until(EC.url_contains("/admin/geo-audit/run"))
+        wait.until(EC.presence_of_element_located((By.XPATH, "//h2[contains(., '运行站点体检')]")))
         driver.get(f"{base}/{locale}/admin/geo-audit/standards")
-        wait.until(EC.presence_of_element_located((By.XPATH, "//h2[contains(., '规则 / 标准中心')]")))
+        wait.until(EC.url_contains("/admin/geo-audit"))
+        # standards 重定向到总览页（/admin/geo-audit），检查 h2
+        wait.until(EC.presence_of_element_located((By.XPATH, "//h2[contains(., '总览')]")))
 
         # 回到总览
         driver.get(f"{base}/{locale}/admin/geo-audit")
-        wait.until(EC.presence_of_element_located((By.XPATH, "//h2[contains(., '总览台')]")))
+        wait.until(EC.presence_of_element_located((By.XPATH, "//h2[contains(., '总览')]")))
 
         # TC-AUTH-02: 退出（避免点到站点其它区域的按钮）
         admin_logout_button(driver).click()

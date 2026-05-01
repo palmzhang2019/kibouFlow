@@ -2,6 +2,11 @@ import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-export default function GeoAuditDecisionsPage() {
-  redirect("/admin/geo-audit/history");
+export default async function GeoAuditDecisionsPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  redirect(`/${locale}/admin/geo-audit/history`);
 }

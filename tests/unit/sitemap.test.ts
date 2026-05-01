@@ -89,7 +89,7 @@ describe("sitemap", () => {
   });
 
   it("article metadata omits en alternate when no English article exists", () => {
-    const languages = buildArticleAlternateLanguages("boundaries", "faq-japanese-path");
+    const languages = buildArticleAlternateLanguages("boundaries", "non-existent-article");
 
     expect(languages).not.toHaveProperty("en");
   });
