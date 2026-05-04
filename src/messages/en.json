@@ -37,78 +37,74 @@
   },
   "home": {
     "hero": {
-      "title": "Building your career in Japan?\nStart by sorting out your direction.",
-      "subtitle": "Not sure whether to improve your Japanese first, prepare your resume, start job hunting, or seek professional advice? kibouFlow helps you sort out your current situation and goals, then figure out where to begin.",
+      "title": "Not sure where to start with your career in Japan?\nLet's sort it out.",
+      "subtitle": "Tell us where you are — Japanese level, experience, goals, and blockers.\nWe'll organize your situation and point you toward the first real next step.",
       "ctaPrimary": "Start Free Assessment →",
       "ctaSecondary": "Learn About Partnerships",
-      "ctaAssistant": "Takes about 3 minutes · No registration required"
+      "ctaAssistant": "Free initial assessment · Takes ~3 minutes · No registration required"
     },
     "heroPathCard": {
       "label": "Example",
       "title": "Assessment Preview",
-      "currentIssues": {
-        "title": "Current Blockers",
-        "items": [
-          "・Unclear Japanese priority",
-          "・Resume materials insufficient",
-          "・Job search direction unclear"
-        ]
-      },
-      "nextStep": {
-        "title": "Suggested Next Step",
-        "content": "Start by organizing resume materials, then decide whether to improve Japanese or move to consultation."
-      },
-      "footer": "Preview example · Actual content will be based on your submission"
+      "blockersLabel": "Current blockers",
+      "blockers": [
+        "Japanese priority is unclear",
+        "Resume materials are not ready",
+        "Job-search direction is not yet defined"
+      ],
+      "nextStepLabel": "Recommended next step",
+      "nextStepContent": "Start by organizing your resume materials, then decide whether Japanese is the real blocker before applying or consulting.",
+      "footer": "Example preview · Your result will be organized based on your input"
     },
     "problems": {
-      "title": "Are you stuck on any of these?",
-      "subtitle": "The most common concerns from people who come to kibouFlow",
+      "title": "Sound familiar?",
+      "subtitle": "These are the situations we hear most often.",
       "items": [
         {
-          "title": "Don't know where to start",
-          "desc": "Japanese, resume, job hunting, consultation — they all seem important",
+          "title": "Not sure where to start",
+          "desc": "Japanese study, resume, job hunting — everything feels urgent at once",
           "href": "/guides/paths/push-forward-or-sort-first",
-          "ctaLabel": "See preparation order →"
+          "ctaLabel": "Find a starting point →"
         },
         {
-          "title": "Too much information, more confused than ever",
-          "desc": "There's a lot online, but you don't know what applies to you",
+          "title": "More research, more confused",
+          "desc": "There's a lot online, but none of it seems to fit your situation",
           "href": "/guides/paths/four-preparation-paths",
-          "ctaLabel": "See how to decide →"
+          "ctaLabel": "See how to filter what matters →"
         },
         {
-          "title": "Want to ask for help, but don't know how",
-          "desc": "You have so many questions that you don't know where to begin",
+          "title": "Not sure who to turn to",
+          "desc": "The questions pile up, and it's hard to know where to even start asking",
           "href": "/guides/problems/goal-unclear-kills-consulting",
-          "ctaLabel": "See how to organize →"
+          "ctaLabel": "See how we help →"
         },
         {
-          "title": "Unfamiliar with Japan's job market rhythm",
-          "desc": "Not sure about hiring cycles, resume requirements, or preparation order",
+          "title": "The rules here feel different",
+          "desc": "Hiring timelines, resume formats, application customs — Japan has its own way of doing things",
           "href": "/guides/paths/job-prep-cluster-entry",
-          "ctaLabel": "See job prep timeline →"
+          "ctaLabel": "See the job prep timeline →"
         }
       ],
       "relatedLink": "Related Content"
     },
     "postSubmit": {
-      "title": "What happens after you submit?",
-      "subtitle": "You don't need to decide whether to consult right away. First, write down your current situation, goals, and concerns — we'll help organize them and determine where to begin.",
+      "title": "Here's how it works",
+      "subtitle": "Start by describing where you are. We'll help you see what's actually going on — and what to do next.",
       "steps": [
         {
-          "label": "Share your situation",
+          "label": "Describe your situation",
           "desc": "Describe your Japanese level, experience, goals, and concerns"
         },
         {
-          "label": "Organize the issues",
+          "label": "We map the picture",
           "desc": "We break your input into actionable directions"
         },
         {
-          "label": "Prioritize",
+          "label": "Find what matters",
           "desc": "Determine what to tackle first"
         },
         {
-          "label": "Decide next steps",
+          "label": "See a clear path forward",
           "desc": "Move into deeper sorting or consultation when ready"
         }
       ],
