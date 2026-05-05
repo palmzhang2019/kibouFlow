@@ -37,23 +37,27 @@
   },
   "home": {
     "hero": {
-      "title": "Not sure where to start with your career in Japan?\nLet's sort it out.",
-      "subtitle": "Tell us where you are — Japanese level, experience, goals, and blockers.\nWe'll organize your situation and point you toward the first real next step.",
+      "title": "Building your career in Japan?\nLet's sort out where to start.",
+      "subtitle": "Not sure whether to study Japanese, prepare your resume, or start applying? kibouFlow helps you organize your current situation and figure out the right first step.",
       "ctaPrimary": "Start Free Assessment →",
       "ctaSecondary": "Learn About Partnerships",
-      "ctaAssistant": "Free initial assessment · Takes ~3 minutes · No registration required"
+      "ctaAssistant": "Free · Takes ~3 minutes · No registration required"
     },
     "heroPathCard": {
       "label": "Example",
       "title": "Assessment Preview",
-      "blockersLabel": "Current blockers",
-      "blockers": [
-        "Japanese priority is unclear",
-        "Resume materials are not ready",
-        "Job-search direction is not yet defined"
-      ],
-      "nextStepLabel": "Recommended next step",
-      "nextStepContent": "Start by organizing your resume materials, then decide whether Japanese is the real blocker before applying or consulting.",
+      "currentIssues": {
+        "title": "Current blockers",
+        "items": [
+          "· Japanese study priority is unclear",
+          "· Resume materials are not ready",
+          "· Job-search direction not yet defined"
+        ]
+      },
+      "nextStep": {
+        "title": "Recommended next step",
+        "content": "Start by organizing your resume materials, then decide whether Japanese is the real blocker before applying or consulting."
+      },
       "footer": "Example preview · Your result will be organized based on your input"
     },
     "problems": {
@@ -185,8 +189,8 @@
     },
     "bottomCta": {
       "title": "Start by sorting out your current situation",
-      "subtitle": "You don't need to decide everything at once. Submit your current situation first, then we'll help determine where to begin.",
-      "assistant": "No registration · Free submission · Chinese, Japanese & English support"
+      "subtitle": "You don't need to decide everything at once. Share where you are, and we'll help you find the first real step.",
+      "assistant": "Free · No registration · Chinese, Japanese & English supported"
     }
   },
   "trial": {

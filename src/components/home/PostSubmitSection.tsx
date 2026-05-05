@@ -1,5 +1,4 @@
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
 import { Section } from "@/components/shared/Section";
 import { Card } from "@/components/shared/Card";
 
@@ -16,8 +15,6 @@ export function PostSubmitSection() {
     content: t(`cards.${i}.content`),
   }));
 
-  const continueOptions = t.raw("continueOptions.items") as string[];
-
   return (
     <Section bg="muted" className="!py-6">
       <h2 className="text-2xl sm:text-3xl font-bold text-center">{t("title")}</h2>
@@ -27,11 +24,11 @@ export function PostSubmitSection() {
       <div className="mt-10 flex flex-col md:flex-row items-start md:items-center justify-center gap-6 md:gap-0">
         {steps.map((step, i) => (
           <div key={i} className="flex items-center gap-4 md:gap-0">
-            <div className="flex flex-col items-center text-center min-w-[120px]">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white font-bold text-lg">
+            <div className="flex flex-col items-center text-center min-w-[120px] min-h-[88px]">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white font-bold text-lg flex-shrink-0">
                 {i + 1}
               </div>
-              <p className="mt-3 text-sm font-semibold text-foreground leading-tight max-w-[140px]">
+              <p className="mt-3 text-sm font-semibold text-foreground leading-tight max-w-[140px] min-h-[2.5rem] flex items-start justify-center">
                 {step.label}
               </p>
             </div>
@@ -61,59 +58,6 @@ export function PostSubmitSection() {
         ))}
       </div>
 
-      {/* Continue options */}
-      <div className="mt-8">
-        <div className="max-w-3xl mx-auto rounded-2xl border border-slate-200 bg-white/70 px-5 py-4 shadow-sm">
-          <p className="text-sm text-slate-600 mb-4 text-center">{t("continueOptions.title")}</p>
-          <div className="flex flex-wrap justify-center gap-3">
-            {continueOptions.map((option, i) => {
-              const isPrimary = i === 1;
-              const isSecondary = i === 2;
-              if (isPrimary) {
-                return (
-                  <Link
-                    key={i}
-                    href="/trial"
-                    className="inline-flex items-center px-5 py-2 rounded-full text-sm font-medium bg-primary text-white hover:bg-primary/90 transition-colors shadow-sm"
-                  >
-                    {option}
-                  </Link>
-                );
-              }
-              if (isSecondary) {
-                return (
-                  <Link
-                    key={i}
-                    href="/partner"
-                    className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-white border border-gray-200 text-foreground hover:bg-gray-50 hover:border-gray-300 transition-colors"
-                  >
-                    {option}
-                  </Link>
-                );
-              }
-              if (i === 3) {
-                return (
-                  <Link
-                    key={i}
-                    href="/partner"
-                    className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gray-50 border border-gray-100 text-slate-500 hover:bg-gray-100 hover:border-gray-200 transition-colors"
-                  >
-                    {option}
-                  </Link>
-                );
-              }
-              return (
-                <span
-                  key={i}
-                  className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-muted"
-                >
-                  {option}
-                </span>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    </Section>
+      </Section>
   );
 }

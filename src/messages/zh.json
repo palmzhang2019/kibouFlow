@@ -62,6 +62,7 @@
     },
     "problems": {
       "title": "你是否也卡在这些地方？",
+      "subtitle": "以下是来到 kibouFlow 的用户最常提到的困惑",
       "items": [
         {
           "title": "不知道先做什么",
@@ -88,8 +89,7 @@
           "ctaLabel": "看求职准备节奏 →"
         }
       ],
-      "relatedLink": "相关内容",
-      "subtitle": "以下是来到 kibouFlow 的用户最常提到的困惑"
+      "relatedLink": "相关内容"
     },
     "postSubmit": {
       "title": "提交之后，会怎么整理？",

@@ -26,19 +26,20 @@ export function ProblemSection() {
       {t.raw("subtitle") && (
         <p className="mt-2 text-sm text-slate-500 text-center">{t("subtitle")}</p>
       )}
-      <div className="mt-10 grid gap-6 sm:grid-cols-2">
+      {/* 关键修复：grid auto-rows-fr 让同一行的卡片严格等高，避免日语版第 4 卡因内容少而出现“浮起”错觉 */}
+      <div className="mt-10 grid gap-6 sm:grid-cols-2 auto-rows-fr">
         {items.map((item, i) => (
           <Link
             key={i}
             href={item.href}
-            className="group block rounded-xl border border-gray-100 bg-white shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all duration-200"
+            className="group flex h-full rounded-xl border border-gray-100 bg-white shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all duration-200"
           >
-            <Card className="!bg-transparent hover:!bg-white">
-              <div className="flex items-start gap-4">
+            <Card className="!bg-transparent hover:!bg-white !border-0 !shadow-none w-full h-full flex">
+              <div className="flex items-start gap-4 w-full">
                 <div className="shrink-0">{icons[i]}</div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-lg">{item.title}</h3>
-                  <p className="mt-1 text-sm text-muted">{item.desc}</p>
+                <div className="flex-1 flex flex-col">
+                  <h3 className="font-semibold text-lg leading-snug">{item.title}</h3>
+                  <p className="mt-1 text-sm text-muted leading-relaxed">{item.desc}</p>
                   <p className="mt-3 text-xs text-primary font-medium group-hover:underline">
                     {item.ctaLabel}
                   </p>

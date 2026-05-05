@@ -8,12 +8,13 @@ export function HeroPathCard() {
   const locale = useLocale();
   const isEnglish = locale === "en";
 
+  // /en 使用与 zh/ja 完全一致的结构，只是 key 名称不同
   if (isEnglish) {
-    const blockers = t.raw("blockers") as string[];
+    const currentIssues = t.raw("currentIssues.items") as string[];
     return (
       <div className="flex flex-col justify-center items-center">
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 overflow-hidden max-w-sm mx-auto w-full">
-          {/* Header */}
+          {/* Header — 与 zh/ja 完全一致：小标签 + 正常粗体标题，无装饰符 */}
           <div className="px-6 pt-6 pb-4">
             <div className="flex items-center gap-2 mb-2">
               <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
@@ -25,13 +26,13 @@ export function HeroPathCard() {
             </h3>
           </div>
 
-          {/* Current blockers */}
+          {/* Current Issues — 与 zh/ja 结构一致 */}
           <div className="px-6 pb-4">
             <p className="text-sm font-medium text-slate-600 mb-2">
-              {t("blockersLabel")}
+              {t("currentIssues.title")}
             </p>
             <ul className="space-y-1.5 bg-gray-50 rounded-lg border border-gray-100 px-4 py-3">
-              {blockers.map((item, i) => (
+              {currentIssues.map((item, i) => (
                 <li key={i} className="text-[13px] text-foreground leading-relaxed">
                   {item}
                 </li>
@@ -39,14 +40,14 @@ export function HeroPathCard() {
             </ul>
           </div>
 
-          {/* Recommended next step */}
+          {/* Next Step — 与 zh/ja 结构一致 */}
           <div className="px-6 pb-4">
             <div className="bg-[#EBF3FF] rounded-xl px-4 py-3">
               <p className="text-sm font-semibold text-blue-800 mb-1">
-                {t("nextStepLabel")}
+                {t("nextStep.title")}
               </p>
               <p className="text-[13px] text-blue-900 leading-relaxed">
-                {t("nextStepContent")}
+                {t("nextStep.content")}
               </p>
             </div>
           </div>
@@ -62,7 +63,7 @@ export function HeroPathCard() {
     );
   }
 
-  // Legacy layout for zh / ja
+  // zh / ja 原有布局保持不变
   const currentIssues = t.raw("currentIssues.items") as string[];
   return (
     <div className="hidden lg:flex flex-col justify-center items-center">
