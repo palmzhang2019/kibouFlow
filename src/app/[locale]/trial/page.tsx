@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Section } from "@/components/shared/Section";
 import { TrialForm } from "@/components/forms/TrialForm";
+import { TrialPageTracking } from "@/components/tracking/TrialPageTracking";
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 import { buildBreadcrumbItems } from "@/lib/seo/breadcrumbs";
 import { resolveGeoMetadata } from "@/lib/geo-settings";
@@ -52,6 +53,7 @@ export default async function TrialPage({ params }: { params: Promise<{ locale: 
 
   return (
     <>
+      <TrialPageTracking locale={locale} />
       <BreadcrumbJsonLd items={crumbs} id="jsonld-breadcrumb-trial" />
       <Section className="pt-8 pb-4 sm:pt-10 sm:pb-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-6 items-start">

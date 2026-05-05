@@ -552,6 +552,20 @@
       "subtitle": "You don't need to have it all figured out — just start by sharing where you are"
     }
   },
+  "shareBox": {
+    "label": "Share",
+    "title": "Found this useful?",
+    "description": "You can share it with someone facing a similar question.",
+    "buttons": {
+      "copyLink": "Copy link",
+      "shareX": "Share on X",
+      "copyText": "Copy share text"
+    },
+    "toast": {
+      "copied": "Copied",
+      "copyFailed": "Copy failed"
+    }
+  },
   "metadata": {
     "home": {
       "title": "Building your career in Japan? Start by sorting your direction | kibouFlow",

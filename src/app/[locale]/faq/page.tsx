@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Section } from "@/components/shared/Section";
 import { FAQQuestionGroup } from "@/components/faq/FAQQuestionGroup";
+import { ShareBox } from "@/components/shared/ShareBox";
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { buildBreadcrumbItems } from "@/lib/seo/breadcrumbs";
@@ -152,6 +153,13 @@ export default async function FAQPage({ params }: { params: Promise<{ locale: st
             ))}
           </div>
         </div>
+
+        <ShareBox
+          locale={locale}
+          contentType="faq_index"
+          title="FAQ"
+          shareSource="faq_bottom"
+        />
       </Section>
     </>
   );

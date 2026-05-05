@@ -552,6 +552,20 @@
       "subtitle": "一度に全部考える必要はありません。まず現状を教えてください"
     }
   },
+  "shareBox": {
+    "label": "シェア",
+    "title": "この記事が役に立ちそうですか？",
+    "description": "同じように悩んでいる人に共有できます。",
+    "buttons": {
+      "copyLink": "リンクをコピー",
+      "shareX": "Xで共有",
+      "copyText": "共有文をコピー"
+    },
+    "toast": {
+      "copied": "コピーしました",
+      "copyFailed": "コピーに失敗しました"
+    }
+  },
   "metadata": {
     "home": {
       "title": "日本での発展、まず希望を整理しよう | kibouFlow",

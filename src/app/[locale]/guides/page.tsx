@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Section } from "@/components/shared/Section";
 import { ArticleCard } from "@/components/article/ArticleCard";
+import { ShareBox } from "@/components/shared/ShareBox";
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 import { buildBreadcrumbItems } from "@/lib/seo/breadcrumbs";
 import {
@@ -215,6 +216,15 @@ export default async function GuidesIndexPage({
               </div>
             </div>
           ))}
+        </div>
+
+        <div className="mt-16">
+          <ShareBox
+            locale={locale}
+            contentType="guides_index"
+            title={t("title")}
+            shareSource="guides_bottom"
+          />
         </div>
       </Section>
     </>

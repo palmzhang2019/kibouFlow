@@ -66,13 +66,14 @@ export type TrackingEventRow = {
   session_id: string | null;
   locale: string | null;
   user_agent: string | null;
+  extra?: Record<string, unknown>;
 };
 
 export async function insertTrackingEvent(event: TrackingEventRow): Promise<void> {
   const sql = getPg();
   if (!sql) return;
   try {
-    await sql`insert into tracking_events ${sql(event)}`;
+    await sql`insert into tracking_events ${sql(event as unknown as Record<string, unknown>)}`;
   } catch {
     // 与旧实现一致：埋点失败不抛给客户端
   }

@@ -9,6 +9,7 @@ export interface TrackingEvent {
   session_id: string;
   locale: string;
   user_agent: string;
+  [key: string]: unknown;
 }
 
 export function sendTrackingEvent(event: TrackingEvent) {
@@ -16,7 +17,7 @@ export function sendTrackingEvent(event: TrackingEvent) {
   const body = JSON.stringify(event);
 
   if (typeof navigator !== "undefined" && navigator.sendBeacon) {
-    navigator.sendBeacon(url, body);
+    navigator.sendBeacon(url, new Blob([body], { type: "application/json" }));
   } else {
     fetch(url, {
       method: "POST",

@@ -552,6 +552,20 @@
       "subtitle": "不需要一次想清楚，先把现状说出来就好"
     }
   },
+  "shareBox": {
+    "label": "分享",
+    "title": "觉得这篇有用？",
+    "description": "可以复制链接，发给正在纠结类似问题的人。",
+    "buttons": {
+      "copyLink": "复制链接",
+      "shareX": "分享到 X",
+      "copyText": "复制分享文案"
+    },
+    "toast": {
+      "copied": "已复制",
+      "copyFailed": "复制失败"
+    }
+  },
   "metadata": {
     "home": {
       "title": "在日本发展，先把方向整理清楚 | kibouFlow",

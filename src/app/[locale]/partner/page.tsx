@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { Section } from "@/components/shared/Section";
 import { Card } from "@/components/shared/Card";
 import { PartnerForm } from "@/components/forms/PartnerForm";
+import { PartnerPageTracking } from "@/components/tracking/PartnerPageTracking";
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 import { buildBreadcrumbItems } from "@/lib/seo/breadcrumbs";
 import { resolveGeoMetadata } from "@/lib/geo-settings";
@@ -72,6 +73,7 @@ export default async function PartnerPage({ params }: { params: Promise<{ locale
 
   return (
     <>
+      <PartnerPageTracking locale={locale} />
       <BreadcrumbJsonLd items={crumbs} id="jsonld-breadcrumb-partner" />
       {/* Header */}
       <Section>

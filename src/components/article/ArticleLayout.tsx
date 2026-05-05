@@ -16,6 +16,7 @@ import { ArticleCTA } from "./ArticleCTA";
 import { ArticleConclusion } from "./ArticleConclusion";
 import { RelatedArticles } from "./RelatedArticles";
 import { TableOfContents } from "./TableOfContents";
+import { ShareBox } from "@/components/shared/ShareBox";
 
 const categoryColors: Record<Category, string> = {
   problems: "bg-amber-100 text-amber-800",
@@ -374,6 +375,7 @@ export function ArticleLayout({
             <ArticleCTA
               ctaType={article.ctaType}
               articleSlug={`${article.category}/${article.slug}`}
+              articleCategory={article.category}
             />
 
             <RelatedArticles articles={relatedArticles} />
@@ -402,6 +404,15 @@ export function ArticleLayout({
                 {t("backToGuides")}
               </Link>
             </div>
+
+            <ShareBox
+              locale={article.locale}
+              contentType={article.contentType ?? "article"}
+              title={article.title}
+              shareSource="article_bottom"
+              articleSlug={article.slug}
+              articleCategory={article.category}
+            />
           </div>
 
           <aside className="hidden w-56 flex-shrink-0 lg:block">
