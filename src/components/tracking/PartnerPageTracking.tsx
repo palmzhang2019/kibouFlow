@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { sendTrackingEvent } from "@/lib/tracking";
-import { trackGaEvent } from "@/lib/ga";
+import { trackGaEventWhenReady } from "@/lib/ga";
 import { PAGE_VIEW_EVENTS } from "@/lib/tracking-events";
 import { getOrCreateSessionId } from "@/lib/utm";
 
@@ -25,9 +25,10 @@ export function PartnerPageTracking({ locale }: PageTrackingProps) {
     const eventName = PAGE_VIEW_EVENTS.PARTNER_PAGE_VIEW;
     const event = buildEvent(eventName, locale);
     sendTrackingEvent(event);
-    trackGaEvent(eventName, {
+    trackGaEventWhenReady(eventName, {
       page_path: event.page_path,
       locale,
+      page_type: "partner",
     });
   }, [locale]);
 
